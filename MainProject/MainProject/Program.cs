@@ -1,13 +1,12 @@
-﻿/* Main for Fixed Radius 3d-optimization */
-// Message of ipopt Errors: https://www.coin-or.org/Ipopt/documentation/node36.html
-
+﻿using Cureos.Numerics;
+using hs071_cs;
 using System;
 using System.Diagnostics;
 using System.Threading;
 using TestProblemIpOpt.Helpers;
 using TestProblemIpOpt.Interfaces;
 
-namespace hs071_cs
+namespace MainProject
 {
     #region Delegates
 
