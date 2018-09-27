@@ -1,0 +1,6 @@
+/.vs
+/build
+/TestProblemIpOpt/bin
+/TestProblemIpOpt/obj
+/Cureos.Numerics/Cureos.Numerics/bin
+/Cureos.Numerics/Cureos.Numerics/obj
