@@ -232,12 +232,12 @@ namespace hs071_cs
 
         public override bool Eval_g(int n, double[] x, bool new_x, int m, double[] g)
         {
-            int kk = 0;
+            int counter = 0;//counter
             // (R-r[i])^2 - x[i]^2 - y[i]^2 - z^2 >= 0
             // from 0 to count-1
             Parallel.For(0, countCircles, i =>
             {
-                g[kk++] = Math.Pow((x[_n - 1] - radius[i]), 2) -
+                g[counter++] = Math.Pow((x[_n - 1] - radius[i]), 2) -
                     x[3 * i] * x[3 * i] -          // x
                     x[3 * i + 1] * x[3 * i + 1] -  // y
                     x[3 * i + 2] * x[3 * i + 2];   // z
@@ -250,7 +250,7 @@ namespace hs071_cs
             {
                 for (int j = i + 1; j < countCircles; j++)
                 {
-                    g[kk++] = Math.Pow((x[3 * i] - x[3 * j]), 2.0)
+                    g[counter++] = Math.Pow((x[3 * i] - x[3 * j]), 2.0)
                                   + Math.Pow((x[3 * i + 1] - x[3 * j + 1]), 2.0)
                                   + Math.Pow((x[3 * i + 2] - x[3 * j + 2]), 2.0)
                                   - Math.Pow((radius[i] - radius[j]), 2.0);
@@ -268,7 +268,7 @@ namespace hs071_cs
         {
             if (values == null)
             {
-                int kk = 0,
+                int counter = 0,//counter
                     g = 0;
 
                 // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
@@ -276,20 +276,20 @@ namespace hs071_cs
                 for (g = 0; g < countCircles; ++g)
                 {
                     //R0 -> внешний шар 
-                    iRow[kk] = g;
-                    jCol[kk++] = _n - 1;
+                    iRow[counter] = g;
+                    jCol[counter++] = _n - 1;
 
                     //X
-                    iRow[kk] = g;
-                    jCol[kk++] = 3 * g;
+                    iRow[counter] = g;
+                    jCol[counter++] = 3 * g;
 
                     //Y
-                    iRow[kk] = g;
-                    jCol[kk++] = 3 * g + 1;
+                    iRow[counter] = g;
+                    jCol[counter++] = 3 * g + 1;
 
                     //Z
-                    iRow[kk] = g;
-                    jCol[kk++] = 3 * g + 2;
+                    iRow[counter] = g;
+                    jCol[counter++] = 3 * g + 2;
                 }
 
                 // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
@@ -298,22 +298,22 @@ namespace hs071_cs
                     for (int j = i + 1; j < countCircles; ++j)
                     {
                         // -------  X[i], X[j] ------- 
-                        iRow[kk] = g;
-                        jCol[kk++] = 3 * i;
-                        iRow[kk] = g;
-                        jCol[kk++] = 3 * j;
+                        iRow[counter] = g;
+                        jCol[counter++] = 3 * i;
+                        iRow[counter] = g;
+                        jCol[counter++] = 3 * j;
 
                         // -------  Y[i], Y[j] ------- 
-                        iRow[kk] = g; ;
-                        jCol[kk++] = 3 * i + 1;
-                        iRow[kk] = g;
-                        jCol[kk++] = 3 * j + 1;
+                        iRow[counter] = g; ;
+                        jCol[counter++] = 3 * i + 1;
+                        iRow[counter] = g;
+                        jCol[counter++] = 3 * j + 1;
 
                         // -------  Z[i], Z[j] ------- 
-                        iRow[kk] = g;
-                        jCol[kk++] = 3 * i + 2;
-                        iRow[kk] = g;
-                        jCol[kk++] = 3 * j + 2;
+                        iRow[counter] = g;
+                        jCol[counter++] = 3 * i + 2;
+                        iRow[counter] = g;
+                        jCol[counter++] = 3 * j + 2;
 
                         ++g;
                     }
@@ -339,17 +339,17 @@ namespace hs071_cs
             else
             {
                 // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
-                int kk = 0;
+                int counter = 0;//counter kk
                 for (int i = 0; i < countCircles; i++)// шаг по Z это каждый третий эл
                 {
-                    values[kk] = 2.0 * (x[_n - 1] - radius[i]); // R0'
-                    kk++;
-                    values[kk] = -2.0 * x[3 * i]; //X'
-                    kk++;
-                    values[kk] = -2.0 * x[3 * i + 1]; //Y'
-                    kk++;
-                    values[kk] = -2.0 * x[3 * i + 2]; //Z'
-                    kk++;
+                    values[counter] = 2.0 * (x[_n - 1] - radius[i]); // R0'
+                    counter++;
+                    values[counter] = -2.0 * x[3 * i]; //X'
+                    counter++;
+                    values[counter] = -2.0 * x[3 * i + 1]; //Y'
+                    counter++;
+                    values[counter] = -2.0 * x[3 * i + 2]; //Z'
+                    counter++;
                 }
                 // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
                 //  Console.WriteLine("---------------------------------------");
@@ -358,14 +358,14 @@ namespace hs071_cs
                 {
                     for (int j = i + 1; j < countCircles; j++)
                     {
-                        values[kk++] = 2.0 * (x[3 * i] - x[3 * j]); //X[i]'
-                        values[kk++] = -2.0 * (x[3 * i] - x[3 * j]); //X[j]'
+                        values[counter++] = 2.0 * (x[3 * i] - x[3 * j]); //X[i]'
+                        values[counter++] = -2.0 * (x[3 * i] - x[3 * j]); //X[j]'
 
-                        values[kk++] = 2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[i]'
-                        values[kk++] = -2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[j]'
+                        values[counter++] = 2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[i]'
+                        values[counter++] = -2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[j]'
 
-                        values[kk++] = 2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[i]'
-                        values[kk++] = -2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[j]'
+                        values[counter++] = 2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[i]'
+                        values[counter++] = -2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[j]'
                     }
                 }
 
