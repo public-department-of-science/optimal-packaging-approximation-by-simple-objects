@@ -49,7 +49,7 @@ namespace hs071_cs
             C = new double[objectCount, objectCount];
         }
 
-        public Data(int[] amountOfSpheresInEachComplexObject, double[] x, double[] y, double[] z, double[] r, IContainer container, int objectsCount, int holesCount, CircularObjectType[] type = null, double[,] C = null) : this(objectsCount)
+        public Data(int[] amountOfSpheresInEachComplexObject, double[] x, double[] y, double[] z, double[] r, IContainer container, int objectsCount, int holesCount, ObjectType[] type = null, double[,] C = null) : this(objectsCount)
         {
             AmountOfObjectsInEachComplexObject = amountOfSpheresInEachComplexObject ?? throw new ArgumentNullException("AmountOfSpheresInEachComplexObject", "Argument is null!!");
             this.objectsCount = objectsCount;
@@ -68,7 +68,7 @@ namespace hs071_cs
                 int v = (j + AmountOfObjectsInEachComplexObject[i]);
                 for (; j < v; j++)
                 {
-                    Objects[i].ListWithObjects.Add(new Object(x[j], y[j], z[j], r[j], CircularObjectType.Sphere));
+                    Objects[i].ListWithObjects.Add(new Object(x[j], y[j], z[j], r[j], ObjectType.Sphere));
                 }
 
                 Objects[i].ComputeDistance();

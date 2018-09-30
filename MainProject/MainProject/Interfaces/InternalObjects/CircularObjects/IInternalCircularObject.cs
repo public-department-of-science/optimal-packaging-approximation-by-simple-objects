@@ -1,6 +1,6 @@
 ﻿namespace PackegeProject.Interfaces
 {
-    internal interface IInternalCircularObject
+    public interface IInternalCircularObject
     {
         double Radius { get; set; }
     }

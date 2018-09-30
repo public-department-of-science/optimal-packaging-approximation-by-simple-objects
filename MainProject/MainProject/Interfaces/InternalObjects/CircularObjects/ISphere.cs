@@ -1,6 +1,6 @@
 ﻿namespace PackegeProject.Interfaces
 {
-    internal interface ISphere : IInternalCircularObject, IInternalObject
+    public interface ISphere : IInternalCircularObject, IInternalObject
     {
     }
 }

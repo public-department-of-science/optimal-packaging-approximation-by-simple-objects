@@ -1,29 +1,22 @@
-﻿using System;
+﻿using PackegeProject.Interfaces;
+using PackegeProject.InternalObjectsClasses.CircularObjects;
 using static TestProblemIpOpt.Enums;
 
 namespace hs071_cs
 {
     public class Object
     {
-        public double X { get; set; }
-        public double Y { get; set; }
-        public double Z { get; set; }
-        public double R { get; set; }
-        public double Weight { get => Weight; private set => Weight = (4.0 / 3 * Math.PI * Math.Pow(R, 3.0)); }
-        public CircularObjectType ObjectType { get; set; }
+        public IInternalObject InternalObject { get; set; }
 
         public Object()
         {
-            ObjectType = 0;
+            InternalObject = new Sphere();
         }
 
-        public Object(double x, double y, double z, double r, CircularObjectType objectType)
+        public Object(IInternalObject internalObject, ObjectType objectType)
         {
-            X = x;
-            Y = y;
-            Z = z;
-            R = r;
-            ObjectType = objectType;
+            InternalObject = internalObject;
+            InternalObject.ObjectType = objectType;
         }
     }
 }
