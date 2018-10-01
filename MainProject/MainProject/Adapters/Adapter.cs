@@ -41,20 +41,20 @@ namespace hs071_cs
         /// <param name="data"></param>
         public Adapter(Data data)
         {
-            AllIteration = new List<double[]>();
-            container = data.Container;
-            countObjects = data.AmountOfObjectsInEachComplexObject.Sum();
+            //AllIteration = new List<double[]>();
+            //container = data.Container;
+            //countObjects = data.AmountOfObjectsInEachComplexObject.Sum();
 
-            _n = countObjects * 3 + 1; // количество переменных в векторе
-            radius = new double[countObjects];
-            int q = 0;
-            for (int i = 0; i < data.Objects.Length; i++)
-            {
-                for (int j = 0; j < data.Objects[i].ListWithObjects.Count; j++)
-                {
-                    radius[q++] = data.Objects[i].ListWithObjects[j].R;
-                }
-            }
+            //_n = countObjects * 3 + 1; // количество переменных в векторе
+            //radius = new double[countObjects];
+            //int q = 0;
+            //for (int i = 0; i < data.Objects.Length; i++)
+            //{
+            //    for (int j = 0; j < data.Objects[i].ListWithObjects.Count; j++)
+            //    {
+            //        //radius[q++] = data.Objects[i].ListWithObjects[j].R;
+            //    }
+            //}
 
             /*    Ограничения переменных
             * *************************************************************************************/

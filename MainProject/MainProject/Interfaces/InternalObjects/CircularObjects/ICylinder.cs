@@ -2,7 +2,7 @@
 
 namespace PackegeProject.Interfaces
 {
-    internal interface ICylinder : IInternalCircularObject, IInternalObject
+    internal interface ICylinder : IObjectHasCircleInStructure, IInternalObject
     {
         Point LowerBaseCenter { get; set; }
 

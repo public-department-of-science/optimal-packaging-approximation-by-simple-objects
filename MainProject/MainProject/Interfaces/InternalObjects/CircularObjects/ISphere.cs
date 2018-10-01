@@ -1,6 +1,9 @@
-﻿namespace PackegeProject.Interfaces
+﻿using MainProject.Interfaces.InternalObjects.CircularObjects;
+using System.Drawing;
+
+namespace PackegeProject.Interfaces
 {
-    public interface ISphere : IInternalCircularObject, IInternalObject
+    public interface ISphere : IObjectHasCircleInStructure, IInternalObject, ICircularObject
     {
     }
 }

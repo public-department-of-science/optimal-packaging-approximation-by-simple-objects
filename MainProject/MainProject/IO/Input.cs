@@ -77,19 +77,18 @@ namespace hs071_cs
         }
 
         //Type Reading data
-        public static void ChooseTypeReadingData(out int[] amountOfObjectsInEachComplexObject, out int TotalBallCount, out int holesCount, out double[] xNach, out double[] yNach, out double[] zNach, out double[] rNach, out double RNach, out double maxRandRadius, out double[] rSortSum)
+        public static void ChooseTypeReadingData(out int[] amountOfObjectsInEachComplexObject, out int TotalBallCount, out double[] xNach, out double[] yNach, out double[] zNach, out double[] rNach, out double RNach, out double maxRandRadius, out double[] rSortSum)
         {
             xNach = new double[ObjectsCount];
             yNach = new double[ObjectsCount];
             zNach = new double[ObjectsCount];
             rNach = new double[ObjectsCount];
             TotalBallCount = 0;
-            holesCount = 0;
             RNach = 0;
             maxRandRadius = 0;
             rSortSum = new double[ObjectsCount];
 
-            TypeOFReadingData(out amountOfObjectsInEachComplexObject, ref TotalBallCount, ref holesCount, ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref maxRandRadius, ref rSortSum);
+            TypeOFReadingData(out amountOfObjectsInEachComplexObject, ref TotalBallCount, ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref maxRandRadius, ref rSortSum);
         }
 
         public static void ChooseTypeOfContainer(out IContainer container, double rNach)
@@ -108,7 +107,7 @@ namespace hs071_cs
             }
         }
 
-        private static void TypeOFReadingData(out int[] amountOfObjectsInEachComplexObject, ref int TotalBallCount, ref int holesCount, ref double[] xNach, ref double[] yNach,
+        private static void TypeOFReadingData(out int[] amountOfObjectsInEachComplexObject, ref int TotalBallCount, ref double[] xNach, ref double[] yNach,
             ref double[] zNach, ref double[] rNach, ref double RNach, ref double maxRandRadius, ref double[] rSortSum)
         {
             amountOfObjectsInEachComplexObject = null;
@@ -128,15 +127,13 @@ namespace hs071_cs
                 case 1:
                     try
                     {
-                        ReadFromFile(out amountOfObjectsInEachComplexObject, ref xNach, ref yNach, ref zNach,
-                            ref rNach, ref RNach, ref TotalBallCount, ref holesCount, "ChangedCoordinateWithHoles");
-                        rSortSum = new RadiusSumGenerateDel(raSumGenerate)(rNach); // отсортированные радиусы r[0]; r[0] + r[1];
+                        ReadFromFile(out amountOfObjectsInEachComplexObject, ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref TotalBallCount, "ChangedCoordinateWithHoles");
+                        rSortSum = raSumGenerate(rNach); // отсортированные радиусы r[0]; r[0] + r[1];
                     }
                     catch (IOException exIO)
                     {
                         OutPut.WriteLine(string.Format(" Объект вызвавший ошибку {0}, вознuкшая ошибка - {1}  ", exIO.Source, exIO.Message));
                         TotalBallCount = 1;
-                        holesCount = 0;
                         maxRandRadius = 0;
                     }
                     break;
@@ -145,23 +142,20 @@ namespace hs071_cs
                     {
 
                         SetIntegerValue(ref TotalBallCount, "Total balls count"); // кол шаров всего
-                        SetIntegerValue(ref holesCount, "Holes count"); // количество дыр
                         SetDoubleValue(ref maxRandRadius, "Max radius"); // радиус
 
                         NumberLessOrEqualZero(TotalBallCount);
-                        NumberLessOrEqualZero(holesCount);
                         NumberLessOrEqualZero(maxRandRadius);
                     }
                     catch (Exception ex)
                     {
                         PrintError("\nError -> {0}" + ex.Message);
                         TotalBallCount = 1;
-                        holesCount = 0;
                         maxRandRadius = 0;
                     }
-                    rNach = new RadiusRandomGenerate(RadiusRandomGenerate)(maxRandRadius, TotalBallCount); //"~~~ Генерирования случайными числами начальных радиусов ~~~
-                    rSortSum = new RadiusSumGenerateDel(raSumGenerate)(rNach); // отсортированные радиусы r[0]; r[0] + r[1];
-                    new XYZRGenerateDel(XyzRRandomGenerateAvg)(TotalBallCount, rNach, out xNach, out yNach, out zNach, out RNach); // генерируем начальные точки x,y,r,R
+                    rNach = RadiusRandomGenerate(maxRandRadius, TotalBallCount); //"~~~ Генерирования случайными числами начальных радиусов ~~~
+                    rSortSum = raSumGenerate(rNach); // отсортированные радиусы r[0]; r[0] + r[1];
+                    XyzRRandomGenerateAvg(TotalBallCount, rNach, out xNach, out yNach, out zNach, out RNach); // генерируем начальные точки x,y,r,R
                     break;
                 default:
                     break;
@@ -264,14 +258,12 @@ namespace hs071_cs
         }
 
         // Reading from file while end (x, y, z, r, R)
-        public static void ReadFromFile(out int[] amountOfObjectsInEachComplexObject, ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R,
-            ref int TotalBallCount, ref int holesCount, string fileName)
+        public static void ReadFromFile(out int[] amountOfObjectsInEachComplexObject, ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalBallCount, string fileName)
         {
-            ReadDataFromFile(out amountOfObjectsInEachComplexObject, ref x, ref y, ref z, ref r, ref R, ref TotalBallCount, ref holesCount, fileName);
+            ReadDataFromFile(out amountOfObjectsInEachComplexObject, ref x, ref y, ref z, ref r, ref R, ref TotalBallCount, fileName);
         }
 
-        private static void ReadDataFromFile(out int[] amountOfObjectsInEachComplexObject, ref double[] x, ref double[] y, ref double[] z,
-            ref double[] r, ref double R, ref int TotalBallCount, ref int holesCount, string fileName)
+        private static void ReadDataFromFile(out int[] amountOfObjectsInEachComplexObject, ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalBallCount, string fileName)
         {
             try
             {
@@ -299,8 +291,7 @@ namespace hs071_cs
 
                     string[] arrayOfLines = allReadedSymbols.Split(';');
                     TotalBallCount = ObjectsCount = i - 1;// first
-                    holesCount = Convert.ToInt32(arrayOfLines[0].Split(' ')[0].Trim()); //  amount holes
-                    R = Convert.ToDouble(arrayOfLines[0].Split(' ')[4].Replace('.', ',').Trim()); // external radius
+                    R = Convert.ToDouble(arrayOfLines[0].Split(' ')[3].Replace('.', ',').Trim()); // external radius
 
                     // check demention
                     if ((i - 1) != TotalBallCount) /// (i-2)

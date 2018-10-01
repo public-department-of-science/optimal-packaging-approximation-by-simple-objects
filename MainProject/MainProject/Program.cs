@@ -1,6 +1,9 @@
 ﻿using Cureos.Numerics;
 using hs071_cs;
+using MainProject.InternalObjectsClasses.CircularObjects;
+using PackegeProject.InternalObjectsClasses.CircularObjects;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
 using TestProblemIpOpt.Helpers;
@@ -10,19 +13,17 @@ namespace MainProject
 {
     #region Delegates
 
-    // outPut Delegates
-    public delegate void PrintTextDel(string message); // делегат для вывода информации
-    public delegate void PrintErrorMessageDel(string message); // делегат для вывода информации об ошибке
-    public delegate void ShowResultDel(Data data); // делегат для вывода информации об ошибке
-    public delegate void WriteResultToFileDel(Data data, string fileName); // делегат для вывода информации в файл
-    public delegate void PrintResultCodeDel(string codeResult); // делегат для вывода информации о решении
+    /// <summary>
+    /// Console print delegate
+    /// </summary>
+    /// <param name="message">Text message</param>
+    public delegate void PrintTextDel(string message);
 
-    // Input Delegates
-    public delegate void ReadResultFromFileDel(ref double[] xNach, ref double[] yNach, ref double[] zNach, ref double[] rNach,
-        ref double RNach, ref int TotalBallCount, ref int holesCount, string filePath);
-    public delegate double[] RadiusSumGenerateDel(double[] radius);
-    public delegate double[] RadiusRandomGenerate(double maxRandRadius, int cCount);
-    public delegate void XYZRGenerateDel(int cCount, double[] r, out double[] x, out double[] y, out double[] z, out double R);
+    /// <summary>
+    /// Delegat-helper for output error messages to stream
+    /// </summary>
+    /// <param name="message">Text message</param>
+    public delegate void PrintErrorMessageDel(string message);
 
     #endregion
 
@@ -30,6 +31,18 @@ namespace MainProject
     {
         public static void Main()
         {
+            ObservableCollection<CombinedObject> z = new ObservableCollection<CombinedObject>()
+            {
+                new CombinedObject()
+            };
+            z[0].InternalInCombineObject.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 2));
+            z[0].InternalInCombineObject.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 28));
+
+            Data data1232 = new Data();
+            data1232.Objects.AddRange(z);
+            data1232.Objects.Add(new Sphere(new TestProblemIpOpt.Model.Point(1, 2, 3), 12));
+            data1232.Objects.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 34));
+            //t[0].ListWithObjects.Add()
             Dimension dimension = new Dimension();
             dimension.CreateInstance(3);
             Console.WriteLine(Thread.CurrentThread.Name + dimension.EntityOfProblem.SettedDimension);
@@ -52,12 +65,12 @@ namespace MainProject
 
             #region Reading Data
             Print("\nSelect input method \n 1 --> Read from File \n 2 --> Random generate");
-            Input.ChooseTypeReadingData(out int[] amountOfObjectsInEachComplexObject, out int TotalBallCount, out int holesCount, out xNach, out yNach, out zNach, out rNach, out RNach, out double maxRandRadius, out rSortSum);
+            Input.ChooseTypeReadingData(out int[] amountOfObjectsInEachComplexObject, out int TotalBallCount, out xNach, out yNach, out zNach, out rNach, out RNach, out double maxRandRadius, out rSortSum);
             Print("\nChoose  type of external container \n 1 --> Circular container \n 2 --> Parallelogram container\nSelect-->");
             Input.ChooseTypeOfContainer(out IContainer container, RNach);
             #endregion
 
-            Data startPointData = new Data(amountOfObjectsInEachComplexObject, xNach, yNach, zNach, rNach, container, TotalBallCount, holesCount);
+            Data startPointData = new Data(amountOfObjectsInEachComplexObject, xNach, yNach, zNach, rNach, container, TotalBallCount);
             int c = xNach.Length;
             double[] xIter = new double[c]; double[] yIter = new double[c];
             double[] zIter = new double[c]; double[] rIter = new double[c];
@@ -209,7 +222,7 @@ namespace MainProject
                 status = problem.SolveProblem(xyz, out obj, null, null, null, null);
             }
             taskWatch.Stop();
-            new PrintResultCodeDel(OutPut.ReturnCodeMessage)("\nOptimization return status: " + status);
+            OutPut.ReturnCodeMessage("\nOptimization return status: " + status);
 
             NewX = new double[ballN];
             NewY = new double[ballN];

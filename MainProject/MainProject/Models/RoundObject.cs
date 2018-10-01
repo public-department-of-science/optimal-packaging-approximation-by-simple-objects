@@ -6,7 +6,7 @@
         public double Y { get; private set; }
         public double Z { get; private set; }
 
-        public Point(int x, int y, int z)
+        public Point(double x, double y, double z)
         {
             X = x;
             Y = y;

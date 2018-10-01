@@ -1,11 +1,11 @@
 ﻿using PackegeProject.Interfaces;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace MainProject.Interfaces.InternalObjects.CircularObjects
 {
-    public interface ICombinedObject<T> where T : IInternalObject
+    public interface ICombinedObject
     {
-        List<T> InternalCircularObjects { get; }
+        ObservableCollection<IInternalObject> InternalInCombineObject { get; }
 
         double[] ArrayWithDistances { get; }
 

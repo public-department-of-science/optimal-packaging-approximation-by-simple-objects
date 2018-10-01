@@ -6,14 +6,14 @@ namespace TestProblemIpOpt.Containers
 {
     public class CircularContainer : IСircularContainer
     {
-        public double Radius { get; set; }
+        public double Radius { get; private set; }
 
-        public Point CenterOfContainer { get; set; }
+        public Point CenterOfTheContainer { get; private set; }
 
         public CircularContainer(double radius, Point centerOfContainer)
         {
             Radius = radius;
-            CenterOfContainer = centerOfContainer ?? new Point(0, 0, 0);
+            CenterOfTheContainer = centerOfContainer ?? new Point(0, 0, 0);
         }
 
         #region Interface implementation methods

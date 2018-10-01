@@ -1,4 +1,4 @@
-﻿namespace TestProblemIpOpt
+﻿namespace MainProject.Enums
 {
     public class Enums
     {

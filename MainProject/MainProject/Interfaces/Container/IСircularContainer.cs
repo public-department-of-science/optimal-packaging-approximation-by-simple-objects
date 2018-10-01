@@ -4,8 +4,8 @@ namespace TestProblemIpOpt.Interfaces
 {
     public interface IСircularContainer : IContainer
     {
-        double Radius { get; set; }
+        double Radius { get; }
 
-        Point CenterOfContainer { get; }
+        Point CenterOfTheContainer { get; }
     }
 }

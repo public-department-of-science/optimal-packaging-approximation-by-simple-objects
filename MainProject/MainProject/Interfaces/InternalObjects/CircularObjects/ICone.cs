@@ -2,7 +2,7 @@
 
 namespace PackegeProject.Interfaces
 {
-    internal interface ICone : IInternalCircularObject, IInternalObject
+    internal interface ICone : IObjectHasCircleInStructure, IInternalObject
     {
         double Height { get; set; }
 

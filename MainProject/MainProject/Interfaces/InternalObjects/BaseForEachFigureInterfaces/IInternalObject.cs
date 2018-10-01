@@ -1,4 +1,4 @@
-﻿using static TestProblemIpOpt.Enums;
+﻿using static MainProject.Enums.Enums;
 
 namespace PackegeProject.Interfaces
 {
@@ -7,16 +7,16 @@ namespace PackegeProject.Interfaces
         /// <summary>
         /// Amount of variables for one internal object (for fix radius sphere it's 3)
         /// </summary>
-        int NumberOfVariables { get; set; }
+        int NumberOfVariableValues { get; }
 
         /// <summary>
         /// value of Object Weight 
         /// </summary>
-        double Weight { get; set; }
+        double Weight { get; }
 
         /// <summary>
         /// Type of object selected according to ObjectType enum
         /// </summary>
-        ObjectType ObjectType { get; set; }
+        ObjectType ObjectType { get; }
     }
 }

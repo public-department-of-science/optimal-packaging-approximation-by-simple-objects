@@ -1,8 +1,9 @@
 ﻿using PackegeProject.Interfaces;
+using TestProblemIpOpt.Model;
 
 namespace MainProject.Interfaces.InternalObjects.CircularObjects
 {
-    public interface ICircle : IInternalObject, IInternalCircularObject
+    public interface ICircle : IInternalObject, IObjectHasCircleInStructure, ICircularObject
     {
     }
 }
