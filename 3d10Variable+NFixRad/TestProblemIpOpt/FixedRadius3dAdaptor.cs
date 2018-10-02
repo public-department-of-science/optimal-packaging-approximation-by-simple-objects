@@ -268,7 +268,7 @@ namespace hs071_cs
         {
             if (values == null)
             {
-                int counter = 0,//counter
+                int counter = 0,//counter kk
                     g = 0;
 
                 // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
