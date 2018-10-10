@@ -48,8 +48,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cureos.Numerics">
-      <HintPath>..\..\Cureos.Numerics\Cureos.Numerics\bin\x64\Debug\Cureos.Numerics.dll</HintPath>
+    <Reference Include="Cureos.Numerics, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Cureos.Numerics\Cureos.Numerics\bin\x86\Release\Cureos.Numerics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

@@ -91,14 +91,14 @@ namespace hs071_cs
                 //}
                 //else
                 //{
-                _x_L[3 * i] = -K1 * DiametrSum(radius) + radius[countCoordinate];
-                _x_U[3 * i] = K1 * DiametrSum(radius) - radius[countCoordinate];
+                _x_L[3 * i] = Ipopt.NegativeInfinity;// -K1 * DiametrSum(radius) + radius[countCoordinate];
+                _x_U[3 * i] = Ipopt.PositiveInfinity;// K1 * DiametrSum(radius) - radius[countCoordinate];
 
-                _x_L[3 * i + 1] = -K1 * DiametrSum(radius) + radius[countCoordinate];
-                _x_U[3 * i + 1] = K1 * DiametrSum(radius) - radius[countCoordinate];
+                _x_L[3 * i + 1] = Ipopt.NegativeInfinity; // - K1 * DiametrSum(radius) + radius[countCoordinate];
+                _x_U[3 * i + 1] = Ipopt.PositiveInfinity;// K1 * DiametrSum(radius) - radius[countCoordinate];
 
-                _x_L[3 * i + 2] = -K1 * DiametrSum(radius) + radius[countCoordinate];
-                _x_U[3 * i + 2] = K1 * DiametrSum(radius) - radius[countCoordinate];
+                _x_L[3 * i + 2] = Ipopt.NegativeInfinity;// - K1 * DiametrSum(radius) + radius[countCoordinate];
+                _x_U[3 * i + 2] = Ipopt.PositiveInfinity; // K1 * DiametrSum(radius) - radius[countCoordinate];
                 //}
                 if (max < radius[countCoordinate])
                     max = radius[countCoordinate];
@@ -127,7 +127,6 @@ namespace hs071_cs
             //m[i]*x[i] + count
             // _nele_jac += 3 * countCircles;
             // _m += countCircles;
-
 
             _g_L = new double[_m];
             _g_U = new double[_m];

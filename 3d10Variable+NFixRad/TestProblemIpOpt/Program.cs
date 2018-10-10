@@ -27,7 +27,7 @@ namespace hs071_cs
 
     public class Program
     {
-        public static int VariableBALLS { get; private set; } = 10;
+        public static int VariableBALLS { get; private set; } =10;
 
         public static void Main()
         {
@@ -289,7 +289,7 @@ namespace hs071_cs
             using (Ipopt problem = new Ipopt(op._n, op._x_L, op._x_U, op._m, op._g_L, op._g_U, op._nele_jac, op._nele_hess, op.Eval_f, op.Eval_g, op.Eval_grad_f, op.Eval_jac_g, op.Eval_h))
             {
                 // https://www.coin-or.org/Ipopt/documentation/node41.html#opt:print_options_documentation
-                problem.AddOption("tol", 1e-10);
+                problem.AddOption("tol", 1e-3);
                 problem.AddOption("mu_strategy", "adaptive");
                 problem.AddOption("hessian_approximation", "limited-memory");
                 problem.AddOption("max_iter", 10000);
