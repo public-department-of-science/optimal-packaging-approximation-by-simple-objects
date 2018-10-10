@@ -1,9 +1,9 @@
 ﻿using MainProject.Enums;
-using PackegeProject.Interfaces;
+using PackageProject.Interfaces;
 using System;
 using TestProblemIpOpt.Model;
 
-namespace PackegeProject.InternalObjectsClasses.CircularObjects
+namespace PackageProject.InternalObjectsClasses.CircularObjects
 {
     internal class Sphere : ISphere
     {

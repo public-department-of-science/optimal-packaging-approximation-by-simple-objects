@@ -8,11 +8,13 @@ namespace TestProblemIpOpt.Containers
     {
         public double Radius { get; private set; }
 
+        public int AmountOfVariables { get; private set; }
         public Point CenterOfTheContainer { get; private set; }
 
         public CircularContainer(double radius, Point centerOfContainer)
         {
             Radius = radius;
+            AmountOfVariables = 1; // Radius
             CenterOfTheContainer = centerOfContainer ?? new Point(0, 0, 0);
         }
 

@@ -1,4 +1,4 @@
-﻿using PackegeProject.Interfaces;
+﻿using PackageProject.Interfaces;
 using TestProblemIpOpt.Model;
 
 namespace MainProject.Interfaces.InternalObjects.CircularObjects

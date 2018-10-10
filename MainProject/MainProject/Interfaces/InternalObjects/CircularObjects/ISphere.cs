@@ -1,7 +1,7 @@
 ﻿using MainProject.Interfaces.InternalObjects.CircularObjects;
 using System.Drawing;
 
-namespace PackegeProject.Interfaces
+namespace PackageProject.Interfaces
 {
     public interface ISphere : IObjectHasCircleInStructure, IInternalObject, ICircularObject
     {

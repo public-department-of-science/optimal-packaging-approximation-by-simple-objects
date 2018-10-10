@@ -2,7 +2,7 @@
 
 namespace hs071_cs
 {
-    public abstract class BaseAdapter
+    public abstract class BaseAdapter:IDisposable
     {
         /// <summary>
         /// amount of variables in vector
@@ -103,5 +103,10 @@ namespace hs071_cs
         public abstract bool Eval_jac_g(int n, double[] x, bool new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values);
 
         public abstract bool Eval_h(int n, double[] x, bool new_x, double obj_factor, int m, double[] lambda, bool new_lambda, int nele_hess, int[] iRow, int[] jCol, double[] values);
+
+        public void Dispose()
+        {
+            _m = 0;
+        }
     }
 }

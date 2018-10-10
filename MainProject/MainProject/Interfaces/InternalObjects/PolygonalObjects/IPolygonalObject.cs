@@ -1,6 +1,6 @@
 ﻿using TestProblemIpOpt.Model;
 
-namespace PackegeProject.Interfaces.InternalObjects.PolygonalObjects
+namespace PackageProject.Interfaces.InternalObjects.PolygonalObjects
 {
     internal interface IPolygonalObject
     {

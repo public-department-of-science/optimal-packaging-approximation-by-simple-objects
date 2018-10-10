@@ -1,4 +1,4 @@
-﻿namespace PackegeProject.Interfaces
+﻿namespace PackageProject.Interfaces
 {
     public interface IObjectHasCircleInStructure
     {

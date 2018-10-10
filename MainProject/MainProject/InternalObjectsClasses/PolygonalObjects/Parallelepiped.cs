@@ -1,9 +1,9 @@
 ﻿using MainProject.Enums;
-using PackegeProject.Interfaces.InternalObjects.PolygonalObjects;
+using PackageProject.Interfaces.InternalObjects.PolygonalObjects;
 using System;
 using TestProblemIpOpt.Model;
 
-namespace PackegeProject.InternalObjectsClasses.PolygonalObjects
+namespace PackageProject.InternalObjectsClasses.PolygonalObjects
 {
     internal class Parallelepiped : IParallelepiped
     {

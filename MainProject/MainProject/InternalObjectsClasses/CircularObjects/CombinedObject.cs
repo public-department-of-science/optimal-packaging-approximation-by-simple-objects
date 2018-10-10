@@ -1,5 +1,5 @@
 ﻿using MainProject.Interfaces.InternalObjects.CircularObjects;
-using PackegeProject.Interfaces;
+using PackageProject.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -8,12 +8,12 @@ using static MainProject.Enums.Enums;
 
 namespace MainProject.InternalObjectsClasses.CircularObjects
 {
-    internal class CombinedObject : IInternalObject, ICombinedObject
+    public class CombinedObject : IInternalObject, ICombinedObject
     {
-        public ObservableCollection<IInternalObject> InternalInCombineObject { get; }
+        public ObservableCollection<IInternalObject> InternalInCombineObjects { get; }
 
         public double[] ArrayWithDistances { get; private set; }
-        public int NumberOfVariableValues { get; }
+        public int NumberOfVariableValues { get; private set; }
 
         public double Weight { get; }
 
@@ -22,22 +22,19 @@ namespace MainProject.InternalObjectsClasses.CircularObjects
 
         public CombinedObject() : this(combinedObjects: new ObservableCollection<IInternalObject>())
         {
-            NumberOfVariableValues = ((Func<int>)(() =>
-            {
-                int count = 0;
-                foreach (CombinedObject item in InternalInCombineObject)
-                {
-                    count += item.NumberOfVariableValues;
-                }
-                return count;
-            })).Invoke();
+            NumberOfVariableValues = 0;
 
             ObjectType = ObjectType.CombinedObject;
             Weight = CulculateWeightOfObject();
 
-            InternalInCombineObject.CollectionChanged += ReCulculateDistances;
-            ArrayWithDistances = new double[InternalInCombineObject.Count];
+            InternalInCombineObjects.CollectionChanged += ReCulculateDistances;
+            ArrayWithDistances = new double[InternalInCombineObjects.Count];
 
+        }
+
+        private CombinedObject(ObservableCollection<IInternalObject> combinedObjects)
+        {
+            InternalInCombineObjects = combinedObjects ?? new ObservableCollection<IInternalObject>();
         }
 
         private void ReCulculateDistances(object sender, NotifyCollectionChangedEventArgs e)
@@ -45,19 +42,23 @@ namespace MainProject.InternalObjectsClasses.CircularObjects
             switch (e.Action)
             {
                 default:
+                    NumberOfVariableValues = ((Func<int>)(() =>
+                      {
+                          int count = 0;
+                          foreach (var item in InternalInCombineObjects)
+                          {
+                              count += item.NumberOfVariableValues;
+                          }
+                          return count;
+                      })).Invoke();
                     ComputeDistanceWithObjects();
                     break;
             }
         }
 
-        private CombinedObject(ObservableCollection<IInternalObject> combinedObjects)
-        {
-            InternalInCombineObject = combinedObjects ?? new ObservableCollection<IInternalObject>();
-        }
-
         public void ComputeDistanceWithObjects()
         {
-            foreach (IInternalObject item in InternalInCombineObject)
+            foreach (IInternalObject item in InternalInCombineObjects)
             {
                 switch (item.ObjectType)
                 {
@@ -67,17 +68,16 @@ namespace MainProject.InternalObjectsClasses.CircularObjects
                         break;
                     default:
                         throw new Exception($"Combined object must be {ObjectType.Circle} or {ObjectType.Sphere} structure!");
-                        break;
                 }
             }
 
-            double[] arrayWithDistances = new double[InternalInCombineObject.Count];
-            for (int i = 0; i < InternalInCombineObject.Count - 1; i++)
+            double[] arrayWithDistances = new double[InternalInCombineObjects.Count];
+            for (int i = 0; i < InternalInCombineObjects.Count - 1; i++)
             {
-                Point tempFirst = ((ICircularObject)InternalInCombineObject[i]).Center;
-                for (int j = i + 1; j < InternalInCombineObject.Count; j++)
+                Point tempFirst = ((ICircularObject)InternalInCombineObjects[i]).Center;
+                for (int j = i + 1; j < InternalInCombineObjects.Count; j++)
                 {
-                    Point tempSecond = ((ICircularObject)InternalInCombineObject[j]).Center;
+                    Point tempSecond = ((ICircularObject)InternalInCombineObjects[j]).Center;
                     arrayWithDistances[j] = DistanceBetweenTwoObjects(tempFirst, tempSecond);
                 }
             }
@@ -92,7 +92,7 @@ namespace MainProject.InternalObjectsClasses.CircularObjects
         private double CulculateWeightOfObject()
         {
             double weight = 0.0;
-            foreach (CombinedObject @object in InternalInCombineObject)
+            foreach (CombinedObject @object in InternalInCombineObjects)
             {
                 weight += @object.Weight;
             }

@@ -11,9 +11,12 @@ namespace TestProblemIpOpt.Containers
             set => ParallelogramPoints = value ?? new Point[4];
         }
 
+        public int AmountOfVariables { get; private set; }
+
         public ParallelogramContainer()
         {
             int pointAmount = 4;
+            AmountOfVariables = 4; // A1, A2, A3, A4
             ParallelogramPoints = new Point[pointAmount];
         }
 

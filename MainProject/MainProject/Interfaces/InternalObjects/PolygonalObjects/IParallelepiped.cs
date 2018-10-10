@@ -1,4 +1,4 @@
-﻿namespace PackegeProject.Interfaces.InternalObjects.PolygonalObjects
+﻿namespace PackageProject.Interfaces.InternalObjects.PolygonalObjects
 {
     internal interface IParallelepiped : IPolygonalObject, IInternalObject
     {

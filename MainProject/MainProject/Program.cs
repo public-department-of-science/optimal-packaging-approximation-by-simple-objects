@@ -1,7 +1,7 @@
 ﻿using Cureos.Numerics;
 using hs071_cs;
 using MainProject.InternalObjectsClasses.CircularObjects;
-using PackegeProject.InternalObjectsClasses.CircularObjects;
+using PackageProject.InternalObjectsClasses.CircularObjects;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -33,15 +33,25 @@ namespace MainProject
         {
             ObservableCollection<CombinedObject> z = new ObservableCollection<CombinedObject>()
             {
+                new CombinedObject(),
                 new CombinedObject()
             };
-            z[0].InternalInCombineObject.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 2));
-            z[0].InternalInCombineObject.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 28));
+            z[0].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 2));
+            z[0].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 28));
+            z[0].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 8));
 
-            Data data1232 = new Data();
+            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 2));
+            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 28));
+            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 8));
+            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 2));
+            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 28));
+
+            Data data1232 = new Data(null);
             data1232.Objects.AddRange(z);
             data1232.Objects.Add(new Sphere(new TestProblemIpOpt.Model.Point(1, 2, 3), 12));
             data1232.Objects.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 34));
+            Adapter adaptor = new Adapter(data1232);
+
             //t[0].ListWithObjects.Add()
             Dimension dimension = new Dimension();
             dimension.CreateInstance(3);
@@ -70,7 +80,7 @@ namespace MainProject
             Input.ChooseTypeOfContainer(out IContainer container, RNach);
             #endregion
 
-            Data startPointData = new Data(amountOfObjectsInEachComplexObject, xNach, yNach, zNach, rNach, container, TotalBallCount);
+            //Data startPointData = new Data(amountOfObjectsInEachComplexObject, xNach, yNach, zNach, rNach, container, TotalBallCount);
             int c = xNach.Length;
             double[] xIter = new double[c]; double[] yIter = new double[c];
             double[] zIter = new double[c]; double[] rIter = new double[c];
@@ -115,13 +125,13 @@ namespace MainProject
             Stopwatch TaskTime = new Stopwatch();
             TaskTime.Start();// Start time
 
-            using (Adapter adaptor = new Adapter(startPointData))
-            {
-                RunTask(adaptor, xyzFixR, out xIter, out yIter, out zIter, c);
-                RIter = xyzFixR[3 * TotalBallCount];
-                // IpoptIterationData = adaptor.AllIteration;
-                rNach = adaptor.radius;
-            }
+            //using (Adapter adaptor = new Adapter(startPointData))
+            //{
+            //    RunTask(adaptor, xyzFixR, out xIter, out yIter, out zIter, c);
+            //    RIter = xyzFixR[3 * TotalBallCount];
+            //    // IpoptIterationData = adaptor.AllIteration;
+            //    rNach = adaptor.radius;
+            //}
 
             //fixRTaskTime.Stop(); // Stop time
             //Print("\nВыполенение задачи RunTime: " + OutPut.getElapsedTime(fixRTaskTime));

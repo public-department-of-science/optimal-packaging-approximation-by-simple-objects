@@ -10,6 +10,11 @@
     public interface IContainer
     {
         /// <summary>
+        /// Variable values for vontainer
+        /// </summary>
+        int AmountOfVariables { get; }
+
+        /// <summary>
         /// In this method you should culculate value for objective ("target") function and reproduce your logic
         /// </summary>
         /// <remarks>

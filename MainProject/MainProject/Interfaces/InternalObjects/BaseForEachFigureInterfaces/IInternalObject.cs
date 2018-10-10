@@ -1,6 +1,6 @@
 ﻿using static MainProject.Enums.Enums;
 
-namespace PackegeProject.Interfaces
+namespace PackageProject.Interfaces
 {
     public interface IInternalObject
     {

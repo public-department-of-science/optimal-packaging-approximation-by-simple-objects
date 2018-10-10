@@ -1,6 +1,6 @@
 ﻿using TestProblemIpOpt.Model;
 
-namespace PackegeProject.Interfaces
+namespace PackageProject.Interfaces
 {
     internal interface ICone : IObjectHasCircleInStructure, IInternalObject
     {
