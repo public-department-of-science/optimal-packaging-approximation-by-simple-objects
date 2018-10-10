@@ -1,4 +1,4 @@
-﻿namespace TestProblemIpOpt.Interfaces
+﻿namespace MainProject.Interfaces
 {
     /// <summary>
     /// This intarface include methods for calculation parameters for external container

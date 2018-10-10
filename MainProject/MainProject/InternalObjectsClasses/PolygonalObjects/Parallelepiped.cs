@@ -1,7 +1,7 @@
 ﻿using MainProject.Enums;
 using PackageProject.Interfaces.InternalObjects.PolygonalObjects;
 using System;
-using TestProblemIpOpt.Model;
+using MainProject.Model;
 
 namespace PackageProject.InternalObjectsClasses.PolygonalObjects
 {

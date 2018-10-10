@@ -1,7 +1,7 @@
 ﻿using MainProject.Enums;
 using PackageProject.Interfaces;
 using System;
-using TestProblemIpOpt.Model;
+using MainProject.Model;
 
 namespace PackageProject.InternalObjectsClasses.CircularObjects
 {

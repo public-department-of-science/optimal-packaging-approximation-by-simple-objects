@@ -1,8 +1,8 @@
 ﻿using PackageProject.Interfaces;
 using System.Collections.Generic;
-using TestProblemIpOpt.Containers;
-using TestProblemIpOpt.Helpers;
-using TestProblemIpOpt.Interfaces;
+using MainProject.Containers;
+using MainProject.Helpers;
+using MainProject.Interfaces;
 
 namespace hs071_cs
 {
@@ -20,7 +20,7 @@ namespace hs071_cs
         public Data(IContainer container)
         {
             Objects = new List<IInternalObject>();
-            Container = container ?? new CircularContainer(0.0, new TestProblemIpOpt.Model.Point());
+            Container = container ?? new CircularContainer(0.0, new MainProject.Model.Point());
             C = null;
         }
     }

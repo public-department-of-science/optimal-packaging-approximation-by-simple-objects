@@ -1,8 +1,8 @@
 ﻿using System;
-using TestProblemIpOpt.Interfaces;
-using TestProblemIpOpt.Model;
+using MainProject.Interfaces;
+using MainProject.Model;
 
-namespace TestProblemIpOpt.Containers
+namespace MainProject.Containers
 {
     public class CircularContainer : IСircularContainer
     {

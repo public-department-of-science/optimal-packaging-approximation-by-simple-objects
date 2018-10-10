@@ -1,47 +1,17 @@
 ﻿using Cureos.Numerics;
-using MainProject.Interfaces.InternalObjects.CircularObjects;
-using MainProject.InternalObjectsClasses.CircularObjects;
 using PackageProject.Interfaces;
-using PackageProject.InternalObjectsClasses.CircularObjects;
 using System;
-using System.Collections.Generic;
-using TestProblemIpOpt.Interfaces;
 
 namespace hs071_cs
 {
     internal class Adapter : BaseAdapter
     {
         /// <summary>
-        /// amount of objects
-        /// </summary>
-        public readonly int countObjects;
-
-        /// <summary>
-        /// first coeficient (used in objective function)
-        /// </summary>
-        private readonly double K1 = 1;
-
-        /// <summary>
-        /// second coeficient (used in objective function)
-        /// </summary>
-        private readonly double K2 = 1;
-
-        /// <summary>
-        /// List with IpOpt coordinates on each iteration
-        /// </summary>
-        public List<double[]> AllIteration { get; set; }
-        private double[] Weight { get; set; }
-        private double[,] C { get; set; }
-
-        private readonly IContainer container;
-
-        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="data"></param>
         public Adapter(Data data)
         {
-            AllIteration = new List<double[]>();
             container = data.Container;
             countObjects = 0;
 
@@ -57,39 +27,7 @@ namespace hs071_cs
 
             #region value restriction
 
-            int i = 0;
-            foreach (IInternalObject item in data.Objects)
-            {
-                if (item is ICombinedObject)
-                {
-                    foreach (IInternalObject item1 in ((CombinedObject)item).InternalInCombineObjects)
-                    {
-                        int varInOneInternalObject = 0;
-                        for (; varInOneInternalObject < item1.NumberOfVariableValues; ++varInOneInternalObject, ++i)
-                        {
-                            _x_L[i] = Ipopt.NegativeInfinity;
-                            _x_U[i] = Ipopt.PositiveInfinity;
-                        }
-                        ++countObjects;
-                    }
-                }
-                else
-                {
-                    int varInInternalObject = 0;
-                    for (; varInInternalObject < item.NumberOfVariableValues; ++varInInternalObject, ++i)
-                    {
-                        _x_L[i] = Ipopt.NegativeInfinity;
-                        _x_U[i] = Ipopt.PositiveInfinity;
-                    }
-                    ++countObjects;
-                }
-            }
-
-            for (int j = 0; j < data.Container.AmountOfVariables; ++j, ++i)
-            {
-                _x_L[i] = Ipopt.NegativeInfinity;
-                _x_U[i] = Ipopt.PositiveInfinity;
-            }
+            int AmountOfVariablesWithoutContainer = Restrictions.ValueRestriction(data, ref countObjects, _x_L, _x_U);
 
             #endregion
 
@@ -99,31 +37,31 @@ namespace hs071_cs
             _m = 0; // => restrictions
 
             // (R-r[i])^2-x[i]^2-y[i]^2 -z[i]^2 >= 0
-            _nele_jac += (i - data.Container.AmountOfVariables); // x, y, z , R
+            _nele_jac += (AmountOfVariablesWithoutContainer - data.Container.AmountOfVariables); // x, y, z , R
             _m += countObjects;
 
             // (x[i] - x[j]) ^ 2 + (y[i] - y[j]) ^ 2 + (z[i] - z[j]) ^ 2 - (r[i] - r[j]) ^ 2 >= 0
-            int v = AmountOfIntersectionElement(data);
-            _nele_jac += v;
-            _m += v;
+            Restrictions.AmountOfIntersectionElement(data, out int amountOfElementThoseMustNotIntersect, out int _nele_jacAmountOfElementThoseMustNotIntersect);
+            _nele_jac += _nele_jacAmountOfElementThoseMustNotIntersect;
+            _m += amountOfElementThoseMustNotIntersect;
 
             //m[i]*x[i] + count
             // _nele_jac += 3 * countCircles;
             // _m += countCircles;
 
-            //_g_L = new double[_m];
-            //_g_U = new double[_m];
-            //int op = 0;
-            //for (int j = 0; j < countObjects; j++) // радиусы от 0 до MAX
-            //{
-            //    _g_L[op] = 0;
-            //    _g_U[op++] = Ipopt.PositiveInfinity;
-            //}
+            _g_L = new double[_m];
+            _g_U = new double[_m];
+            int op = 0;
+            for (int j = 0; j < countObjects; j++) // радиусы от 0 до MAX
+            {
+                _g_L[op] = 0;
+                _g_U[op++] = Ipopt.PositiveInfinity;
+            }
             //for (int i = 0; i < countObjects - 1; i++)
             //{
             //    for (int j = i + 1; j < countObjects; j++)
             //    {
-            //        _g_L[op] = Math.Pow((radius[i] + radius[j]), 2);
+            //       // _g_L[op] = Math.Pow((radius[i] + radius[j]), 2);
             //        _g_U[op++] = Ipopt.PositiveInfinity;
             //    }
             //}
@@ -142,59 +80,7 @@ namespace hs071_cs
             _nele_hess = 0;
         }
 
-        private int AmountOfIntersectionElement(Data data)
-        {
-            int amountOfIntersectionElement = 0;
-            for (int i = 0; i < data.Objects.Count - 1; i++)
-            {
-                if (!((data.Objects[i] is ISphere) || (data.Objects[i] is ICombinedObject)))
-                {
-                    throw new Exception($"Program didn't configure for using polypoint objects. Only spheres or combined object.{data.Objects[i].GetType().ToString()}");
-                }
 
-                List<IInternalObject> firstInternalObject = new List<IInternalObject>();
-                if (data.Objects[i] is CombinedObject)
-                {
-                    firstInternalObject.AddRange(((CombinedObject)data.Objects[i]).InternalInCombineObjects);
-                }
-                else
-                {
-                    firstInternalObject.Add(data.Objects[i]);
-                }
-
-                for (int j = i + 1; j < data.Objects.Count; j++)
-                {
-                    if (!((data.Objects[j] is ISphere) || (data.Objects[j] is ICombinedObject)))
-                    {
-                        throw new Exception($"Program didn't configure for using polypoint objects. Only spheres or combined object.{data.Objects[j].GetType().ToString()}");
-                    }
-
-                    List<IInternalObject> secondInternalObject = new List<IInternalObject>();
-                    if (data.Objects[j] is CombinedObject)
-                    {
-                        secondInternalObject.AddRange(((CombinedObject)data.Objects[j]).InternalInCombineObjects);
-                    }
-                    else
-                    {
-                        secondInternalObject.Add(data.Objects[j]);
-                    }
-
-                    // Cycle for not intersection restriction
-                    for (int k = 0; k < firstInternalObject.Count; k++)
-                    {
-                        Sphere first = (Sphere)firstInternalObject[k];
-                        for (int z = 0; z < secondInternalObject.Count; z++)
-                        {
-                            Sphere second = (Sphere)secondInternalObject[z];
-
-                            ++amountOfIntersectionElement;
-                        }
-                    }
-                }
-            }
-
-            return amountOfIntersectionElement;
-        }
 
         public override bool Eval_f(int n, double[] x, bool new_x, out double obj_value)
         {

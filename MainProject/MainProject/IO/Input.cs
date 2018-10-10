@@ -3,8 +3,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using TestProblemIpOpt.Containers;
-using TestProblemIpOpt.Interfaces;
+using MainProject.Containers;
+using MainProject.Interfaces;
 
 namespace hs071_cs
 {
@@ -96,13 +96,13 @@ namespace hs071_cs
             switch (Console.ReadLine())
             {
                 case "1":
-                    container = new CircularContainer(rNach, new TestProblemIpOpt.Model.Point());
+                    container = new CircularContainer(rNach, new MainProject.Model.Point());
                     break;
                 case "2":
                     container = new ParallelogramContainer();
                     break;
                 default:
-                    container = new CircularContainer(rNach, new TestProblemIpOpt.Model.Point());
+                    container = new CircularContainer(rNach, new MainProject.Model.Point());
                     break;
             }
         }

@@ -1,6 +1,6 @@
 ﻿using MainProject.Interfaces.InternalObjects.CircularObjects;
 using System;
-using TestProblemIpOpt.Model;
+using MainProject.Model;
 using static MainProject.Enums.Enums;
 
 namespace MainProject.InternalObjectsClasses.CircularObjects

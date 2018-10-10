@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TestProblemIpOpt.Helpers
+namespace MainProject.Helpers
 {
     /// <summary>
     /// Entity instance for concrete dimention

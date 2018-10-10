@@ -3,7 +3,7 @@ using PackageProject.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using TestProblemIpOpt.Model;
+using MainProject.Model;
 using static MainProject.Enums.Enums;
 
 namespace MainProject.InternalObjectsClasses.CircularObjects

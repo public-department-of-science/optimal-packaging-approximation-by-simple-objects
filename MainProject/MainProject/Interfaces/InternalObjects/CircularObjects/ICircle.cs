@@ -1,5 +1,5 @@
 ﻿using PackageProject.Interfaces;
-using TestProblemIpOpt.Model;
+using MainProject.Model;
 
 namespace MainProject.Interfaces.InternalObjects.CircularObjects
 {

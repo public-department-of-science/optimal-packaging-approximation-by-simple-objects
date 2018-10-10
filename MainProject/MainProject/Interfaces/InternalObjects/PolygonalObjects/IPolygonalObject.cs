@@ -1,4 +1,4 @@
-﻿using TestProblemIpOpt.Model;
+﻿using MainProject.Model;
 
 namespace PackageProject.Interfaces.InternalObjects.PolygonalObjects
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestProblemIpOpt.Helpers
+namespace MainProject.Helpers
 {
     /// <summary>
     /// Settings of dimention for optimization problem; Create <Single> instance for one Thread 

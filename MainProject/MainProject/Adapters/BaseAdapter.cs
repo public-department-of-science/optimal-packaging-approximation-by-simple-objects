@@ -1,9 +1,27 @@
-﻿using System;
+﻿using MainProject.Restrictions;
+using System;
+using System.Collections.Generic;
+using MainProject.Interfaces;
 
 namespace hs071_cs
 {
-    public abstract class BaseAdapter:IDisposable
+    public abstract class BaseAdapter : IDisposable
     {
+        /// <summary>
+        /// amount of objects
+        /// </summary>
+        public  int countObjects;
+
+        /// <summary>
+        /// first coeficient (used in objective function)
+        /// </summary>
+        protected readonly double K1 = 1;
+
+        /// <summary>
+        /// second coeficient (used in objective function)
+        /// </summary>
+        protected readonly double K2 = 1;
+
         /// <summary>
         /// amount of variables in vector
         /// </summary>
@@ -19,6 +37,9 @@ namespace hs071_cs
         /// </summary>
         public int _nele_jac;
 
+        /// <summary>
+        /// Hessian
+        /// </summary>
         public int _nele_hess;
 
         /// <summary>
@@ -41,20 +62,51 @@ namespace hs071_cs
         /// </summary>
         public double[] _g_U;
 
+        /// <summary>
+        /// Matrix of coefficients which can "say" prioritet of position some of object in container space
+        /// </summary>
+        protected double[,] C { get; set; }
+
+        /// <summary>
+        /// List with IpOpt coordinates on each iteration
+        /// </summary>
+        public List<double[]> AllIteration { get; protected set; }
+
+        /// <summary>
+        /// Random instance
+        /// </summary>
         protected Random random;
+
+        /// <summary>
+        /// All restrictions which you can use
+        /// </summary>
+        protected ObjectsRestrictions Restrictions { get; set; }
+
+        /// <summary>
+        /// Type of container which you use in your task
+        /// </summary>
+        protected IContainer container;
 
         public BaseAdapter()
         {
+            countObjects = -1;
+
             _x_L = null;
             _x_U = null;
             _g_L = null;
             _g_U = null;
 
-            random = new Random();
             _n = 0;
             _m = 0;
             _nele_jac = 0;
             _nele_hess = 0;
+
+            C = null;
+            container = null;
+
+            random = new Random();
+            AllIteration = new List<double[]>();
+            Restrictions = new ObjectsRestrictions();
         }
 
         /// <summary>

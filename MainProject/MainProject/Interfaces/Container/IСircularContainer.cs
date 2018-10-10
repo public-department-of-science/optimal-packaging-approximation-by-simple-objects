@@ -1,6 +1,6 @@
-﻿using TestProblemIpOpt.Model;
+﻿using MainProject.Model;
 
-namespace TestProblemIpOpt.Interfaces
+namespace MainProject.Interfaces
 {
     public interface IСircularContainer : IContainer
     {

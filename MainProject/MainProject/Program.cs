@@ -6,8 +6,8 @@ using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Threading;
-using TestProblemIpOpt.Helpers;
-using TestProblemIpOpt.Interfaces;
+using MainProject.Helpers;
+using MainProject.Interfaces;
 
 namespace MainProject
 {
@@ -36,20 +36,20 @@ namespace MainProject
                 new CombinedObject(),
                 new CombinedObject()
             };
-            z[0].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 2));
-            z[0].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 28));
-            z[0].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 8));
+            z[0].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(), 2));
+            z[0].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 28));
+            z[0].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 8));
 
-            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 2));
-            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 28));
-            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 8));
-            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 2));
-            z[1].InternalInCombineObjects.Add(new Sphere(new TestProblemIpOpt.Model.Point(3, 2, -1), 28));
+            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(), 2));
+            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 28));
+            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 8));
+            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(), 2));
+            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 28));
 
             Data data1232 = new Data(null);
             data1232.Objects.AddRange(z);
-            data1232.Objects.Add(new Sphere(new TestProblemIpOpt.Model.Point(1, 2, 3), 12));
-            data1232.Objects.Add(new Sphere(new TestProblemIpOpt.Model.Point(), 34));
+            data1232.Objects.Add(new Sphere(new MainProject.Model.Point(1, 2, 3), 12));
+            data1232.Objects.Add(new Sphere(new MainProject.Model.Point(), 34));
             Adapter adaptor = new Adapter(data1232);
 
             //t[0].ListWithObjects.Add()

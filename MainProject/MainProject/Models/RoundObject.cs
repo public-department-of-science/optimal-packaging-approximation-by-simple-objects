@@ -1,4 +1,4 @@
-﻿namespace TestProblemIpOpt.Model
+﻿namespace MainProject.Model
 {
     public class Point
     {
