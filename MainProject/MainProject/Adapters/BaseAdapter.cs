@@ -5,12 +5,15 @@ using MainProject.Interfaces;
 
 namespace hs071_cs
 {
+    /// <summary>
+    /// Main adaptor for all adaptor classes
+    /// </summary>
     public abstract class BaseAdapter : IDisposable
     {
         /// <summary>
         /// amount of objects
         /// </summary>
-        public  int countObjects;
+        public  int objectsCont;
 
         /// <summary>
         /// first coeficient (used in objective function)
@@ -89,7 +92,7 @@ namespace hs071_cs
 
         public BaseAdapter()
         {
-            countObjects = -1;
+            objectsCont = -1;
 
             _x_L = null;
             _x_U = null;

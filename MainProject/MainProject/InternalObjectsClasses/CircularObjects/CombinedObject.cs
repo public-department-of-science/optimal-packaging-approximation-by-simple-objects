@@ -10,7 +10,7 @@ namespace MainProject.InternalObjectsClasses.CircularObjects
 {
     public class CombinedObject : IInternalObject, ICombinedObject
     {
-        public ObservableCollection<IInternalObject> InternalInCombineObjects { get; }
+        public ObservableCollection<IInternalObject> InternalInCombineObjects { get; private set; }
 
         public double[] ArrayWithDistances { get; private set; }
         public int NumberOfVariableValues { get; private set; }
