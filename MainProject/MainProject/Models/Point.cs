@@ -13,6 +13,17 @@
             Z = z;
         }
 
+        public Point(double[] x)
+        {
+            if (x.Length < 3)
+            {
+                throw new System.Exception("Cast array to Point error");
+            }
+            X = x[0];
+            Y = x[1];
+            Z = x[2];
+        }
+
         public Point()
         {
             X = 0;

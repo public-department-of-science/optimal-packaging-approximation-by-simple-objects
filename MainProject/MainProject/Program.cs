@@ -1,13 +1,13 @@
 ﻿using Cureos.Numerics;
 using hs071_cs;
+using MainProject.Helpers;
+using MainProject.Interfaces;
 using MainProject.InternalObjectsClasses.CircularObjects;
 using PackageProject.InternalObjectsClasses.CircularObjects;
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using MainProject.Helpers;
-using MainProject.Interfaces;
 
 namespace MainProject
 {
@@ -31,25 +31,32 @@ namespace MainProject
     {
         public static void Main()
         {
-            ObservableCollection<CombinedObject> z = new ObservableCollection<CombinedObject>()
-            {
-                new CombinedObject(),
-                new CombinedObject()
-            };
-            z[0].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(), 2));
-            z[0].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 28));
-            z[0].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 8));
+            CombinedObject list2 = new CombinedObject();
 
-            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(), 2));
-            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 28));
-            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 8));
-            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(), 2));
-            z[1].InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 28));
+            list2.InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(), 2));
+            list2.InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 28));
+            list2.InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 8));
+            list2.InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(), 2));
+            list2.InternalInCombineObjects.Add(new Sphere(new MainProject.Model.Point(3, 2, -1), 28));
+
+            CombinedObject list1 = new CombinedObject();
+            list1.InternalInCombineObjects.Add(new Sphere(new Model.Point(), 2));
+            list1.InternalInCombineObjects.Add(new Sphere(new Model.Point(3, 2, -1), 28));
+            list1.InternalInCombineObjects.Add(new Sphere(new Model.Point(3, 2, -1), 8));
+
+            List<CombinedObject> combinedObjects = new List<CombinedObject>()
+            {
+                list1,
+                list2
+            };
+
 
             Data data1232 = new Data(null);
-            data1232.Objects.AddRange(z);
+            data1232.Objects.AddRange(combinedObjects);
             data1232.Objects.Add(new Sphere(new MainProject.Model.Point(1, 2, 3), 12));
             data1232.Objects.Add(new Sphere(new MainProject.Model.Point(), 34));
+
+            data1232.ArrayToData(null);
             Adapter adaptor = new Adapter(data1232);
 
             //t[0].ListWithObjects.Add()

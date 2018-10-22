@@ -1,7 +1,7 @@
-﻿using MainProject.Restrictions;
+﻿using MainProject.Interfaces;
+using MainProject.Restrictions;
 using System;
 using System.Collections.Generic;
-using MainProject.Interfaces;
 
 namespace hs071_cs
 {
@@ -13,7 +13,7 @@ namespace hs071_cs
         /// <summary>
         /// amount of objects
         /// </summary>
-        public  int objectsCont;
+        public int objectsCont;
 
         /// <summary>
         /// first coeficient (used in objective function)

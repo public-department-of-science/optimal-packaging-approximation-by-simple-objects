@@ -1,6 +1,6 @@
 ﻿using Cureos.Numerics;
 using hs071_cs;
-using MainProject.Interfaces;
+using MainProject.Containers;
 using MainProject.Interfaces.InternalObjects.CircularObjects;
 using MainProject.InternalObjectsClasses.CircularObjects;
 using PackageProject.Interfaces;
@@ -10,8 +10,10 @@ using System.Collections.Generic;
 
 namespace MainProject.Restrictions
 {
-    public class ObjectsRestrictions : IRestrictions
+    public class ObjectsRestrictions //: IRestrictions
     {
+        #region Calculation restriction
+
         public void CalculationAmountOf_Not_IntersectionElementRestriction(Data data, ref int _nele_jac, ref int _m, out int amountOfElementThoseMustNotIntersect, out int _nele_jacAmountOfElementThoseMustNotIntersect)
         {
             amountOfElementThoseMustNotIntersect = 0;
@@ -68,36 +70,18 @@ namespace MainProject.Restrictions
             _m += amountOfElementThoseMustNotIntersect;
         }
 
-        public void CalculationAmountOfIntersectionCombinedObjectsRestriction(Data data, ref int nele_jac, ref int m)
+        public void CalculationAmountOfIntersectionCombinedObjectsRestriction(Data data, ref int _nele_jac, ref int _m)
         {
-            for (int i = 0; i < data.Objects.Count - 1; i++)
+            //_nele_jac += ;
+            foreach (IInternalObject item in data.Objects)
             {
-                if (!((data.Objects[i] is ISphere) || (data.Objects[i] is ICombinedObject)))
-                {
-                    throw new Exception($"Program didn't configure for using polypoint objects. Only spheres or combined object.{data.Objects[i].GetType().ToString()}");
-                }
-
-                List<IInternalObject> firstInternalObject = new List<IInternalObject>();
-                if (data.Objects[i] is CombinedObject)
-                {
-                    firstInternalObject.AddRange(((CombinedObject)data.Objects[i]).InternalInCombineObjects);
-                }
-                else
+                CombinedObject combinedObject = item as CombinedObject;
+                if (combinedObject is null)
                 {
                     continue;
                 }
-
-                // Cycle for not intersection restriction
-                for (int k = 0; k < firstInternalObject.Count - 1; k++)
-                {
-                    for (int z = 1; z < firstInternalObject.Count; z++)
-                    {
-
-                    }
-                }
+                _m += combinedObject.AmountOfElementsInTheDistanceArray;
             }
-            _nele_jac += ;
-            _m +=;
         }
 
         public void CalculationAmountOfVariablesForTask(Data data, ref int _n)
@@ -115,7 +99,7 @@ namespace MainProject.Restrictions
             restrictions += objectsCount;
         }
 
-        public void CalculationFlourAndCeilingValuesRestrictionForVariables(Data data, ref int countObjects, double[] _x_L, double[] _x_U, out int systemVariables)
+        public void CalculationFlourAndCeilingValuesRestrictionForVariablesVector(Data data, ref int countObjects, double[] _x_L, double[] _x_U, out int systemVariables)
         {
             countObjects = 0;
             systemVariables = 0; // amount of variables(not fixed values) in system
@@ -191,7 +175,7 @@ namespace MainProject.Restrictions
                 {
                     if (!((data.Objects[j] is ISphere) || (data.Objects[j] is ICombinedObject)))
                     {
-                        throw new Exception($"Program didn't configure for using polypoint objects. Only spheres or combined object.{data.Objects[j].GetType().ToString()}");
+                        throw new Exception($"Program didn't configure for using polypoint objects. Only spheres or combined objects.{data.Objects[j].GetType().ToString()}");
                     }
 
                     List<IInternalObject> secondInternalObject = new List<IInternalObject>();
@@ -223,18 +207,63 @@ namespace MainProject.Restrictions
 
             #region Combined objects intersections
 
-            //radius = new double[countObjects];
+            foreach (IInternalObject item in data.Objects)
+            {
+                if (item as CombinedObject is null)
+                {
+                    continue;
+                }
 
-            //int q = 0;
-            //for (int i = 0; i < data.Objects.Length; i++)
-            //{
-            //    for (int j = 0; j < data.Objects[i].ListWithObjects.Count; j++)
-            //    {
-            //        radius[q++] = data.Objects[i].ListWithObjects[j].R;
-            //    }
-            //}
+                double[][] arrayWithDistances = ((CombinedObject)item).ArrayWithDistances;
+                for (int i = 0; i < arrayWithDistances.Length; i++)
+                {
+                    for (int j = 0; j < arrayWithDistances[i].Length; j++)
+                    {
+                        _g_L[op] = _g_U[op] = arrayWithDistances[i][j];
+                        ++op;
+                    }
+                }
+            }
 
             #endregion
         }
+
+        #endregion
+
+        #region Eval
+
+        public void Evaluation_g(Data data, int n, double[] x, bool new_x, int m, double[] g)
+        {
+            int count = 0;
+
+            // (R-r[i])^2 - x[i]^2 - y[i]^2 - z^2 >= 0
+            foreach (IInternalObject @object in data.Objects)
+            {
+                if (@object is ISphere)
+                {
+                    g[count++] = EquationKeepingSphereInTheContainer((CircularContainer)data.Container, (Sphere)@object);
+                    continue;
+                }
+
+                if (@object is ICombinedObject)
+                {
+                    foreach (IInternalObject item in ((CombinedObject)@object).InternalInCombineObjects)
+                    {
+                        g[count++] = EquationKeepingSphereInTheContainer((CircularContainer)data.Container, (Sphere)item);
+                        continue;
+                    }
+                }
+            }
+
+            // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
+        }
+
+        private static double EquationKeepingSphereInTheContainer(CircularContainer container, Sphere @object)
+        {
+            return Math.Pow(container.Radius - @object.Radius, 2.0) -
+                   Math.Pow(@object.Center.X, 2.0) - Math.Pow(@object.Center.Y, 2.0) - Math.Pow(@object.Center.Z, 2.0);
+        }
+
+        #endregion
     }
 }

@@ -1,9 +1,9 @@
 ﻿using MainProject.Interfaces.InternalObjects.CircularObjects;
+using MainProject.Model;
 using PackageProject.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using MainProject.Model;
 using static MainProject.Enums.Enums;
 
 namespace MainProject.InternalObjectsClasses.CircularObjects
@@ -11,25 +11,21 @@ namespace MainProject.InternalObjectsClasses.CircularObjects
     public class CombinedObject : IInternalObject, ICombinedObject
     {
         public ObservableCollection<IInternalObject> InternalInCombineObjects { get; private set; }
-
-        public double[] ArrayWithDistances { get; private set; }
+        public double[][] ArrayWithDistances { get; private set; }
         public int NumberOfVariableValues { get; private set; }
-
         public double Weight { get; }
-
-        public ObjectType ObjectType { get; set; }
-
+        public ObjectType ObjectType { get; private set; }
+        public int AmountOfElementsInTheDistanceArray { get; private set; }
 
         public CombinedObject() : this(combinedObjects: new ObservableCollection<IInternalObject>())
         {
-            NumberOfVariableValues = 0;
-
             ObjectType = ObjectType.CombinedObject;
             Weight = CulculateWeightOfObject();
+            NumberOfVariableValues = 0;
+            AmountOfElementsInTheDistanceArray = 0;
+            ArrayWithDistances = null;
 
             InternalInCombineObjects.CollectionChanged += ReCulculateDistances;
-            ArrayWithDistances = new double[InternalInCombineObjects.Count];
-
         }
 
         private CombinedObject(ObservableCollection<IInternalObject> combinedObjects)
@@ -45,7 +41,7 @@ namespace MainProject.InternalObjectsClasses.CircularObjects
                     NumberOfVariableValues = ((Func<int>)(() =>
                       {
                           int count = 0;
-                          foreach (var item in InternalInCombineObjects)
+                          foreach (IInternalObject item in InternalInCombineObjects)
                           {
                               count += item.NumberOfVariableValues;
                           }
@@ -71,14 +67,21 @@ namespace MainProject.InternalObjectsClasses.CircularObjects
                 }
             }
 
-            double[] arrayWithDistances = new double[InternalInCombineObjects.Count];
+            double[][] arrayWithDistances = new double[InternalInCombineObjects.Count - 1][];
+            for (int i = 0; i < arrayWithDistances.Length; i++)
+            {
+                arrayWithDistances[i] = new double[InternalInCombineObjects.Count - 1 - i];
+            }
+
+            AmountOfElementsInTheDistanceArray = 0;
             for (int i = 0; i < InternalInCombineObjects.Count - 1; i++)
             {
                 Point tempFirst = ((ICircularObject)InternalInCombineObjects[i]).Center;
                 for (int j = i + 1; j < InternalInCombineObjects.Count; j++)
                 {
                     Point tempSecond = ((ICircularObject)InternalInCombineObjects[j]).Center;
-                    arrayWithDistances[j] = DistanceBetweenTwoObjects(tempFirst, tempSecond);
+                    arrayWithDistances[i][j - 1 - i] = DistanceBetweenTwoObjects(tempFirst, tempSecond);
+                    ++AmountOfElementsInTheDistanceArray;
                 }
             }
             ArrayWithDistances = arrayWithDistances;

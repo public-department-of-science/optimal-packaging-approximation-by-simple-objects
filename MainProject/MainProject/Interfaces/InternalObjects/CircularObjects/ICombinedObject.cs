@@ -7,7 +7,9 @@ namespace MainProject.Interfaces.InternalObjects.CircularObjects
     {
         ObservableCollection<IInternalObject> InternalInCombineObjects { get; }
 
-        double[] ArrayWithDistances { get; }
+        double[][] ArrayWithDistances { get; }
+
+        int AmountOfElementsInTheDistanceArray { get; }
 
         void ComputeDistanceWithObjects();
     }

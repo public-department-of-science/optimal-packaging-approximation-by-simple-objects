@@ -1,7 +1,7 @@
 ﻿using MainProject.Enums;
+using MainProject.Model;
 using PackageProject.Interfaces;
 using System;
-using MainProject.Model;
 
 namespace PackageProject.InternalObjectsClasses.CircularObjects
 {
@@ -28,6 +28,19 @@ namespace PackageProject.InternalObjectsClasses.CircularObjects
             Center = center ?? new Point();
             NumberOfVariableValues = 4;
             Radius = radius;
+            ObjectType = Enums.ObjectType.Sphere;
+
+            Weight = ((Func<double>)(() =>
+            {
+                return 4.0 / 3.0 * Math.PI * Math.Pow(Radius, 3.0);
+            })).Invoke();
+        }
+
+        public Sphere(double[] data)
+        {
+            Center = new Point(data);
+            NumberOfVariableValues = 4;
+            Radius = data[3];
             ObjectType = Enums.ObjectType.Sphere;
 
             Weight = ((Func<double>)(() =>
