@@ -63,7 +63,7 @@ namespace MainProject.InternalObjectsClasses.CircularObjects
                     case ObjectType.Sphere:
                         break;
                     default:
-                        throw new Exception($"Combined object must be {ObjectType.Circle} or {ObjectType.Sphere} structure!");
+                        throw new Exception($"Combined object must be {ObjectType.Sphere} structure!");
                 }
             }
 

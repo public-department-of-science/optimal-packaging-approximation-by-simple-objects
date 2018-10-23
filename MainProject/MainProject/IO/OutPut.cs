@@ -44,6 +44,11 @@ namespace hs071_cs
             Console.ForegroundColor = ConsoleColor.Black;
         }
 
+        internal static void SaveResultToFile(Data data1232, string v)
+        {
+            throw new NotImplementedException();
+        }
+
         //public static void ShowData(Data data)
         //{
         //    int cicleCount = data.objectsCount;
@@ -190,27 +195,9 @@ namespace hs071_cs
                 ErrorMessage("Writing Error!! --> " + ex.Message);
             }
         }
-
-        public static string TimeToString(Stopwatch Watch)
-        {
-            TimeSpan ts = Watch.Elapsed;
-            return String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-        }
-        // Форматирует результат конвертирования времени запуска программы 
-        public static string getElapsedTime(Stopwatch Watch)
-        {
-            // Get the elapsed time as a TimeSpan value.
-            TimeSpan ts = Watch.Elapsed;
-            // Format and display the TimeSpan value.
-
-            return String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
-        }
         #endregion
+
         #region Form Interface
-        private static void WriteToTextBox(string str)
-        {
-            throw new NotImplementedException();
-        }
         #endregion
     }
 }
