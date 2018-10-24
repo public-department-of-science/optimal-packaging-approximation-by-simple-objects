@@ -145,7 +145,6 @@ namespace MainProject.Restrictions
             {
                 _g_L[op] = 0;
                 _g_U[op++] = Ipopt.PositiveInfinity;
-                Console.WriteLine(_g_U[op-1].ToString());
             }
 
             #endregion
@@ -222,7 +221,6 @@ namespace MainProject.Restrictions
                     }
                 }
             }
-            Console.WriteLine(op.ToString());
             #endregion
         }
 
@@ -233,7 +231,6 @@ namespace MainProject.Restrictions
         public void Evaluation_g(Data data, int n, double[] x, bool new_x, int m, double[] restrictions)
         {
             int gCount = 0;
-
             // (R-r[i])^2 - x[i]^2 - y[i]^2 - z^2 >= 0
             foreach (IInternalObject @object in data.Objects)
             {
@@ -254,7 +251,6 @@ namespace MainProject.Restrictions
             }
 
             // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
-
             for (int i = 0; i < data.Objects.Count - 1; i++)
             {
                 List<IInternalObject> firstInternalObject = new List<IInternalObject>();
@@ -294,7 +290,7 @@ namespace MainProject.Restrictions
                 }
             }
 
-            //
+            // objects intersection in combined object 
             foreach (IInternalObject item in data.Objects)
             {
                 CombinedObject combinedObject = item as CombinedObject;
@@ -314,94 +310,258 @@ namespace MainProject.Restrictions
             }
         }
 
-        internal void Evaluation_jacobian_g(Data data, int n, double[] x, bool new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values)
+        public void Evaluation_jacobian_g(Data data, int n, double[] x, bool new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values)
         {
-            //if (values == null)
-            //{
-            //    int kk = 0,
-            //        g = 0;
+            if (values == null)
+            {
+                int kk = 0, g = 0;
+                // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
+                // позиции R, Х и У, Z
+                foreach (IInternalObject @object in data.Objects)
+                {
+                    if (@object is ISphere)
+                    {
+                        kk = ElementsPositionCalculationForKeepingObjectsInArea_Jacobian_G(n, iRow, jCol, kk, g);
+                        ++g;
+                        continue;
+                    }
 
-            //    // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
-            //    // позиции R, Х и У, Z
-            //    for (g = 0; g < countCircles; ++g)
-            //    {
-            //        //R0 -> внешний шар 
-            //        iRow[kk] = g;
-            //        jCol[kk++] = _n - 1;
+                    if (@object is ICombinedObject)
+                    {
+                        foreach (IInternalObject item in ((CombinedObject)@object).InternalInCombineObjects)
+                        {
+                            kk = ElementsPositionCalculationForKeepingObjectsInArea_Jacobian_G(n, iRow, jCol, kk, g);
+                            continue;
+                        }
+                    }
+                }
 
-            //        //X
-            //        iRow[kk] = g;
-            //        jCol[kk++] = 3 * g;
+                // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
+                for (int i = 0; i < data.Objects.Count - 1; i++)
+                {
+                    List<IInternalObject> firstInternalObject = new List<IInternalObject>();
+                    if (data.Objects[i] is CombinedObject)
+                    {
+                        firstInternalObject.AddRange(((CombinedObject)data.Objects[i]).InternalInCombineObjects);
+                    }
+                    else
+                    {
+                        firstInternalObject.Add(data.Objects[i]);
+                    }
 
-            //        //Y
-            //        iRow[kk] = g;
-            //        jCol[kk++] = 3 * g + 1;
+                    for (int j = i + 1; j < data.Objects.Count; j++)
+                    {
+                        List<IInternalObject> secondInternalObject = new List<IInternalObject>();
+                        if (data.Objects[j] is CombinedObject)
+                        {
+                            secondInternalObject.AddRange(((CombinedObject)data.Objects[j]).InternalInCombineObjects);
+                        }
+                        else
+                        {
+                            secondInternalObject.Add(data.Objects[j]);
+                        }
 
-            //        //Z
-            //        iRow[kk] = g;
-            //        jCol[kk++] = 3 * g + 2;
-            //    }
+                        // Cycle for not intersection restriction
+                        for (int k = 0; k < firstInternalObject.Count; k++)
+                        {
+                            for (int z = 0; z < secondInternalObject.Count; z++)
+                            {
+                                kk = ElementsPositionCalculationForNotIntersectionObjects_Jacobian_G(iRow, jCol, kk, g, k, z);
+                                ++g;
+                            }
+                        }
+                    }
+                }
 
-            //    // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
-            //    for (int i = 0; i < countCircles - 1; ++i)
-            //    {
-            //        for (int j = i + 1; j < countCircles; ++j)
-            //        {
-            //            // -------  X[i], X[j] ------- 
-            //            iRow[kk] = g;
-            //            jCol[kk++] = 3 * i;
-            //            iRow[kk] = g;
-            //            jCol[kk++] = 3 * j;
+                // попарное пересечение 
+                foreach (IInternalObject item in data.Objects)
+                {
+                    CombinedObject combinedObject = item as CombinedObject;
+                    if (combinedObject is null)
+                    {
+                        continue;
+                    }
 
-            //            // -------  Y[i], Y[j] ------- 
-            //            iRow[kk] = g; ;
-            //            jCol[kk++] = 3 * i + 1;
-            //            iRow[kk] = g;
-            //            jCol[kk++] = 3 * j + 1;
+                    double[][] arrayWithDistances = combinedObject.ArrayWithDistances;
+                    for (int i = 0; i < arrayWithDistances.Length; i++)
+                    {
+                        for (int j = 0; j < arrayWithDistances[i].Length; j++)
+                        {
+                            kk = ElementsPositionCalculationForNotIntersectionObjects_Jacobian_G(iRow, jCol, kk, g, i, j);
+                            ++g;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                int kk = 0;
+                // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
+                foreach (IInternalObject @object in data.Objects)
+                {
+                    if (@object is ISphere)
+                    {
+                        Sphere sphere = (Sphere)@object;
+                        kk = ValuesCalculationKeepingInArea_Jacobian_G(n, x, values, kk, sphere);
+                        continue;
+                    }
 
-            //            // -------  Z[i], Z[j] ------- 
-            //            iRow[kk] = g;
-            //            jCol[kk++] = 3 * i + 2;
-            //            iRow[kk] = g;
-            //            jCol[kk++] = 3 * j + 2;
+                    if (@object is ICombinedObject)
+                    {
+                        foreach (IInternalObject item in ((CombinedObject)@object).InternalInCombineObjects)
+                        {
+                            Sphere sphere = (Sphere)item;
+                            kk = ValuesCalculationKeepingInArea_Jacobian_G(n, x, values, kk, sphere);
+                            continue;
+                        }
+                    }
+                }
 
-            //            ++g;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
-            //    int kk = 0;
-            //    for (int i = 0; i < countCircles; i++)// шаг по Z это каждый третий эл
-            //    {
-            //        values[kk] = 2.0 * (x[_n - 1] - radius[i]); // R0'
-            //        kk++;
-            //        values[kk] = -2.0 * x[3 * i]; //X'
-            //        kk++;
-            //        values[kk] = -2.0 * x[3 * i + 1]; //Y'
-            //        kk++;
-            //        values[kk] = -2.0 * x[3 * i + 2]; //Z'
-            //        kk++;
-            //    }
-            //    // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
-            //    //  Console.WriteLine("---------------------------------------");
+                // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
 
-            //    for (int i = 0; i < countCircles - 1; i++)
-            //    {
-            //        for (int j = i + 1; j < countCircles; j++)
-            //        {
-            //            values[kk++] = 2.0 * (x[3 * i] - x[3 * j]); //X[i]'
-            //            values[kk++] = -2.0 * (x[3 * i] - x[3 * j]); //X[j]'
+                for (int i = 0; i < data.Objects.Count - 1; i++)
+                {
+                    List<IInternalObject> firstInternalObject = new List<IInternalObject>();
+                    if (data.Objects[i] is CombinedObject)
+                    {
+                        firstInternalObject.AddRange(((CombinedObject)data.Objects[i]).InternalInCombineObjects);
+                    }
+                    else
+                    {
+                        firstInternalObject.Add(data.Objects[i]);
+                    }
 
-            //            values[kk++] = 2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[i]'
-            //            values[kk++] = -2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[j]'
+                    for (int j = i + 1; j < data.Objects.Count; j++)
+                    {
+                        List<IInternalObject> secondInternalObject = new List<IInternalObject>();
+                        if (data.Objects[j] is CombinedObject)
+                        {
+                            secondInternalObject.AddRange(((CombinedObject)data.Objects[j]).InternalInCombineObjects);
+                        }
+                        else
+                        {
+                            secondInternalObject.Add(data.Objects[j]);
+                        }
 
-            //            values[kk++] = 2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[i]'
-            //            values[kk++] = -2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[j]'
-            //        }
-            //    }
-            //}
+                        // Cycle for not intersection restriction
+                        for (int k = 0; k < firstInternalObject.Count; k++)
+                        {
+                            Sphere first = (Sphere)firstInternalObject[k];
+                            for (int z = 0; z < secondInternalObject.Count; z++)
+                            {
+                                Sphere second = (Sphere)secondInternalObject[z];
+
+                                kk = ValuesCalculationObjectsNotIntersection_Jacobian_G(values, kk, first, second);
+                                continue;
+                            }
+                        }
+                    }
+                }
+                //попарное пересечение комб объетов
+                foreach (IInternalObject item in data.Objects)
+                {
+                    CombinedObject combinedObject = item as CombinedObject;
+                    if (combinedObject is null)
+                    {
+                        continue;
+                    }
+
+                    double[][] arrayWithDistances = combinedObject.ArrayWithDistances;
+                    for (int i = 0; i < arrayWithDistances.Length; i++)
+                    {
+                        for (int j = 0; j < arrayWithDistances[i].Length; j++)
+                        {
+                            kk = ValuesCalculationObjectsIntersectionInCombinedObjects_Jacobian_G(values, kk);
+                            continue;
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Restriction helper methods
+
+        private static int ValuesCalculationObjectsIntersectionInCombinedObjects_Jacobian_G(double[] values, int kk)
+        {
+            values[kk++] = 2.0;//* (first.Center.X - second.Center.X); //X[i]'
+            values[kk++] = -2.0;// * (first.Center.X - second.Center.X); //X[j]'
+
+            values[kk++] = 2.0;// * (first.Center.Y - second.Center.Y); //Y[i]'
+            values[kk++] = -2.0;// * (first.Center.Y - second.Center.Y); //Y[j]'
+
+            values[kk++] = 2.0;// * (first.Center.Z - second.Center.Z); //Z[i]'
+            values[kk++] = -2.0;// * (first.Center.Z - second.Center.Z); //Z[j]'
+            return kk;
+        }
+
+        private static int ValuesCalculationObjectsNotIntersection_Jacobian_G(double[] values, int kk, Sphere first, Sphere second)
+        {
+            values[kk++] = 2.0 * (first.Center.X - second.Center.X); //X[i]'
+            values[kk++] = -2.0 * (first.Center.X - second.Center.X); //X[j]'
+
+            values[kk++] = 2.0 * (first.Center.Y - second.Center.Y); //Y[i]'
+            values[kk++] = -2.0 * (first.Center.Y - second.Center.Y); //Y[j]'
+
+            values[kk++] = 2.0 * (first.Center.Z - second.Center.Z); //Z[i]'
+            values[kk++] = -2.0 * (first.Center.Z - second.Center.Z); //Z[j]'
+            return kk;
+        }
+
+        private static int ValuesCalculationKeepingInArea_Jacobian_G(int n, double[] x, double[] values, int kk, Sphere sphere)
+        {
+            values[kk] = 2.0 * (x[n - 1] - sphere.Radius); // R0'
+            kk++;
+            values[kk] = -2.0 * sphere.Center.X; //X'
+            kk++;
+            values[kk] = -2.0 * sphere.Center.Y; //Y'
+            kk++;
+            values[kk] = -2.0 * sphere.Center.Z; //Z'
+            kk++;
+            return kk;
+        }
+
+        private static int ElementsPositionCalculationForNotIntersectionObjects_Jacobian_G(int[] iRow, int[] jCol, int kk, int g, int k, int z)
+        {
+            // -------  X[i], X[j] ------- 
+            iRow[kk] = g;
+            jCol[kk++] = 3 * k;
+            iRow[kk] = g;
+            jCol[kk++] = 3 * z + 1;
+
+            // -------  Y[i], Y[j] ------- 
+            iRow[kk] = g;
+            jCol[kk++] = 3 * k + 2;
+            iRow[kk] = g;
+            jCol[kk++] = 3 * z + 3;
+
+            // -------  Z[i], Z[j] ------- 
+            iRow[kk] = g;
+            jCol[kk++] = 3 * k + 4;
+            iRow[kk] = g;
+            jCol[kk++] = 3 * z + 5;
+            return kk;
+        }
+
+        private static int ElementsPositionCalculationForKeepingObjectsInArea_Jacobian_G(int n, int[] iRow, int[] jCol, int kk, int g)
+        {
+            //R0 -> внешний шар 
+            iRow[kk] = g;
+            jCol[kk++] = n - 1;
+
+            //X
+            iRow[kk] = g;
+            jCol[kk++] = 3 * g;
+
+            //Y
+            iRow[kk] = g;
+            jCol[kk++] = 3 * g + 1;
+
+            //Z
+            iRow[kk] = g;
+            jCol[kk++] = 3 * g + 2;
+            return kk;
         }
 
         private double EquationNotIntersactionTwoSpheres(Sphere first, Sphere second)

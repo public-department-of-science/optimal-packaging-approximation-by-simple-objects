@@ -42,6 +42,7 @@ namespace hs071_cs
 
             //g
             var t = 5;
+            Console.WriteLine(t);
             Restrictions.CalculationFlourAndCeilingValuesForAllRestrictions_g(data, _g_L, _g_U, objectsCont);
 
             #endregion
