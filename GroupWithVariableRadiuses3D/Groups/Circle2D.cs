@@ -6,16 +6,16 @@
 
 namespace hs071_cs.ObjectOptimazation
 {
-    public class Circle2D : CircleBase
+    public class Balls : CircleBase
     {
         public CoordinateBase Coordinate { get; set; }
 
         public OdzBase Odz { get; set; }
 
-        public Circle2D()
+        public Balls()
         {
-            this.Coordinate = new Coordinate2D();
-            this.Odz = new Odz2D();
+            Coordinate = new Coordinate2D();
+            Odz = new Odz2D();
         }
     }
 }

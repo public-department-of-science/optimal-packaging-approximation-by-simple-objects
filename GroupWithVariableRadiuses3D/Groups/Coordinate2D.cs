@@ -12,9 +12,11 @@ namespace hs071_cs.ObjectOptimazation
 
         public override double Y { get; set; }
 
+        public override double Z { get; set; }
+
         public Coordinate2D()
         {
-            this.X = this.Y = 0.0;
+            X = Y = Z = 0.0;
         }
     }
 }

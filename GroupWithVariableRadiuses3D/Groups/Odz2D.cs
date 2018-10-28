@@ -20,9 +20,13 @@ namespace hs071_cs.ObjectOptimazation
 
         public override double yU { get; set; }
 
+        public override double zL { get; set; }
+
+        public override double zU { get; set; }
+
         public Odz2D()
         {
-            this.rL = this.rU = this.xL = this.xU = this.yL = this.yU = 0.0;
+            rL = rU = xL = xU = yL = yU = zL = zU = 0.0;
         }
     }
 }

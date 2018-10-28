@@ -19,5 +19,9 @@ namespace hs071_cs.ObjectOptimazation
         public abstract double yL { get; set; }
 
         public abstract double yU { get; set; }
+
+        public abstract double zL { get; set; }
+
+        public abstract double zU { get; set; }
     }
 }

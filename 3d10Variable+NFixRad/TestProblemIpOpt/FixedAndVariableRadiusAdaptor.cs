@@ -101,9 +101,11 @@ namespace hs071_cs
              **************************************************************************************/
             _nele_jac = 0;
             _m = 0;
+            
             // (R-r[i])^2-x[i]^2-y[i]^2 -z[i]^2 >= 0
             _nele_jac += 5 * ballsCount; // x, y, z , r, R
             _m += ballsCount;
+
             // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]+r[j])^2 >=0
             _nele_jac += 2 * 4 * ballsCount * (ballsCount - 1) / 2;  // 2 * 3 два ограничения по 3 ненулевых частных производных
             _m += ballsCount * (ballsCount - 1) / 2;
