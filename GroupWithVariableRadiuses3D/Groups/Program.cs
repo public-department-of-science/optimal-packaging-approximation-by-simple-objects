@@ -65,7 +65,7 @@ namespace hs071_cs
             //rNach.OrderBy(a => a).ToArray();
             rSortSum = raSumGenerate(rNach); // отсортированные радиусы r[0]; r[0] + r[1]; ...
                                              // генерируем начальные точки x,y,r,R
-            xyRRandomGenerateAvg(ballsCount, rNach, out xNach, out yNach, out yNach, out RNach);
+            xyRRandomGenerateAvg(ballsCount, rNach, out xNach, out yNach, out zNach, out RNach);
             Console.WriteLine("\n\t~~~ Генерируем точки с которых будем считать ~~~");
             for (int i = 0; i < ballsCount; ++i)
             {
