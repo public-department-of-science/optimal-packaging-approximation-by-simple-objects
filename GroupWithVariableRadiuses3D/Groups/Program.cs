@@ -30,8 +30,8 @@ namespace hs071_cs
         public static void Main()
         {
             //Timer tmr = new Timer(Tick, null, 1000, 1000);
-            const int ballsCount = 20; // количество кругов
-            const double maxRandRadius = 30; // максимальный радиус кругов r = 1..maxRandRadius
+            const int ballsCount = 40; // количество кругов
+            const double maxRandRadius = 20; // максимальный радиус кругов r = 1..maxRandRadius
             #region Инициализация и обявление переменных
             double[] rSortSum = null; // отсортированный массив радиусов, для ограничений
             int[] groups = new int[ballsCount];
@@ -50,7 +50,6 @@ namespace hs071_cs
             double[] xBest = new double[ballsCount];
             double[] yBest = new double[ballsCount];
             double[] zBest = new double[ballsCount];
-            double RBest = maxRandRadius * ballsCount;
 
             Stopwatch fullTaskTime = new Stopwatch();
             #endregion
@@ -94,18 +93,17 @@ namespace hs071_cs
             xyzFixR[3 * ballsCount] = RNach;
             Stopwatch fixRTaskTime = new Stopwatch();
             fixRTaskTime.Start();
-            //using (var op7 = new OptimalPoints7(rNach, xNach, yNach, RNach))
-            //{
-            //    RunTask(op7, xyFixR, out xIter, out yIter);
-            //    // Сохраняем результат рачсётов с фиксированными радиусами
-            //    //for (int i = 0; i < circlesCount; ++i)
-            //    //{
-            //    //  // rNach - не изменились
-            //    //  xIter[i] = xNach[i];
-            //    //  yIter[i] = yNach[i];
-            //    //}
-            //    RNach = RIter = xyFixR[2 * circlesCount];
-            //}
+
+            //At first with Fixed radiuses
+            Data startPointData = new Data(xNach, yNach, zNach, rNach, RNach, ballsCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+            using (FixedRadius3dAdaptor adaptor = new FixedRadius3dAdaptor(startPointData))
+            {
+                RunTask(adaptor, xyzFixR, out xIter, out yIter, out zIter, ballsCount);
+                RIter = xyzFixR[3 * ballsCount];
+                rNach = adaptor.radius;
+                RNach = RIter = xyzFixR[3 * ballsCount];
+            }
+
             fixRTaskTime.Stop();
             Console.WriteLine("Выполенение задачи RunTime: " + getElapsedTime(fixRTaskTime));
 
@@ -146,9 +144,13 @@ namespace hs071_cs
                 //    Circles[i].Group = 0;
                 //}
 
-                if (i < 3)
+                if (i < 7)
                 {
                     balls[i].Group = 1;
+                }
+                if (i >= 7 && i <= 15)
+                {
+                    balls[i].Group = 2;
                 }
             }
             Stopwatch varRTaskTime = new Stopwatch();
@@ -188,11 +190,10 @@ namespace hs071_cs
                 problem.AddOption("mu_strategy", "adaptive");
                 problem.AddOption("hessian_approximation", "limited-memory");
                 problem.AddOption("output_file", op.ToString() + "_" + DateTime.Now.ToShortDateString() + "_" + DateTime.Now.Hour + "_" + DateTime.Now.Minute + ".txt");
-                problem.AddOption("print_frequency_iter", 20);
                 //problem.AddOption("file_print_level", 7); // 0..12
-                problem.AddOption("file_print_level", 8);
+                problem.AddOption("file_print_level", 0);
                 problem.AddOption("max_iter", 100000);
-                problem.AddOption("print_level", 0); // 0<= value <= 12, default value is 5
+                problem.AddOption("print_level", 3); // 0<= value <= 12, default value is 5
 #if INTERMEDIATE
         problem.SetIntermediateCallback(p.intermediate);
 #endif
@@ -237,6 +238,41 @@ namespace hs071_cs
             Console.WriteLine("===> RunTime: " + TimeToString(timer));
             return status;
         }
+
+        private static void RunTask(FixedRadius3dAdaptor op, double[] xyz, out double[] NewX, out double[] NewY, out double[] NewZ, int ballN)
+        {
+            Stopwatch taskWatch = new Stopwatch();
+            IpoptReturnCode status;
+            taskWatch.Start();
+            using (Ipopt problem = new Ipopt(op._n, op._x_L, op._x_U, op._m, op._g_L, op._g_U, op._nele_jac, op._nele_hess, op.Eval_f, op.Eval_g, op.Eval_grad_f, op.Eval_jac_g, op.Eval_h))
+            {
+                // https://www.coin-or.org/Ipopt/documentation/node41.html#opt:print_options_documentation
+                problem.AddOption("tol", 1e-2);
+                problem.AddOption("mu_strategy", "adaptive");
+                problem.AddOption("hessian_approximation", "limited-memory");
+                problem.AddOption("max_iter", 3000);
+                problem.AddOption("print_level", 3); // 0 <= value <= 12, default is 5
+
+                /* solve the problem */
+                double obj;
+                status = problem.SolveProblem(xyz, out obj, null, null, null, null);
+            }
+            taskWatch.Stop();
+            OutPut.ReturnCodeMessage("\nOptimization return status: " + status);
+
+            NewX = new double[ballN];
+            NewY = new double[ballN];
+            NewZ = new double[ballN];
+
+            for (int i = 0; i < ballN; i++)
+            {
+                NewX[i] = xyz[3 * i];
+                NewY[i] = xyz[3 * i + 1];
+                NewZ[i] = xyz[3 * i + 2];
+            }
+            OutPut.WriteLine("RunTime: " + OutPut.getElapsedTime(taskWatch));
+        }
+
         private static string TimeToString(Stopwatch Watch)
         {
             // Get the elapsed time as a TimeSpan value.
@@ -244,129 +280,6 @@ namespace hs071_cs
             // Format and display the TimeSpan value.
             return String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
         }
-
-        //        private static void RunTask(OptimalPoints7 op, double[] xy, out double[] NewX, out double[] NewY)
-        //        {
-        //            Stopwatch taskWatch = new Stopwatch();
-        //            IpoptReturnCode status;
-        //            taskWatch.Start();
-        //            /* allocate space for the initial point and set the values */
-        //            using (Ipopt problem = new Ipopt(op._n, op._x_L, op._x_U, op._m, op._g_L, op._g_U, op._nele_jac, op._nele_hess, op.eval_f, op.eval_g, op.eval_grad_f, op.eval_jac_g, op.eval_h))
-        //            {
-        //                /* Set some options.  The following ones are only examples,
-        //                   they might not be suitable for your problem. */
-        //                // https://www.coin-or.org/Ipopt/documentation/node41.html#opt:print_options_documentation
-        //                problem.AddOption("tol", 1e-7);
-        //                problem.AddOption("mu_strategy", "adaptive");
-        //                problem.AddOption("hessian_approximation", "limited-memory");
-        //                problem.AddOption("output_file", op.ToString() + "_" + DateTime.Now.ToShortDateString() + "_" + DateTime.Now.Hour + "_" + DateTime.Now.Minute + ".txt");
-        //                //problem.AddOption("print_frequency_iter", 20);
-        //                //problem.AddOption("file_print_level", 7); // 0..12
-        //                problem.AddOption("file_print_level", 1);
-        //                problem.AddOption("max_iter", 100000);
-        //                problem.AddOption("print_level", 1); // 0<= value <= 12, default value is 5
-        //#if INTERMEDIATE
-        //                problem.SetIntermediateCallback(p.intermediate);
-        //#endif
-        //                /* solve the problem */
-        //                double obj;
-        //                status = problem.SolveProblem(xy, out obj, null, null, null, null);
-        //            }
-        //            taskWatch.Stop();
-        //            Console.WriteLine("{0}{0}Optimization return status: {1}{0}{0}", Environment.NewLine, status);
-        //            //SaveToFile("d:\\out.txt", r, x, 10);
-        //            NewX = new double[circleN];
-        //            NewY = new double[circleN];
-        //            for (int i = 0; i < circleN; ++i)
-        //            {
-        //                //Console.WriteLine("x[{0}]=  {1}", i, x[i]);
-        //                NewX[i] = xy[2 * i];
-        //                NewY[i] = xy[2 * i + 1];
-        //            }
-        //            //ShowData(x); // форматный вывод результата
-        //            Console.WriteLine("RunTime: " + getElapsedTime(taskWatch));
-        //        }
-
-        //        private static void RunTask(OptimalPoints4 op, double[] x, out double[] NewX)
-        //        {
-        //            Stopwatch stopWatch = new Stopwatch();
-        //            IpoptReturnCode status;
-
-        //            stopWatch.Reset();
-        //            stopWatch.Start();
-        //            /* allocate space for the initial point and set the values */
-        //            using (Ipopt problem = new Ipopt(op._n, op._x_L, op._x_U, op._m, op._g_L, op._g_U, op._nele_jac, op._nele_hess, op.eval_f, op.eval_g, op.eval_grad_f, op.eval_jac_g, op.eval_h))
-        //            {
-        //                /* Set some options.  The following ones are only examples,
-        //                   they might not be suitable for your problem. */
-        //                // https://www.coin-or.org/Ipopt/documentation/node41.html#opt:print_options_documentation
-        //                problem.AddOption("tol", 1e-7);
-        //                problem.AddOption("mu_strategy", "adaptive");
-        //                problem.AddOption("hessian_approximation", "limited-memory");
-        //                problem.AddOption("output_file", op.ToString() + "_" + DateTime.Now.ToShortDateString() + "_" + DateTime.Now.Hour + "_" + DateTime.Now.Minute + ".txt");
-        //                //problem.AddOption("print_frequency_iter", 20);
-        //                //problem.AddOption("file_print_level", 7); // 0..12
-        //                problem.AddOption("file_print_level", 1);
-        //                problem.AddOption("max_iter", 100000);
-        //                problem.AddOption("print_level", 1); // 0<= value <= 12, default value is 5
-        //#if INTERMEDIATE
-        //                problem.SetIntermediateCallback(p.intermediate);
-        //#endif
-        //                /* solve the problem */
-        //                double obj;
-        //                status = problem.SolveProblem(x, out obj, null, null, null, null);
-        //            }
-        //            stopWatch.Stop();
-        //            Console.WriteLine("{0}{0}Optimization return status: {1}{0}{0}", Environment.NewLine, status);
-        //            //SaveToFile("d:\\out.txt", r, x, 10);
-        //            NewX = new double[x.Length];
-        //            for (int i = 0; i < x.Length; ++i)
-        //            {
-        //                //Console.WriteLine("x[{0}]=  {1}", i, x[i]);
-        //                NewX[i] = x[i];
-        //            }
-        //            //ShowData(x); // форматный вывод результата
-        //            Console.WriteLine("RunTime: " + getElapsedTime(stopWatch));
-        //        }
-
-        //        private static void RunTask(OptimalPoints7 op, double[] x, out double[] NewX)
-        //        {
-        //            Stopwatch stopWatch = new Stopwatch();
-        //            IpoptReturnCode status;
-        //            stopWatch.Start();
-        //            /* allocate space for the initial point and set the values */
-        //            using (Ipopt problem = new Ipopt(op._n, op._x_L, op._x_U, op._m, op._g_L, op._g_U, op._nele_jac, op._nele_hess, op.eval_f, op.eval_g, op.eval_grad_f, op.eval_jac_g, op.eval_h))
-        //            {
-        //                /* Set some options.  The following ones are only examples,
-        //                   they might not be suitable for your problem. */
-        //                // https://www.coin-or.org/Ipopt/documentation/node41.html#opt:print_options_documentation
-        //                problem.AddOption("tol", 1e-7);
-        //                problem.AddOption("mu_strategy", "adaptive");
-        //                problem.AddOption("hessian_approximation", "limited-memory");
-        //                problem.AddOption("output_file", op.ToString() + "_" + DateTime.Now.ToShortDateString() + "_" + DateTime.Now.Hour + "_" + DateTime.Now.Minute + ".txt");
-        //                //problem.AddOption("print_frequency_iter", 20);
-        //                //problem.AddOption("file_print_level", 7); // 0..12
-        //                problem.AddOption("file_print_level", 1);
-        //                problem.AddOption("max_iter", 100000);
-        //                problem.AddOption("print_level", 1); // 0<= value <= 12, default value is 5
-        //#if INTERMEDIATE
-        //                problem.SetIntermediateCallback(p.intermediate);
-        //#endif
-        //                /* solve the problem */
-        //                double obj;
-        //                status = problem.SolveProblem(x, out obj, null, null, null, null);
-        //            }
-        //            stopWatch.Stop();
-        //            Console.WriteLine("{0}{0}Optimization return status: {1}{0}{0}", Environment.NewLine, status);
-        //            //SaveToFile("d:\\out.txt", r, x, 10);
-        //            NewX = new double[x.Length];
-        //            for (int i = 0; i < x.Length; ++i)
-        //            {
-        //                //Console.WriteLine("x[{0}]=  {1}", i, x[i]);
-        //                NewX[i] = x[i];
-        //            }
-        //            Console.WriteLine("RunTime: " + getElapsedTime(stopWatch));
-        //        }
 
         /// <summary>
         /// Форматирует результат конвертирования времени запуска программы 
@@ -603,7 +516,5 @@ namespace hs071_cs
 
             return arrSumR;
         }
-
-
     }
 }
