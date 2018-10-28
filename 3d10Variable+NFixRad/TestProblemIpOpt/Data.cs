@@ -34,7 +34,7 @@ namespace hs071_cs
     }
 
 
-    public class Data:IComparable<Data>
+    public class Data : IComparable<Data>
     {
         public int ballCount;
         public int VariableBALLSCount;
@@ -78,11 +78,18 @@ namespace hs071_cs
         public int CompareTo(Data nextSetOfData)
         {
             if (this.R > nextSetOfData.R)
+            {
                 return 1;
+            }
+
             if (this.R < nextSetOfData.R)
+            {
                 return -1;
+            }
             else
+            {
                 return 0;
+            }
         }
     }
 }

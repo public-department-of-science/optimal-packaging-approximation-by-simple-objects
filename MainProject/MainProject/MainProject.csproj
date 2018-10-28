@@ -6,12 +6,12 @@
     <Platforms>AnyCPU;x64</Platforms>
     <ApplicationIcon />
     <Win32Resource />
-    <StartupObject>MainProject.Program</StartupObject>
+    <StartupObject>hs071_cs.Program</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <Prefer32Bit>true</Prefer32Bit>
-    <Optimize>true</Optimize>
+    <Optimize>false</Optimize>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <Reference Include="Cureos.Numerics">
-      <HintPath>..\..\Cureos.Numerics\Cureos.Numerics\bin\x86\Release\Cureos.Numerics.dll</HintPath>
+      <HintPath>bin\Debug\netcoreapp2.1\Cureos.Numerics.dll</HintPath>
     </Reference>
   </ItemGroup>
 

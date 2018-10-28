@@ -1,10 +1,12 @@
 ﻿using hs071_cs;
+using MainProject.Containers;
 using MainProject.Helpers;
 using MainProject.InternalObjectsClasses.CircularObjects;
+using MainProject.Model;
 using PackageProject.InternalObjectsClasses.CircularObjects;
 using System.Collections.Generic;
 
-namespace MainProject
+namespace App
 {
     #region Delegates
 
@@ -31,21 +33,32 @@ namespace MainProject
 
             #region will be deleted soon, now it's like imitation of data input
 
-            CombinedObject list1 = new CombinedObject();
-            list1.InternalInCombineObjects.Add(new Sphere(new Model.Point(), 2));
-            list1.InternalInCombineObjects.Add(new Sphere(new Model.Point(3, 2, -1), 28));
-            list1.InternalInCombineObjects.Add(new Sphere(new Model.Point(3, 2, -1), 8));
+            //CombinedObject list1 = new CombinedObject();
+            //list1.InternalInCombineObjects.Add(new Sphere(new Point(), 2));
+            //list1.InternalInCombineObjects.Add(new Sphere(new Point(3, 2, -1), 28));
+            //list1.InternalInCombineObjects.Add(new Sphere(new Point(3, 2, -1), 8));
 
-            List<CombinedObject> combinedObjects = new List<CombinedObject>()
-            {
-                list1
-            };
+            //List<CombinedObject> combinedObjects = new List<CombinedObject>()
+            //{
+            //    list1
+            //};
 
             Data data1232 = new Data(null);
-            data1232.Objects.AddRange(combinedObjects);
-            data1232.Objects.Add(new Sphere(new MainProject.Model.Point(1, 2, 3), 12));
+            data1232.Container = new CircularContainer(20, new Point());
 
-            Adapter adaptor = new Adapter(data1232);
+            data1232.Objects.AddRange(combinedObjects);
+            data1232.Objects.Add(new Sphere(new Point(0, 2, 4), 2));
+            data1232.Objects.Add(new Sphere(new Point(1, -2, 3), 3));
+            data1232.Objects.Add(new Sphere(new Point(-4, -5, 7), 10));
+
+            try
+            {
+                solverHelper.SolveTheProblem(dataAdapter: new Adapter(data1232), data: data1232);
+            }
+            catch (System.Exception ex)
+            {
+                throw;
+            }
 
             #endregion
 
@@ -58,7 +71,7 @@ namespace MainProject
 
             #endregion
 
-            OutPut.SaveResultToFile(data1232, "IterationFixedRadius");
+           // OutPut.SaveResultToFile(data1232, "IterationFixedRadius");
         }
     }
 }

@@ -27,7 +27,7 @@ namespace hs071_cs
 
     public class Program
     {
-        public static int VariableBALLS { get; private set; } =10;
+        public static int VariableBALLS { get; private set; } = 10;
 
         public static void Main()
         {
@@ -204,7 +204,7 @@ namespace hs071_cs
                 xyzrFixR[++j] = yNach[i];
                 xyzrFixR[++j] = zNach[i];
                 xyzrFixR[++j] = rNach[i] * random.NextDouble();//centroid + range * (random.NextDouble() - 0.5); //rNach[i] * random.NextDouble(); // // Math.Abs(xNach[i]); // //rNach[i];
-               // xyzrFixR[++j] = centroid + range * (random.NextDouble() - 0.5); //rNach[i] * random.NextDouble(); // // Math.Abs(xNach[i]); // //rNach[i];
+                                                               // xyzrFixR[++j] = centroid + range * (random.NextDouble() - 0.5); //rNach[i] * random.NextDouble(); // // Math.Abs(xNach[i]); // //rNach[i];
 
                 j++;
             }

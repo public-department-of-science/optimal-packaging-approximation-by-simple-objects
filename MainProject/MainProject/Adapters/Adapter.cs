@@ -5,7 +5,7 @@ namespace hs071_cs
     /// <summary>
     /// Classic adaptor with spheres, combined objects
     /// </summary>
-    internal class Adapter : BaseAdapter
+    public class Adapter : BaseAdapter
     {
         /// <summary>
         /// 
@@ -41,7 +41,7 @@ namespace hs071_cs
             _g_U = new double[_m];
 
             //g
-            var t = 5;
+            int t = 5;
             Console.WriteLine(t);
             Restrictions.CalculationFlourAndCeilingValuesForAllRestrictions_g(data, _g_L, _g_U, objectsCont);
 

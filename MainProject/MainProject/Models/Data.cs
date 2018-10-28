@@ -16,7 +16,7 @@ namespace hs071_cs
         public List<IInternalObject> Objects { get; }
         public double[,] C { get; } // матрица связей
 
-        public IContainer Container { get; }
+        public IContainer Container { get; set; }
 
         public Data(IContainer container)
         {
@@ -32,7 +32,54 @@ namespace hs071_cs
         /// <returns></returns>
         public double[] DataToArray()
         {
-            return null;
+            int varCount = 0;
+            foreach (IInternalObject item in Objects)
+            {
+                varCount += item.NumberOfVariableValues;
+            }
+
+            double[] dataToArray = new double[varCount + Container.AmountOfVariables];
+            varCount = 0;
+
+            foreach (IInternalObject @object in Objects)
+            {
+                if (@object is ISphere)
+                {
+                    Sphere sphere = (Sphere)@object;
+                    dataToArray[varCount++] = sphere.Center.X;
+                    dataToArray[varCount++] = sphere.Center.Y;
+                    dataToArray[varCount++] = sphere.Center.Z;
+                    dataToArray[varCount++] = sphere.Radius;
+                    continue;
+                }
+
+                if (@object is ICombinedObject)
+                {
+                    CombinedObject combinedObject = new CombinedObject();
+                    foreach (IInternalObject item in ((CombinedObject)@object).InternalInCombineObjects)
+                    {
+                        if (item is ISphere)
+                        {
+                            Sphere sphere = (Sphere)item;
+                            dataToArray[varCount++] = sphere.Center.X;
+                            dataToArray[varCount++] = sphere.Center.Y;
+                            dataToArray[varCount++] = sphere.Center.Z;
+                            dataToArray[varCount++] = sphere.Radius;
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            for (; varCount < dataToArray.Length; ++varCount)
+            {
+                if (Container is CircularContainer)
+                {
+                    dataToArray[varCount] = ((CircularContainer)Container).Radius;
+                }
+            }
+
+            return dataToArray;
         }
 
         /// <summary>
@@ -44,7 +91,7 @@ namespace hs071_cs
         public Data ArrayToData(double[] x)
         {
             int xCount = 0;
-            Data deserializedArrayToData = new Data(Container);
+            Data deserializedArrayToData = new Data(null);
 
             foreach (IInternalObject @object in Objects)
             {
@@ -69,8 +116,8 @@ namespace hs071_cs
                     {
                         if (item is ISphere)
                         {
-                            double[] sphereData = new double[((Sphere)tempObject).NumberOfVariableValues];
-                            for (int i = 0; i < ((Sphere)tempObject).NumberOfVariableValues; ++i, ++xCount)
+                            double[] sphereData = new double[((Sphere)item).NumberOfVariableValues];
+                            for (int i = 0; i < ((Sphere)item).NumberOfVariableValues; ++i, ++xCount)
                             {
                                 sphereData[i] = x[xCount];
                             }
@@ -84,6 +131,15 @@ namespace hs071_cs
                     continue;
                 }
             }
+
+            for (; xCount < x.Length; ++xCount)
+            {
+                if (Container is IСircularContainer)
+                {
+                    deserializedArrayToData.Container = new CircularContainer(x[xCount], new MainProject.Model.Point());
+                }
+            }
+
             return deserializedArrayToData;
         }
     }

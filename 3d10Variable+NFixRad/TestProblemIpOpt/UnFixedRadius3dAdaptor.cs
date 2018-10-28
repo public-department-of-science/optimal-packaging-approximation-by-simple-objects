@@ -114,7 +114,7 @@ namespace hs071_cs
                     _g_U[op++] = Ipopt.PositiveInfinity;
                 }
             }
-            // Constraint for "перестановочного многоранника"
+            // ограничения "перестановочного многоранника"
             // В правую часть помещаем константы, т.е. от констрант до +inf
             for (int i = 0; i < elementsInTranspositionPolyhedron; i++)
             {
