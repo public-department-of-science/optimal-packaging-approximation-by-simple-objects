@@ -15,8 +15,8 @@ namespace hs071_cs
         public double[] X { get; } //массив х (входят все координаты и радиусы)
         public readonly double[] radius;
         public readonly double[] unsortedRadius;
-        private double K1 = 1;
-        private double K2 = 1;
+        private readonly double K1 = 1;
+        private readonly double K2 = 1;
         private List<double[]> _allIteration;
 
         public List<double[]> AllIteration { get => _allIteration; set => _allIteration = value; }
@@ -143,8 +143,6 @@ namespace hs071_cs
                     _g_U[op++] = Ipopt.PositiveInfinity;
                 }
             }
-
-            double eps = Ipopt.PositiveInfinity;
 
             //Constraints of variebles For  Weight[i] * X[i] + Weight[i] * Y[i] + Weight[i] * Z[i]
             //for (int i = 0; i < countCircles; i++)

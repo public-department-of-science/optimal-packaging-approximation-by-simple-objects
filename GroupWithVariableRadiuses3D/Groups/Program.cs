@@ -20,9 +20,8 @@ using System.Linq;
 
 namespace hs071_cs
 {
-    public class ProgramScriptCycleProblemSept2017
+    public class Program
     {
-        private static readonly int _flagProcess = 1;
         private static Random _rnd = new Random();
         private static int ballN;
         private static int _countVarR; // количество кругов с переменным радиусом
@@ -30,8 +29,9 @@ namespace hs071_cs
         public static void Main()
         {
             //Timer tmr = new Timer(Tick, null, 1000, 1000);
-            const int ballsCount = 40; // количество кругов
+            int ballsCount = 40; // количество кругов
             const double maxRandRadius = 20; // максимальный радиус кругов r = 1..maxRandRadius
+
             #region Инициализация и обявление переменных
             double[] rSortSum = null; // отсортированный массив радиусов, для ограничений
             int[] groups = new int[ballsCount];
@@ -39,7 +39,8 @@ namespace hs071_cs
             double[] xNach = new double[ballsCount];
             double[] yNach = new double[ballsCount];
             double[] zNach = new double[ballsCount];
-            double RNach;
+            double[] rNach = new double[ballsCount];
+            double RNach = 0.0;
 
             double[] rIter = new double[ballsCount];
             double[] xIter = new double[ballsCount];
@@ -50,30 +51,52 @@ namespace hs071_cs
             double[] xBest = new double[ballsCount];
             double[] yBest = new double[ballsCount];
             double[] zBest = new double[ballsCount];
-
+            double RIter = 0.0;
             Stopwatch fullTaskTime = new Stopwatch();
             #endregion
+
             fullTaskTime.Start();
             ballN = ballsCount; // для использования вне Main (количество кругов)
-                                /* Генерирования случайными числами начальных радиусов
-                                 * *********************************************************************************/
-            Console.WriteLine("~~~ Генерирования случайными числами начальных радиусов ~~~");
-            Stopwatch stopWatch = new Stopwatch();
-            double[] rNach = new double[ballsCount];
-            rNach = rRandomGenerate(maxRandRadius, ballsCount);
-            //rNach.OrderBy(a => a).ToArray();
-            rSortSum = raSumGenerate(rNach); // отсортированные радиусы r[0]; r[0] + r[1]; ...
-                                             // генерируем начальные точки x,y,r,R
-            xyRRandomGenerateAvg(ballsCount, rNach, out xNach, out yNach, out zNach, out RNach);
-            Console.WriteLine("\n\t~~~ Генерируем точки с которых будем считать ~~~");
-            for (int i = 0; i < ballsCount; ++i)
+
+            Console.WriteLine("\nSelect input method \n 1 --> Read from File \n 2 --> Random generate");
+
+            string type = "";
+            switch (type = Console.ReadLine())
             {
-                xIter[i] = xNach[i];
-                yIter[i] = yNach[i];
-                zIter[i] = zNach[i];
-                rIter[i] = rNach[i];
+                case "1":
+                    break;
+                case "2":
+                    break;
+                default: return;
             }
-            double RIter = RNach;
+
+            if (type == "1")
+            {
+                Input.ReadFromFile(ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref ballsCount, "");
+            }
+
+            if (type == "2")
+            {
+                /* Генерирования случайными числами начальных радиусов
+                 * *********************************************************************************/
+                Console.WriteLine("~~~ Генерирования случайными числами начальных радиусов ~~~");
+                Stopwatch stopWatch = new Stopwatch();
+                rNach = rRandomGenerate(maxRandRadius, ballsCount);
+                //rNach.OrderBy(a => a).ToArray();
+                rSortSum = raSumGenerate(rNach); // отсортированные радиусы r[0]; r[0] + r[1]; ...
+                                                 // генерируем начальные точки x,y,r,R
+                xyRRandomGenerateAvg(ballsCount, ref rNach, ref xNach, ref yNach, ref zNach, ref RNach);
+                Console.WriteLine("\n\t~~~ Генерируем точки с которых будем считать ~~~");
+                for (int i = 0; i < ballsCount; ++i)
+                {
+                    xIter[i] = xNach[i];
+                    yIter[i] = yNach[i];
+                    zIter[i] = zNach[i];
+                    rIter[i] = rNach[i];
+                }
+                RIter = RNach;
+            }
+
             Console.WriteLine("=== Начальные значения ===");
             ShowData(xNach, yNach, zNach, rNach, RNach);
             Console.WriteLine("=== ================== ===");
@@ -103,6 +126,7 @@ namespace hs071_cs
                 rNach = adaptor.radius;
                 RNach = RIter = xyzFixR[3 * ballsCount];
             }
+            OutPut.SaveToFile(startPointData, "StartPointWithHoles");
 
             fixRTaskTime.Stop();
             Console.WriteLine("Выполенение задачи RunTime: " + getElapsedTime(fixRTaskTime));
@@ -162,6 +186,8 @@ namespace hs071_cs
 #if DEBUG
             ShowData(xIter, yIter, zIter, radius, RIter);
 #endif
+            Data optionalPoint = new Data(xIter, yIter, zIter, rNach, RIter, ballsCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+            OutPut.SaveToFile(optionalPoint, "VariableRadius"); // запись результата в файл
             varRTaskTime.Stop();
             Console.WriteLine("Выполенение задачи RunTime: " + getElapsedTime(varRTaskTime));
 
@@ -227,7 +253,7 @@ namespace hs071_cs
                 //if(i<_countVarR) Console.WriteLine("x[{0}]=    {1}", i, x[2 * _count + i]);
                 NewX[i] = x[3 * i];
                 NewY[i] = x[3 * i + 1];
-                NewZ[i] = x[3 * i + 1];
+                NewZ[i] = x[3 * i + 2];
                 NewR[i] = (i >= _countVarR) ? c[i].Radius : x[3 * ballN + i];
             }
             for (int i = 0; i < x.Length; ++i)
@@ -469,7 +495,7 @@ namespace hs071_cs
         /// Генератор начальных x and y and R
         /// в диапазоне от -max(r[i]) до max(r[i])
         /// </summary>
-        public static void xyRRandomGenerateAvg(int cCount, double[] r, out double[] x, out double[] y, out double[] z, out double R)
+        public static void xyRRandomGenerateAvg(int cCount, ref double[] r, ref double[] x, ref double[] y, ref double[] z, ref double R)
         {
             x = new double[cCount];
             y = new double[cCount];
