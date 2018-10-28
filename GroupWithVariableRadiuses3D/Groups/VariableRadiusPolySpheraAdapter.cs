@@ -126,7 +126,7 @@ namespace hs071_cs
             _m += count;
 
             // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]+r[j])^2 >=0
-            _nele_jac += 2 * 4 * count * (count - 1) + countVarR * (countVarR - 1) + countVarR * countFixR;
+            _nele_jac += 2 * 3 * count * (count - 1) + countVarR * (countVarR - 1) + countVarR * countFixR;
             _m += count * (count - 1) / 2;
 
             int num1 = 0;
