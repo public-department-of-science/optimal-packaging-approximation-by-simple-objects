@@ -1,9 +1,12 @@
 ﻿/*Main for Fixed Radius 3d-optimization*/
 // Message of ipopt Errors: https://www.coin-or.org/Ipopt/documentation/node36.html
 
+using MainProject.Containers;
+using MainProject.Interfaces.InternalObjects.CircularObjects;
+using MainProject.InternalObjectsClasses.CircularObjects;
+using PackageProject.Interfaces;
+using PackageProject.InternalObjectsClasses.CircularObjects;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace hs071_cs
@@ -44,9 +47,67 @@ namespace hs071_cs
             Console.ForegroundColor = ConsoleColor.Black;
         }
 
-        internal static void SaveResultToFile(Data data1232, string v)
+        public static void SaveResultToFile(Data optionalPoint)
         {
-            throw new NotImplementedException();
+            try
+            {
+                string writePath = @"D:\" + optionalPoint.ToString() + ".txt";
+                FileInfo fi = new FileInfo(writePath);
+                if (fi.Exists)
+                {
+                    fi.Delete();
+                }
+                using (StreamWriter sw = new StreamWriter(writePath))
+                {
+                    sw.Write(optionalPoint.Objects.Count.ToString().Replace(',', '.')); // ballCount
+                    sw.Write(" ");
+
+                    foreach (IInternalObject @object in optionalPoint.Objects)
+                    {
+                        sw.WriteLine();
+                        if (@object is ISphere)
+                        {
+                            Sphere sphere = (Sphere)@object;
+                            sw.Write(sphere.Center.X.ToString().Replace(',', '.') + " "); // X
+                            sw.Write(sphere.Center.Y.ToString().Replace(',', '.') + " "); // Y
+                            sw.Write(sphere.Center.Z.ToString().Replace(',', '.') + " "); // Z
+                            sw.Write(sphere.Radius.ToString().Replace(',', '.') + " "); // R
+                            continue;
+                        }
+
+                        if (@object is ICombinedObject)
+                        {
+                            CombinedObject combinedObject = new CombinedObject();
+                            foreach (IInternalObject item in ((CombinedObject)@object).InternalInCombineObjects)
+                            {
+                                if (item is ISphere)
+                                {
+                                    Sphere sphere = (Sphere)item;
+                                    sw.Write(sphere.Center.X.ToString().Replace(',', '.') + " "); // X
+                                    sw.Write(sphere.Center.Y.ToString().Replace(',', '.') + " "); // Y
+                                    sw.Write(sphere.Center.Z.ToString().Replace(',', '.') + " "); // Z
+                                    sw.Write(sphere.Radius.ToString().Replace(',', '.') + " "); // R
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+
+                    sw.WriteLine();
+
+                    if (optionalPoint.Container is CircularContainer)
+                    {
+                        sw.Write(((CircularContainer)optionalPoint.Container).Radius.ToString().Replace(',', '.') + " "); // R
+                    }
+
+                    sw.Close();
+                    WriteLine("Optional point has been written to " + writePath);
+                }
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage("Writing Error!! --> " + ex.Message);
+            }
         }
 
         //public static void ShowData(Data data)
@@ -179,12 +240,18 @@ namespace hs071_cs
                         for (int j = 0; j < circleCount; j++)
                         {
                             if (j == (circleCount - 1))
+                            {
                                 sw.Write(C[i, j]);
+                            }
                             else
+                            {
                                 sw.Write(C[i, j] + " ");
+                            }
                         }
                         if (i != circleCount - 1)
+                        {
                             sw.WriteLine();
+                        }
                     }
                     sw.Close();
                     WriteLine("All Data has been written to " + writePath);

@@ -10,7 +10,7 @@ namespace hs071_cs
         /// <summary>
         /// 
         /// </summary>
-        private readonly Data adaptorLocalData;
+        private static Data adaptorLocalData;
 
         /// <summary>
         /// Constructor
@@ -40,18 +40,16 @@ namespace hs071_cs
             _g_L = new double[_m];
             _g_U = new double[_m];
 
-            //g
-            int t = 5;
-            Console.WriteLine(t);
             Restrictions.CalculationFlourAndCeilingValuesForAllRestrictions_g(data, _g_L, _g_U, objectsCont);
-
+            
             #endregion
         }
 
         public override bool Eval_f(int n, double[] x, bool new_x, out double obj_value)
         {
             // R -> min
-            obj_value = K2 * container.EvalFunction(x, _n);
+            obj_value = container.EvalFunction(x, _n);
+            AddNewIteration(x);
             return true;
         }
 
@@ -70,7 +68,7 @@ namespace hs071_cs
 
         public override bool Eval_jac_g(int n, double[] x, bool new_x, int m, int nele_jac, int[] iRow, int[] jCol, double[] values)
         {
-            Restrictions.Evaluation_jacobian_g(adaptorLocalData.ArrayToData(x), n, x, new_x, m, nele_jac, iRow, jCol, values);
+            Restrictions.Evaluation_jacobian_g((x is null) ? adaptorLocalData : adaptorLocalData.ArrayToData(x), n, x, new_x, m, nele_jac, iRow, jCol, values);
             return true;
         }
 
@@ -79,9 +77,9 @@ namespace hs071_cs
             return false;
         }
 
-        private void AddNewIteration(object element)
+        private void AddNewIteration(double[] element)
         {
-            AllIteration.Add((double[])element);
+            AllIteration.Add(element);
         }
     }
 }

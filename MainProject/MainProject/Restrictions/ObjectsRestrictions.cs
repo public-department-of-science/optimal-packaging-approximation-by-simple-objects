@@ -8,7 +8,7 @@ using PackageProject.InternalObjectsClasses.CircularObjects;
 using System;
 using System.Collections.Generic;
 
-namespace MainProject.Restrictions
+namespace hs071_cs
 {
     public class ObjectsRestrictions //: IRestrictions
     {
@@ -130,7 +130,7 @@ namespace MainProject.Restrictions
 
             for (int j = 0; j < data.Container.AmountOfVariables; ++j, ++systemVariables)
             {
-                _x_L[systemVariables] = Ipopt.NegativeInfinity;
+                _x_L[systemVariables] = 0;
                 _x_U[systemVariables] = Ipopt.PositiveInfinity;
             }
         }
@@ -331,8 +331,8 @@ namespace MainProject.Restrictions
                         foreach (IInternalObject item in ((CombinedObject)@object).InternalInCombineObjects)
                         {
                             kk = ElementsPositionCalculationForKeepingObjectsInArea_Jacobian_G(n, iRow, jCol, kk, g);
-                            continue;
                         }
+                        continue;
                     }
                 }
 

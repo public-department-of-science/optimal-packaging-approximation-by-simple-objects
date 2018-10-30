@@ -13,6 +13,7 @@ namespace hs071_cs
     {
         public Dimension dimension = new Dimension();
 
+        public List<double[]> Iterations { get; set; }
         public List<IInternalObject> Objects { get; }
         public double[,] C { get; } // матрица связей
 
@@ -22,6 +23,7 @@ namespace hs071_cs
         {
             Objects = new List<IInternalObject>();
             Container = container ?? new CircularContainer(0.0, new MainProject.Model.Point());
+            Iterations = new List<double[]>();
             C = null;
         }
 
@@ -90,6 +92,11 @@ namespace hs071_cs
         /// <returns></returns>
         public Data ArrayToData(double[] x)
         {
+            if (x is null)
+            {
+                return new Data(null);
+            }
+
             int xCount = 0;
             Data deserializedArrayToData = new Data(null);
 
@@ -141,6 +148,15 @@ namespace hs071_cs
             }
 
             return deserializedArrayToData;
+        }
+
+        /// <summary>
+        /// ToString()
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return "Solution";
         }
     }
 }
