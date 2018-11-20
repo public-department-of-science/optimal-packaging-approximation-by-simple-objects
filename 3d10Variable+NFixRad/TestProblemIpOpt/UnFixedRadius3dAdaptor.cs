@@ -4,22 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace hs071_cs
 {
-    class UnFixedRadius3dAdaptor : BaseAdaptor, IDisposable
+    internal class UnFixedRadius3dAdaptor : BaseAdaptor, IDisposable
     {
         public double[] X { get; } //массив х (входят все координаты и радиусы)
 
         private readonly int circlesCount; // количество шаров
         private readonly double[] sortedRadius;
-        private double[] unsortedRadius;
+        private readonly double[] unsortedRadius;
         private readonly int elementsInTranspositionPolyhedron; // 2^circleCount
         private readonly int elementsInJacLinPolyhedron; // OneCounter
         private readonly double[] arrayWithRightPart;
         private readonly string[] leftPatOfArrayInBinary;
-        private double K1 = 1;
+        private readonly double K1 = 1;
         private readonly double TAU;
         public List<double[]> AllIteration { get; set; }
 
@@ -64,12 +63,17 @@ namespace hs071_cs
             * *************************************************************************************/
 
             if (circlesCount <= 10)
+            {
                 K1 = 1;
+            }
             else
+            {
                 K1 = 0.4;
+            }
+
             _x_L = new double[_n];
             _x_U = new double[_n];
-            var diametrSum = 2 * sortedRadius.Sum();
+            double diametrSum = 2 * sortedRadius.Sum();
             for (int i = 0; i < circlesCount; i++)
             {
                 _x_L[4 * i] = _x_L[4 * i + 1] = _x_L[4 * i + 2] = -K1 * diametrSum + sortedRadius[i];
@@ -131,12 +135,21 @@ namespace hs071_cs
             int res = 0;
             // r + r + r ... >= cr + cr + cr ...
             for (int i = 0; i < leftPatOfArrayInBinary.Length; ++i)
+            {
                 for (int b = 0; b < leftPatOfArrayInBinary[i].Length; ++b)
+                {
                     if (leftPatOfArrayInBinary[i][b] == '1')
+                    {
                         res++;
+                    }
+                }
+            }
             // sum[r-tau]^2 = sum[cr-tau]^2
             for (int i = 0; i < circlesCount; ++i)
+            {
                 res++;
+            }
+
             return res;
         }
 
@@ -163,7 +176,10 @@ namespace hs071_cs
                     }
                 }
                 else
+                {
                     str.Append(temp);
+                }
+
                 leftPart[i - 1] = str.ToString();
                 str.Clear();
             }
@@ -176,10 +192,12 @@ namespace hs071_cs
                 for (int k = 0; k < ballCount; k++)
                 {
                     if (temp[k] == '1')
+                    {
                         rightPart[i - 1] += constantRadius[k];
+                    }
                 }
             }
-            foreach (var radius in constantRadius)
+            foreach (double radius in constantRadius)
             {
                 sum += Math.Pow(radius - TAU, 2);
             }
@@ -205,7 +223,7 @@ namespace hs071_cs
 
         public override bool Eval_grad_f(int n, double[] x, bool new_x, double[] grad_f)
         {
-            for (var i = 0; i < _n - 1; i++)
+            for (int i = 0; i < _n - 1; i++)
             {
                 grad_f[i] = 0;
             }
@@ -261,13 +279,18 @@ namespace hs071_cs
                 for (int k = 0; k < circlesCount; k++)
                 {
                     if (temp[k] == '1')
+                    {
                         arrayWithNewUnfixedRadius[i - 1] += x[4 * k + 3];
+                    }
                 }
             }
             //leftPatOfArrayInBinary[]
             int length = circlesCount;
             for (int i = 0; i < length; i++)
+            {
                 sum += Math.Pow(x[4 * i + 3] - TAU, 2);
+            }
+
             arrayWithNewUnfixedRadius[arrayWithRightPart.Length - 1] = sum;
         }
 
@@ -390,7 +413,9 @@ namespace hs071_cs
                     values[kk++] = 1;
                 }
                 for (int i = 0; i < circlesCount; i++)
+                {
                     values[kk++] = 2 * (x[4 * i + 3] - TAU);
+                }
             }
             return true;
         }

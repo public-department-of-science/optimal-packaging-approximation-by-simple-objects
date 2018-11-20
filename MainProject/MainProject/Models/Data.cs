@@ -1,11 +1,13 @@
-﻿using MainProject.Containers;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
+using Cureos.Numerics;
+using MainProject.Containers;
 using MainProject.Helpers;
 using MainProject.Interfaces;
 using MainProject.Interfaces.InternalObjects.CircularObjects;
 using MainProject.InternalObjectsClasses.CircularObjects;
 using PackageProject.Interfaces;
 using PackageProject.InternalObjectsClasses.CircularObjects;
-using System.Collections.Generic;
 
 namespace hs071_cs
 {
@@ -17,6 +19,9 @@ namespace hs071_cs
         public List<IInternalObject> Objects { get; }
         public double[,] C { get; } // матрица связей
 
+        public Stopwatch SpendedTime { get; set; }
+
+        public IpoptReturnCode status;
         public IContainer Container { get; set; }
 
         public Data(IContainer container)
@@ -156,7 +161,7 @@ namespace hs071_cs
         /// <returns></returns>
         public override string ToString()
         {
-            return "Solution";
+            return "Didn't emplemented.";
         }
     }
 }

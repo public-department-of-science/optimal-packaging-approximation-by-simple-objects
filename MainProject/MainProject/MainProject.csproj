@@ -53,6 +53,7 @@
     <Compile Include="Helpers\CustomException.cs" />
     <Compile Include="Helpers\Dimension.cs" />
     <Compile Include="Helpers\DimensionInstance.cs" />
+    <Compile Include="Helpers\IpoptConfig.cs" />
     <Compile Include="Helpers\SolverHelper.cs" />
     <Compile Include="Interfaces\Container\IContainer.cs" />
     <Compile Include="Interfaces\Container\IParallelogramContainer.cs" />
@@ -69,7 +70,7 @@
     <Compile Include="Interfaces\InternalObjects\PolygonalObjects\IParallelepiped.cs" />
     <Compile Include="Interfaces\InternalObjects\PolygonalObjects\IPolygonalObject.cs" />
     <Compile Include="Interfaces\InternalObjects\PolygonalObjects\IPrism.cs" />
-    <Compile Include="Interfaces\Restrictions.cs" />
+    <Compile Include="Interfaces\Restrictions\IRestrictions.cs" />
     <Compile Include="InternalObjectsClasses\CircularObjects\Circle.cs" />
     <Compile Include="InternalObjectsClasses\CircularObjects\CombinedObject.cs" />
     <Compile Include="InternalObjectsClasses\CircularObjects\Cone.cs" />

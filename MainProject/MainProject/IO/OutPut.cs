@@ -1,13 +1,13 @@
 ﻿/*Main for Fixed Radius 3d-optimization*/
 // Message of ipopt Errors: https://www.coin-or.org/Ipopt/documentation/node36.html
 
+using System;
+using System.IO;
 using MainProject.Containers;
 using MainProject.Interfaces.InternalObjects.CircularObjects;
 using MainProject.InternalObjectsClasses.CircularObjects;
 using PackageProject.Interfaces;
 using PackageProject.InternalObjectsClasses.CircularObjects;
-using System;
-using System.IO;
 
 namespace hs071_cs
 {
@@ -51,7 +51,7 @@ namespace hs071_cs
         {
             try
             {
-                string writePath = @"D:\" + optionalPoint.ToString() + ".txt";
+                string writePath = @"D:\" + "Coordinate" + ".txt"; // optionalPoint.ToString() + ".txt";
                 FileInfo fi = new FileInfo(writePath);
                 if (fi.Exists)
                 {
@@ -59,8 +59,12 @@ namespace hs071_cs
                 }
                 using (StreamWriter sw = new StreamWriter(writePath))
                 {
-                    sw.Write(optionalPoint.Objects.Count.ToString().Replace(',', '.')); // ballCount
-                    sw.Write(" ");
+                    if (optionalPoint.Container is CircularContainer)
+                    {
+                        sw.Write(((CircularContainer)optionalPoint.Container).Radius.ToString().Replace(',', '.') + " "); // R
+                    }
+                    //                    sw.Write(optionalPoint.Objects.Count.ToString().Replace(',', '.')); // ballCount
+                    //                  sw.Write(" ");
 
                     foreach (IInternalObject @object in optionalPoint.Objects)
                     {
@@ -94,11 +98,6 @@ namespace hs071_cs
                     }
 
                     sw.WriteLine();
-
-                    if (optionalPoint.Container is CircularContainer)
-                    {
-                        sw.Write(((CircularContainer)optionalPoint.Container).Radius.ToString().Replace(',', '.') + " "); // R
-                    }
 
                     sw.Close();
                     WriteLine("Optional point has been written to " + writePath);

@@ -4,11 +4,11 @@
 
 // Сообщения об ошибках ipopt: https://www.coin-or.org/Ipopt/documentation/node36.html
 using System;
-using Cureos.Numerics;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.IO;
+using Cureos.Numerics;
 
 namespace hs071_cs
 {

@@ -13,15 +13,16 @@
             Z = z;
         }
 
-        public Point(double[] x)
+        public Point(double[] ArrayWithPointData)
         {
-            if (x.Length < 3)
+            if (ArrayWithPointData.Length < 3 || ArrayWithPointData.Length > 4)
             {
-                throw new System.Exception("Cast array to Point error");
+                throw new System.Exception($"Cast array to Point error {nameof(ArrayWithPointData)}");
             }
-            X = x[0];
-            Y = x[1];
-            Z = x[2];
+
+            X = ArrayWithPointData[0];
+            Y = ArrayWithPointData[1];
+            Z = ArrayWithPointData[2];
         }
 
         public Point()

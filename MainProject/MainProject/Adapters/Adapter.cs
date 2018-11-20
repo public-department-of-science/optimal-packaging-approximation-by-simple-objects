@@ -20,27 +20,27 @@ namespace hs071_cs
         {
             adaptorLocalData = data ?? throw new NullReferenceException("Data can't be null!!");
             container = data.Container;
-            Restrictions.CalculationAmountOfVariablesForTask(data, ref _n);
+            Restrictions.CalculationAmountOfVariablesForWholeTask(data, ref _n);
 
             _x_L = new double[_n];
             _x_U = new double[_n];
             C = data.C ?? null;
 
-            Restrictions.CalculationFlourAndCeilingValuesRestrictionForVariablesVector(data, ref objectsCont, _x_L, _x_U, out int systemVariables);
+            Restrictions.CalculationFlourAndCeilValuesRangeForVariablesVector(data, ref objectsCont, _x_L, _x_U, out int systemVariables);
 
             #region Restrictions
 
             // 1) (R-r[i])^2-x[i]^2-y[i]^2 -z[i]^2 >= 0
             Restrictions.CalculationKeepingObjectsIntoContainerRestriction(data: data, amountOfNonZeroElementInFirstDerivatives: ref _nele_jac, restrictions: ref _m, systemVariables: systemVariables, objectsCount: objectsCont);
             // 2) (x[i] - x[j]) ^ 2 + (y[i] - y[j]) ^ 2 + (z[i] - z[j]) ^ 2 - (r[i] + r[j]) ^ 2 >= 0
-            Restrictions.CalculationAmountOf_Not_IntersectionElementRestriction(data, ref _nele_jac, ref _m, out int amountOfElementThoseMustNotIntersect, out int _nele_jacAmountOfElementThoseMustNotIntersect);
+            Restrictions.CalculationAmount_Not_IntersectionObjectsRestriction(data, ref _nele_jac, ref _m, out int amountOfElementThoseMustNotIntersect, out int _nele_jacAmountOfElementThoseMustNotIntersect);
             // 3) Intersection restriction for combinedObjects
             Restrictions.CalculationAmountOfIntersectionCombinedObjectsRestriction(data, ref _nele_jac, ref _m);
 
             _g_L = new double[_m];
             _g_U = new double[_m];
 
-            Restrictions.CalculationFlourAndCeilingValuesForAllRestrictions_g(data, _g_L, _g_U, objectsCont);
+            Restrictions.CalculationFlourAndCeilValuesForAllRestrictions_g(data, _g_L, _g_U, objectsCont);
             
             #endregion
         }

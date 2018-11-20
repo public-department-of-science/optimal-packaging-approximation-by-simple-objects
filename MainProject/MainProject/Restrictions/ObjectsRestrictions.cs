@@ -1,20 +1,20 @@
-﻿using Cureos.Numerics;
-using hs071_cs;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Cureos.Numerics;
 using MainProject.Containers;
 using MainProject.Interfaces.InternalObjects.CircularObjects;
 using MainProject.InternalObjectsClasses.CircularObjects;
 using PackageProject.Interfaces;
 using PackageProject.InternalObjectsClasses.CircularObjects;
-using System;
-using System.Collections.Generic;
 
 namespace hs071_cs
 {
     public class ObjectsRestrictions //: IRestrictions
     {
-        #region Calculation restriction
+        #region Calculation amount of restrictions
 
-        public void CalculationAmountOf_Not_IntersectionElementRestriction(Data data, ref int _nele_jac, ref int _m, out int amountOfElementThoseMustNotIntersect, out int _nele_jacAmountOfElementThoseMustNotIntersect)
+        public void CalculationAmount_Not_IntersectionObjectsRestriction(Data data, ref int _nele_jac, ref int _m, out int amountOfElementThoseMustNotIntersect, out int _nele_jacAmountOfElementThoseMustNotIntersect)
         {
             amountOfElementThoseMustNotIntersect = 0;
             _nele_jacAmountOfElementThoseMustNotIntersect = 0;
@@ -22,7 +22,7 @@ namespace hs071_cs
             {
                 if (!((data.Objects[i] is ISphere) || (data.Objects[i] is ICombinedObject)))
                 {
-                    throw new Exception($"Program didn't configure for using polypoint objects. Only spheres or combined object.{data.Objects[i].GetType().ToString()}");
+                    throw new Exception($"Program didn't configured for using polypoint objects. You can usr only spheres or other combined objects.{data.Objects[i].GetType().ToString()}");
                 }
 
                 List<IInternalObject> firstInternalObject = new List<IInternalObject>();
@@ -57,12 +57,13 @@ namespace hs071_cs
                     {
                         for (int z = 0; z < secondInternalObject.Count; z++)
                         {
-                            _nele_jacAmountOfElementThoseMustNotIntersect += (((Sphere)secondInternalObject[z]).NumberOfVariableValues - 1) * 2;
+                            _nele_jacAmountOfElementThoseMustNotIntersect += (((Sphere)secondInternalObject[z]).NumberOfVariableValues - 1) * 2; // *2 because in one time get elem for two objects
                             ++amountOfElementThoseMustNotIntersect;
                         }
                     }
                 }
             }
+
             _nele_jac += _nele_jacAmountOfElementThoseMustNotIntersect;
             _m += amountOfElementThoseMustNotIntersect;
         }
@@ -81,7 +82,7 @@ namespace hs071_cs
             }
         }
 
-        public void CalculationAmountOfVariablesForTask(Data data, ref int _n)
+        public void CalculationAmountOfVariablesForWholeTask(Data data, ref int _n)
         {
             foreach (IInternalObject @object in data.Objects)
             {
@@ -90,16 +91,74 @@ namespace hs071_cs
             _n += data.Container.AmountOfVariables; // container variables
         }
 
+        #endregion
+
+        #region Calculation amount of non-zero elements and amount of restrictions
+
         public void CalculationKeepingObjectsIntoContainerRestriction(Data data, ref int amountOfNonZeroElementInFirstDerivatives, ref int restrictions, int systemVariables, int objectsCount)
         {
-            amountOfNonZeroElementInFirstDerivatives += (systemVariables - data.Container.AmountOfVariables); // x, y, z , (R - external) for Sphere and minus amount of variables for container
-            restrictions += objectsCount;
+            foreach (IInternalObject @object in data.Objects)
+            {
+                if (@object is ISphere)
+                {
+                    Sphere sphere = (Sphere)@object;
+
+                    if (sphere.ObjectType == MainProject.Enums.Enums.ObjectType.Sphere)
+                    {
+                        amountOfNonZeroElementInFirstDerivatives += @object.NumberOfVariableValues - 1;
+                    }
+                    else
+                    {
+                        amountOfNonZeroElementInFirstDerivatives += @object.NumberOfVariableValues;
+                    }
+
+                    // container var
+                    amountOfNonZeroElementInFirstDerivatives += data.Container.AmountOfVariables;
+
+                    ++restrictions;
+                    continue;
+                }
+
+                if (@object is ICombinedObject)
+                {
+                    CombinedObject combinedObject = new CombinedObject();
+                    foreach (IInternalObject item in ((CombinedObject)@object).InternalInCombineObjects)
+                    {
+                        if (item is ISphere)
+                        {
+                            Sphere sphere = (Sphere)item;
+
+                            if (sphere.ObjectType == MainProject.Enums.Enums.ObjectType.Sphere)
+                            {
+                                amountOfNonZeroElementInFirstDerivatives += @object.NumberOfVariableValues - 1;
+                            }
+                            else
+                            {
+                                amountOfNonZeroElementInFirstDerivatives += @object.NumberOfVariableValues;
+                            }
+
+                            // container var
+                            amountOfNonZeroElementInFirstDerivatives += data.Container.AmountOfVariables;
+
+                            ++restrictions;
+                            continue;
+                        }
+                    }
+                    continue;
+                }
+            }
         }
 
-        public void CalculationFlourAndCeilingValuesRestrictionForVariablesVector(Data data, ref int countObjects, double[] _x_L, double[] _x_U, out int systemVariables)
+        #endregion
+
+        #region Block Calculation Flour And Ceil Values
+
+        public void CalculationFlourAndCeilValuesRangeForVariablesVector(Data data, ref int countObjects, double[] _x_L, double[] _x_U, out int systemVariables)
         {
             countObjects = 0;
             systemVariables = 0; // amount of variables(not fixed values) in system
+            List<Sphere> listWithSpheres = new List<Sphere>();
+            Sphere sphere = null;
 
             foreach (IInternalObject item in data.Objects)
             {
@@ -110,8 +169,18 @@ namespace hs071_cs
                         int varInOneInternalObject = 0;
                         for (; varInOneInternalObject < item1.NumberOfVariableValues; ++varInOneInternalObject, ++systemVariables)
                         {
-                            _x_L[systemVariables] = Ipopt.NegativeInfinity;
-                            _x_U[systemVariables] = Ipopt.PositiveInfinity;
+                            sphere = (Sphere)item1;
+                            listWithSpheres.Add(sphere);
+                            if (varInOneInternalObject == 3) // TODO: hardcode
+                            {
+                                _x_L[systemVariables] = sphere.Radius;
+                                _x_U[systemVariables] = sphere.Radius;
+                            }
+                            else
+                            {
+                                _x_L[systemVariables] = Ipopt.NegativeInfinity;
+                                _x_U[systemVariables] = Ipopt.PositiveInfinity;
+                            }
                         }
                         ++countObjects;
                     }
@@ -121,21 +190,31 @@ namespace hs071_cs
                     int varInInternalObject = 0;
                     for (; varInInternalObject < item.NumberOfVariableValues; ++varInInternalObject, ++systemVariables)
                     {
-                        _x_L[systemVariables] = Ipopt.NegativeInfinity;
-                        _x_U[systemVariables] = Ipopt.PositiveInfinity;
+                        sphere = (Sphere)item;
+                        listWithSpheres.Add(sphere);
+                        if (varInInternalObject == 3) // TODO: fix hardcode
+                        {
+                            _x_L[systemVariables] = sphere.Radius;
+                            _x_U[systemVariables] = sphere.Radius;
+                        }
+                        else
+                        {
+                            _x_L[systemVariables] = Ipopt.NegativeInfinity;
+                            _x_U[systemVariables] = Ipopt.PositiveInfinity;
+                        }
                     }
                     ++countObjects;
                 }
             }
 
-            for (int j = 0; j < data.Container.AmountOfVariables; ++j, ++systemVariables)
+            for (int j = 0; j < data.Container.AmountOfVariables; ++j, ++systemVariables) // TODO: hardcode for container var
             {
-                _x_L[systemVariables] = 0;
-                _x_U[systemVariables] = Ipopt.PositiveInfinity;
+                _x_L[systemVariables] = listWithSpheres.Max(x => x.Radius);
+                _x_U[systemVariables] = listWithSpheres.Sum(x => x.Radius);
             }
         }
 
-        public void CalculationFlourAndCeilingValuesForAllRestrictions_g(Data data, double[] _g_L, double[] _g_U, int objectsCont)
+        public void CalculationFlourAndCeilValuesForAllRestrictions_g(Data data, double[] _g_L, double[] _g_U, int objectsCont)
         {
             int op = 0;
 
@@ -143,7 +222,7 @@ namespace hs071_cs
 
             for (int j = 0; j < objectsCont; j++) // радиусы от 0 до MAX
             {
-                _g_L[op] = 0;
+                _g_L[op] = 0;// Ipopt.NegativeInfinity;
                 _g_U[op++] = Ipopt.PositiveInfinity;
             }
 
@@ -193,7 +272,7 @@ namespace hs071_cs
                         {
                             Sphere second = (Sphere)secondInternalObject[z];
 
-                            _g_L[op] = Math.Pow((first.Radius + second.Radius), 2);
+                            _g_L[op] = 0; // Math.Pow(first.Radius - second.Radius, 2.0);
                             _g_U[op++] = Ipopt.PositiveInfinity;
                         }
                     }
@@ -216,8 +295,8 @@ namespace hs071_cs
                 {
                     for (int j = 0; j < arrayWithDistances[i].Length; j++)
                     {
-                        _g_L[op] = _g_U[op] = arrayWithDistances[i][j];
-                        ++op;
+                        _g_L[op] = arrayWithDistances[i][j];
+                        _g_U[op++] = arrayWithDistances[i][j];
                     }
                 }
             }
@@ -245,8 +324,8 @@ namespace hs071_cs
                     foreach (IInternalObject item in ((CombinedObject)@object).InternalInCombineObjects)
                     {
                         restrictions[gCount++] = EquationKeepingSphereInTheContainer((CircularContainer)data.Container, (Sphere)item);
-                        continue;
                     }
+                    continue;
                 }
             }
 
@@ -331,6 +410,7 @@ namespace hs071_cs
                         foreach (IInternalObject item in ((CombinedObject)@object).InternalInCombineObjects)
                         {
                             kk = ElementsPositionCalculationForKeepingObjectsInArea_Jacobian_G(n, iRow, jCol, kk, g);
+                            ++g;
                         }
                         continue;
                     }
@@ -396,6 +476,7 @@ namespace hs071_cs
             else
             {
                 int kk = 0;
+
                 // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
                 foreach (IInternalObject @object in data.Objects)
                 {
@@ -418,7 +499,6 @@ namespace hs071_cs
                 }
 
                 // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
-
                 for (int i = 0; i < data.Objects.Count - 1; i++)
                 {
                     List<IInternalObject> firstInternalObject = new List<IInternalObject>();
@@ -457,6 +537,7 @@ namespace hs071_cs
                         }
                     }
                 }
+
                 //попарное пересечение комб объетов
                 foreach (IInternalObject item in data.Objects)
                 {
@@ -519,28 +600,30 @@ namespace hs071_cs
             kk++;
             values[kk] = -2.0 * sphere.Center.Z; //Z'
             kk++;
+
             return kk;
         }
 
         private static int ElementsPositionCalculationForNotIntersectionObjects_Jacobian_G(int[] iRow, int[] jCol, int kk, int g, int k, int z)
         {
-            // -------  X[i], X[j] ------- 
+            // -------  X[k], X[z] ------- 
             iRow[kk] = g;
-            jCol[kk++] = 3 * k;
+            jCol[kk++] = 0;// 4 * k;
             iRow[kk] = g;
-            jCol[kk++] = 3 * z + 1;
+            jCol[kk++] = 1;//4 * z;
 
-            // -------  Y[i], Y[j] ------- 
+            // -------  Y[k], Y[z] ------- 
+            iRow[kk] = g; ;
+            jCol[kk++] = 2;//4 * k + 1;
             iRow[kk] = g;
-            jCol[kk++] = 3 * k + 2;
-            iRow[kk] = g;
-            jCol[kk++] = 3 * z + 3;
+            jCol[kk++] = 3;// 4 * z + 1;
 
-            // -------  Z[i], Z[j] ------- 
+            // -------  Z[k], Z[z] ------- 
             iRow[kk] = g;
-            jCol[kk++] = 3 * k + 4;
+            jCol[kk++] = 4;// 4 * k + 2;
             iRow[kk] = g;
-            jCol[kk++] = 3 * z + 5;
+            jCol[kk++] = 5;// 4 * z + 2;
+
             return kk;
         }
 
@@ -552,28 +635,29 @@ namespace hs071_cs
 
             //X
             iRow[kk] = g;
-            jCol[kk++] = 3 * g;
+            jCol[kk++] = 4 * g;
 
             //Y
             iRow[kk] = g;
-            jCol[kk++] = 3 * g + 1;
+            jCol[kk++] = 4 * g + 1;
 
             //Z
             iRow[kk] = g;
-            jCol[kk++] = 3 * g + 2;
+            jCol[kk++] = 4 * g + 2;
+
             return kk;
         }
 
-        private double EquationNotIntersactionTwoSpheres(Sphere first, Sphere second)
+        private static double EquationNotIntersactionTwoSpheres(Sphere first, Sphere second)
         {
             return Math.Pow(first.Center.X - second.Center.X, 2.0) + Math.Pow(first.Center.Y - second.Center.Y, 2.0) + Math.Pow(first.Center.Z - second.Center.Z, 2.0)
                             - Math.Pow(first.Radius + second.Radius, 2.0);
         }
 
-        private double EquationKeepingSphereInTheContainer(CircularContainer container, Sphere @object)
+        private static double EquationKeepingSphereInTheContainer(CircularContainer container, Sphere @object)
         {
-            return Math.Pow(container.Radius - @object.Radius, 2.0) -
-                   Math.Pow(@object.Center.X, 2.0) - Math.Pow(@object.Center.Y, 2.0) - Math.Pow(@object.Center.Z, 2.0);
+            return Math.Pow(container.Radius - @object.Radius, 2.0)
+                - Math.Pow(@object.Center.X, 2.0) - Math.Pow(@object.Center.Y, 2.0) - Math.Pow(@object.Center.Z, 2.0);
         }
 
         #endregion

@@ -72,7 +72,7 @@ namespace hs071_cs
         /// <summary>
         /// List with IpOpt coordinates on each iteration
         /// </summary>
-        public List<double[]> AllIteration { get; protected set; }
+        public static List<double[]> AllIteration { get; protected set; }
 
         /// <summary>
         /// Random instance

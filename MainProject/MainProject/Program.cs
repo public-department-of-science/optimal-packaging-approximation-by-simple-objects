@@ -1,8 +1,8 @@
+using System.Collections.Generic;
 using MainProject.Containers;
 using MainProject.InternalObjectsClasses.CircularObjects;
 using MainProject.Model;
 using PackageProject.InternalObjectsClasses.CircularObjects;
-using System.Collections.Generic;
 
 namespace hs071_cs
 {
@@ -28,6 +28,15 @@ namespace hs071_cs
 
         public static void Main()
         {
+            #region Reading Data => will be there one method Output.ReadDataType
+
+            //Print("\nSelect input method \n 1 --> Read from File \n 2 --> Random generate");
+            //Input.ChooseTypeReadingData(out int[] amountOfObjectsInEachComplexObject, out int TotalBallCount, out xNach, out yNach, out zNach, out rNach, out RNach, out double maxRandRadius, out rSortSum);
+            //Print("\nChoose  type of external container \n 1 --> Circular container \n 2 --> Parallelogram container\nSelect-->");
+            //Input.ChooseTypeOfContainer(out IContainer container, RNach);
+
+            #endregion
+
             SolverHelper solverHelper = new SolverHelper();
 
             #region will be deleted soon, now it's like imitation of data input
@@ -42,12 +51,18 @@ namespace hs071_cs
                 list1
             };
 
-            Data data1232 = new Data(null);
-            data1232.Container = new CircularContainer(13, new Point());
+            Data data1232 = new Data(null)
+            {
+                Container = new CircularContainer(13, new Point())
+            };
 
-            //            data1232.Objects.AddRange(combinedObjects);
-            data1232.Objects.Add(new Sphere(new Point(1, 10, -3), 1));
-            data1232.Objects.Add(new Sphere(new Point(-1, 2, 3), 3));
+            // data1232.Objects.AddRange(combinedObjects);
+            data1232.Objects.Add(new Sphere(new Point(-50.2, 10.8, -3.9), 5));
+            data1232.Objects.Add(new Sphere(new Point(29.22, -22, 2.92), 8));
+            data1232.Objects.Add(new Sphere(new Point(1, 2, 14), 10));
+
+
+            #endregion
 
             Adapter ad = new Adapter(data1232);
             try
@@ -59,17 +74,6 @@ namespace hs071_cs
             {
                 throw;
             }
-
-            #endregion
-
-            #region Reading Data => will be there one method Output.ReadDataType
-
-            //Print("\nSelect input method \n 1 --> Read from File \n 2 --> Random generate");
-            //Input.ChooseTypeReadingData(out int[] amountOfObjectsInEachComplexObject, out int TotalBallCount, out xNach, out yNach, out zNach, out rNach, out RNach, out double maxRandRadius, out rSortSum);
-            //Print("\nChoose  type of external container \n 1 --> Circular container \n 2 --> Parallelogram container\nSelect-->");
-            //Input.ChooseTypeOfContainer(out IContainer container, RNach);
-
-            #endregion
         }
     }
 }

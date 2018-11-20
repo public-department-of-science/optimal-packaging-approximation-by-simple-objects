@@ -5,14 +5,15 @@
         public enum ObjectType
         {
             Undefined = 0, // type not undefined
-            Circle=1,
+            Circle = 1,
             CombinedObject = 2, //a few ball united in one composite object
-            Sphere = 3, 
-            Cone = 4,
-            Cylender = 5,
-            Cube = 6,
-            Parallepiped = 7,
-            Prism = 8
+            Sphere = 3,
+            SphereWithVariableRadius = 4,
+            Cone = 5,
+            Cylender = 6,
+            Cube = 7,
+            Parallepiped = 8,
+            Prism = 9
         }
 
         //    ProhibitionZone = 1, // prohibition zone which not moving

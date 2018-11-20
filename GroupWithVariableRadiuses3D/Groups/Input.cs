@@ -20,7 +20,7 @@ namespace hs071_cs
         {
             try
             {
-                string readPath = @"D:\ChangedCoordinateWithHoles.txt";
+                string readPath = @"D:\p134.txt";
                 FileInfo fileInfo = new FileInfo(readPath);
                 if (fileInfo.Exists)
                 {
@@ -39,9 +39,10 @@ namespace hs071_cs
                         }
                     }
 
-                    string[] arrayOfLines = allReadedSymbols.Split(';');
+                    string[] arrayOfLines = allReadedSymbols.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     TotalBallCount = Convert.ToInt32(arrayOfLines[0].Split(' ')[0].Trim()); // amount balls
-                    R = Convert.ToDouble(arrayOfLines[1].Split(' ')[2].Replace('.', ',').Trim()); // external radius
+
+                    R = double.Parse(arrayOfLines[1].Split(' ')[0].Replace('.', ',').Trim()); // external radius
 
                     // check demention
                     if ((i - 1) != (TotalBallCount + 1)) /// (i-2)
@@ -50,22 +51,22 @@ namespace hs071_cs
                     }
                     else
                     {
+                        r = new double[TotalBallCount];
                         x = new double[TotalBallCount];
                         y = new double[TotalBallCount];
                         z = new double[TotalBallCount];
-                        r = new double[TotalBallCount];
 
-                        for (i = 2; i < arrayOfLines.Length - 1; i++) //// !!!!!! arrayOfLines.Length - 2
+                        for (i = 2; i < arrayOfLines.Length; i++) //// !!!!!! arrayOfLines.Length - 2
                         {
-                            xyzrString = arrayOfLines[i].Split(' ');
+                            xyzrString = arrayOfLines[i].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                             for (int k = 0; k < xyzrString.Length; k++)
                             {
                                 xyzrString[k] = xyzrString[k].Replace('.', ',').Trim();
                             }
-                            x[i - 2] = Convert.ToDouble(xyzrString[0]);
-                            y[i - 2] = Convert.ToDouble(xyzrString[1]);
-                            z[i - 2] = Convert.ToDouble(xyzrString[2]);
-                            r[i - 2] = Convert.ToDouble(xyzrString[3]);
+                            r[i - 2] = double.Parse(xyzrString[0]);
+                            x[i - 2] = double.Parse(xyzrString[1]);
+                            y[i - 2] = double.Parse(xyzrString[2]);
+                            z[i - 2] = double.Parse(xyzrString[3]);
                         }
                         OutPut.WriteLine("Data has been read!");
                     }
