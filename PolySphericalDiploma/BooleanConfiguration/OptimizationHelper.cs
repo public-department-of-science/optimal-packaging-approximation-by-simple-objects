@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace BooleanConfiguration
 {
@@ -24,6 +25,19 @@ namespace BooleanConfiguration
             }
         }
 
+        internal static void GettingArrayWithLabda(double[][] matrixA, out double[] labdaArray, out double mainLambda)
+        {
+            labdaArray = new double[matrixA.Length];
+            for (int i = 0; i < matrixA.Length; i++)
+            {
+                // lambdaInThisLine = Sum of line - a[i][j]
+                labdaArray[i] = matrixA[i].Sum(x => x) - matrixA[i][i];
+            }
+
+            mainLambda = labdaArray.Max();
+            labdaArray = labdaArray.OrderBy(x => x).ToArray();
+        }
+
         public int GerIntegerValueInlcudingUpperBound(int v1, int v2)
         {
             return random.Next(v1, v2 + 1);
@@ -32,6 +46,11 @@ namespace BooleanConfiguration
         public void RandomizeMatrixC(double[][] maxtrixC)
         {
             RandomizeMatrix(maxtrixC);
+        }
+
+        internal static double[] GettingVariablesVector(Data data)
+        {
+            throw new NotImplementedException();
         }
 
         public void RandomizeMatrixA(double[][] maxtrixA)

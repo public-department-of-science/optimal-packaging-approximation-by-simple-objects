@@ -10,7 +10,7 @@ namespace BooleanConfiguration
         /// <summary>
         /// 
         /// </summary>
-        public double[][] MaxtrixA { get; private set; }
+        public double[][] MatrixA { get; private set; }
 
         /// <summary>
         /// Dimension of space
@@ -63,10 +63,10 @@ namespace BooleanConfiguration
 
             Lamda = new int[N];
 
-            AllocateArrayMemory(MaxtrixA, N);
+            AllocateArrayMemory(MatrixA, N);
             AllocateArrayMemory(MatrixC, N);
 
-            OptimizationHelper.RandomizeMatrixA(MaxtrixA);
+            OptimizationHelper.RandomizeMatrixA(MatrixA);
             OptimizationHelper.RandomizeMatrixC(MatrixC);
         }
 

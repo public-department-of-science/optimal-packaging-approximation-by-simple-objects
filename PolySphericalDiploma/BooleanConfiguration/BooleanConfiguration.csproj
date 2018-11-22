@@ -8,9 +8,10 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>BooleanConfiguration</RootNamespace>
     <AssemblyName>BooleanConfiguration</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -46,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseAdaptor.cs" />
-    <Compile Include="FixedRadius3dAdaptor.cs" />
+    <Compile Include="Input.cs" />
     <Compile Include="IPOPTAdapter.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="Enums.cs" />
@@ -54,6 +55,7 @@
     <Compile Include="Output.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResultOfResearching.cs" />
     <Compile Include="RunTask.cs" />
   </ItemGroup>
   <ItemGroup>
