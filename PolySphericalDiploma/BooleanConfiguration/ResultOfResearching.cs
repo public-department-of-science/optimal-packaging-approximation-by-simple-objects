@@ -30,6 +30,12 @@ namespace BooleanConfiguration
 
         public void ShowAllResults()
         {
+            int i = 0;
+            foreach (KeyValuePair<double, double[]> item in Result)
+            {
+                Output.ConsolePrint($"Lambda = {item.Key}, Array {item.Value}, Time = {TaskTimeList[i]}");
+                ++i;
+            }
         }
 
         public (KeyValuePair<double, double[]> keyValuePair, Stopwatch spentTime) GetResultById(double lambda, int i)

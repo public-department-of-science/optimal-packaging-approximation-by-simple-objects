@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 
 namespace BooleanConfiguration
 {
@@ -18,6 +17,7 @@ namespace BooleanConfiguration
 
             Data data = null;
             Input.SelectTypeOfStartSet(data);
+            ResultOfResearching res = new RunTask().SolveTheProblem(data);
 
             Console.ReadLine();
         }
