@@ -7,47 +7,47 @@ namespace BooleanConfiguration
     {
         /// <summary>
         /// Key => labda;
-        /// Value => optional point
+        /// Value => optional point with time
         /// </summary>
-        private Dictionary<double, double[]> Result { get; set; }
-
-        /// <summary>
-        /// Time measurment per iteration
-        /// </summary>
-        private List<Stopwatch> TaskTimeList { get; set; }
+        private Dictionary<double, KeyValuePair<double[], Stopwatch>> Result { get; set; }
 
         public ResultOfResearching()
         {
-            Result = new Dictionary<double, double[]>();
-            TaskTimeList = new List<Stopwatch>();
+            Result = new Dictionary<double, KeyValuePair<double[], Stopwatch>>();
         }
 
-        public void AddNewResult(KeyValuePair<double, double[]> keyValues, Stopwatch time)
+        public void AddNewResult(double lambda, KeyValuePair<double[], Stopwatch> keyValues)
         {
-            Result.Add(keyValues.Key, keyValues.Value);
-            TaskTimeList.Add(time);
+            if (Result.ContainsKey(lambda))
+            {
+                while (!Result.ContainsKey(lambda))
+                {
+                    lambda += 0.01;
+                }
+            }
+
+            Result.Add(lambda, keyValues);
         }
 
         public void ShowAllResults()
         {
             int i = 0;
-            foreach (KeyValuePair<double, double[]> item in Result)
+            foreach (KeyValuePair<double, KeyValuePair<double[], Stopwatch>> item in Result)
             {
-                Output.ConsolePrint($"Lambda = {item.Key}, Array {item.Value}, Time = {TaskTimeList[i]}");
+                Output.ConsolePrint($"Lambda = {item.Key}, Array {item.Value.Key}, Time = {item.Value.Value}");
                 ++i;
             }
         }
 
-        public (KeyValuePair<double, double[]> keyValuePair, Stopwatch spentTime) GetResultById(double lambda, int i)
+        public KeyValuePair<double[], Stopwatch> GetResultById(double lambda)
         {
-            bool res = Result.TryGetValue(lambda, out double[] array);
-            if (res)
+            if (Result.ContainsKey(lambda))
             {
-                return (keyValuePair: new KeyValuePair<double, double[]>(lambda, array), spentTime: TaskTimeList[i]);
+                return Result[lambda];
             }
             else
             {
-                return (keyValuePair: new KeyValuePair<double, double[]>(), spentTime: new Stopwatch());
+                return new KeyValuePair<double[], Stopwatch>();
             }
         }
     }

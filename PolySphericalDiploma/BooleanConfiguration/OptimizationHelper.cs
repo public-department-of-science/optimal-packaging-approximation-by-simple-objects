@@ -50,6 +50,7 @@ namespace BooleanConfiguration
 
         internal static double[] GettingVariablesVector(Data data)
         {
+            return null;
         }
 
         public void RandomizeMatrixA(double[][] maxtrixA)

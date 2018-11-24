@@ -47,10 +47,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseAdaptor.cs" />
+    <Compile Include="Interfaces\IBnSet.cs" />
+    <Compile Include="Interfaces\IBooleanSet.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="IPOPTAdapter.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="Interfaces\ISet.cs" />
+    <Compile Include="Interfaces\ISphericalLocatedBnSet.cs" />
     <Compile Include="OptimizationHelper.cs" />
     <Compile Include="Output.cs" />
     <Compile Include="Program.cs" />

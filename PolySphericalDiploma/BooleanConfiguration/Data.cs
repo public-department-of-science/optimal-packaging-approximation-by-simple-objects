@@ -33,27 +33,15 @@ namespace BooleanConfiguration
         public TypeOfSet SetType { get; set; }
 
         /// <summary>
-        /// Sum of 1 When TypeOfSet = 1
-        /// </summary>
-        public int M { get; private set; }
-
-        /// <summary>
-        /// Sum left bound of Bn => When TypeOfSet = 2
-        /// </summary>
-        public int M1 { get; private set; }
-
-        /// <summary>
-        /// Sum right bound of Bn => When TypeOfSet = 2
-        /// </summary>
-        public int M2 { get; private set; }
-
-        /// <summary>
         /// Class with all restriction/values culculations
         /// </summary>
         private readonly OptimizationHelper OptimizationHelper;
 
+        private ISet Set { get; set; }
+
         public Data(TypeOfSet typeOfSet)
         {
+            Set = SelectSet(typeOfSet);
             SetType = typeOfSet;
 
             const int leftBound = 3;
@@ -68,6 +56,27 @@ namespace BooleanConfiguration
 
             OptimizationHelper.RandomizeMatrixA(MatrixA);
             OptimizationHelper.RandomizeMatrixC(MatrixC);
+        }
+
+        private ISet SelectSet(TypeOfSet typeOfSet)
+        {
+            ISet currentSet = null;
+
+            switch (typeOfSet)
+            {
+                case TypeOfSet.BooleanSet:
+                    currentSet = new BooleanSet();
+                    break;
+                case TypeOfSet.BnSet:
+                    currentSet = new BnSet();
+                    break;
+                case TypeOfSet.SphericalLocatedBnSet:
+                    currentSet = new SphericalLocatedBnSet();
+                    break;
+                default:
+                    break;
+            }
+            return currentSet;
         }
 
         private void AllocateArrayMemory(double[][] array, int n)

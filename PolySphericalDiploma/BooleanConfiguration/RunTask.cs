@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Cureos.Numerics;
 using hs071_cs;
 
@@ -28,7 +29,7 @@ namespace BooleanConfiguration
                         double[] x = OptimizationHelper.GettingVariablesVector(data); // TODO variables array need to be in this one-demension array
                         IpoptReturnCode t = ipoptSolver.SolveProblem(x, out double resultValue, null, null, null, null);
                         taskTime.Stop();
-                        resultOfResearching.AddNewResult(keyValues: new System.Collections.Generic.KeyValuePair<double, double[]>(lamdaArray[i], x), time: taskTime);
+                        resultOfResearching.AddNewResult(lamdaArray[i], new KeyValuePair<double[], Stopwatch>(x, taskTime));
                         // taskTime; => spent time
                     }
                 }

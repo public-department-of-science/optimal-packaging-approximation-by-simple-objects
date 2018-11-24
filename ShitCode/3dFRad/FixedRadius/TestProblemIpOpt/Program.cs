@@ -25,7 +25,7 @@ namespace hs071_cs
 
             try
             {
-                Console.Write("CircleCount = ");
+                Console.Write("BallsCount = ");
                 circlesCount = Convert.ToInt32(Console.ReadLine()); // количество кругов
             }
             catch (Exception ex)
@@ -219,7 +219,7 @@ namespace hs071_cs
         {
             int cicleCount = radius.Length;
             int iterCount = 1;
-            Console.WriteLine("~~~~~~~~~~~ Формат Карташова ~~~~~~~~~~~");
+            Console.WriteLine("~~~~~~~~~~~ ~~~~~~~~~~~");
             for (int i = 0; i < cicleCount; ++i)
             {
                 Console.WriteLine(" x[{0}]=  {1}", iterCount++, dataX[i]);
