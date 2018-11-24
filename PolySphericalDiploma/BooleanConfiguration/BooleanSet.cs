@@ -1,13 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BooleanConfiguration
 {
-    class BooleanSet : IBooleanSet
+    public class BooleanSet : IBooleanSet
     {
-        public int M { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int M { get; set; }
+        public string MatrixX0 { get; set; }
+
+        public BooleanSet(int N)
+        {
+            MatrixX0 = Convert.ToString(new Random().Next(1, 50), 2).Substring(0, N);
+            M = MatrixX0.Length;
+        }
     }
 }

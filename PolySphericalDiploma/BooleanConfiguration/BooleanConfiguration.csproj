@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseAdaptor.cs" />
+    <Compile Include="BnSet.cs" />
+    <Compile Include="BooleanSet.cs" />
     <Compile Include="Interfaces\IBnSet.cs" />
     <Compile Include="Interfaces\IBooleanSet.cs" />
     <Compile Include="Input.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResultOfResearching.cs" />
     <Compile Include="RunTask.cs" />
+    <Compile Include="SphericalLocatedBnSet.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

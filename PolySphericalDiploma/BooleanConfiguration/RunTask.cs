@@ -5,7 +5,7 @@ using hs071_cs;
 
 namespace BooleanConfiguration
 {
-    internal class RunTask
+    public class RunTask
     {
         public ResultOfResearching SolveTheProblem(Data data)
         {
@@ -33,6 +33,7 @@ namespace BooleanConfiguration
                         // taskTime; => spent time
                     }
                 }
+
                 return resultOfResearching;
             }
             catch (System.Exception ex)

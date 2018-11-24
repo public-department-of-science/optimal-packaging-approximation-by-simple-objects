@@ -5,9 +5,9 @@ namespace BooleanConfiguration
 {
     internal class OptimizationHelper
     {
-        private readonly Random random;
+        private static readonly Random random;
 
-        public OptimizationHelper()
+        static OptimizationHelper()
         {
             random = new Random();
         }
@@ -43,19 +43,36 @@ namespace BooleanConfiguration
             return random.Next(v1, v2 + 1);
         }
 
-        public void RandomizeMatrixC(double[][] maxtrixC)
+        public void RandomizeMatrixC(double[] maxtrixC)
         {
-            RandomizeMatrix(maxtrixC);
+            for (int i = 0; i < maxtrixC.Length; i++)
+            {
+                maxtrixC[i] = random.Next(0, 20);
+            }
         }
 
         internal static double[] GettingVariablesVector(Data data)
         {
-            return null;
+            double[] randomStartValues = new double[data.N];
+            for (int i = 0; i < randomStartValues.Length; i++)
+            {
+                randomStartValues[i] = random.NextDouble();
+            }
+
+            return randomStartValues;
         }
 
         public void RandomizeMatrixA(double[][] maxtrixA)
         {
             RandomizeMatrix(maxtrixA);
+        }
+
+        public void RandomizeMatrixX1(double[] matrixX1)
+        {
+            for (int j = 0; j < matrixX1.Length; j++)
+            {
+                matrixX1[j] = random.NextDouble();
+            }
         }
     }
 }

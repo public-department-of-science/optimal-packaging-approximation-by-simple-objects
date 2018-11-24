@@ -4,7 +4,7 @@ namespace BooleanConfiguration
 {
     internal static class Input
     {
-        public static void SelectTypeOfStartSet(Data data)
+        public static void SelectTypeOfStartSet(ref Data data)
         {
             try
             {

@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace BooleanConfiguration
 {
-    internal class ResultOfResearching
+    public class ResultOfResearching
     {
         /// <summary>
         /// Key => labda;
