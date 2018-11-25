@@ -46,27 +46,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseAdaptor.cs" />
-    <Compile Include="BnSet.cs" />
-    <Compile Include="BooleanSet.cs" />
+    <Compile Include="Adapters\BaseAdaptor.cs" />
+    <Compile Include="Helper\IPOPTHelper.cs" />
+    <Compile Include="Model\BnSet.cs" />
+    <Compile Include="Model\BooleanSet.cs" />
     <Compile Include="Interfaces\IBnSet.cs" />
     <Compile Include="Interfaces\IBooleanSet.cs" />
-    <Compile Include="Input.cs" />
-    <Compile Include="IPOPTAdapter.cs" />
-    <Compile Include="Data.cs" />
-    <Compile Include="Enums.cs" />
+    <Compile Include="IO\Input.cs" />
+    <Compile Include="Adapters\IPOPTAdapter.cs" />
+    <Compile Include="Model\Data.cs" />
+    <Compile Include="Helper\Enums.cs" />
     <Compile Include="Interfaces\ISet.cs" />
     <Compile Include="Interfaces\ISphericalLocatedBnSet.cs" />
-    <Compile Include="OptimizationHelper.cs" />
-    <Compile Include="Output.cs" />
+    <Compile Include="Helper\OptimizationHelper.cs" />
+    <Compile Include="IO\Output.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResultOfResearching.cs" />
-    <Compile Include="RunTask.cs" />
-    <Compile Include="SphericalLocatedBnSet.cs" />
+    <Compile Include="Helper\RestrictionHelper.cs" />
+    <Compile Include="Model\ResultOfResearching.cs" />
+    <Compile Include="Solvers\RunTask.cs" />
+    <Compile Include="Model\SphericalLocatedBnSet.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

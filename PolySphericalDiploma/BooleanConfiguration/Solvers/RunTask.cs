@@ -25,6 +25,12 @@ namespace BooleanConfiguration
                     {
                         Stopwatch taskTime = new Stopwatch();
 
+                        ipoptSolver.AddOption("tol", 1e-2);
+                        ipoptSolver.AddOption("mu_strategy", "adaptive");
+                        ipoptSolver.AddOption("hessian_approximation", "limited-memory");
+                        ipoptSolver.AddOption("max_iter", 3000);
+                        ipoptSolver.AddOption("print_level", 3); // 0 <= value <= 12, default is 5
+
                         taskTime.Start();
                         double[] x = OptimizationHelper.GettingVariablesVector(data); // TODO variables array need to be in this one-demension array
                         IpoptReturnCode t = ipoptSolver.SolveProblem(x, out double resultValue, null, null, null, null);

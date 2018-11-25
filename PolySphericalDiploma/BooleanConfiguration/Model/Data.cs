@@ -15,7 +15,7 @@ namespace BooleanConfiguration
         /// <summary>
         /// 
         /// </summary>
-        public double[][] RestrictionsMatrix { get; private set; }
+        public double[][] ConstraintsMatrix { get; private set; }
 
         /// <summary>
         /// Dimension of space
@@ -64,8 +64,8 @@ namespace BooleanConfiguration
 
         public Data(TypeOfSet typeOfSet)
         {
-            const int leftBound = 3;
-            const int rightBound = 10;
+            const int leftBound = 100;
+            const int rightBound = 600;
             OptimizationHelper = new OptimizationHelper();
 
             N = OptimizationHelper.GerIntegerValueInlcudingUpperBound(leftBound, rightBound);
@@ -84,14 +84,14 @@ namespace BooleanConfiguration
             MatrixCOrRightPart = new double[N];
             MatrixX1 = new double[N];
             MatrixA = new double[N][];
-            RestrictionsMatrix = new double[N][];
+            ConstraintsMatrix = new double[N][];
             AllocateArrayMemory(MatrixA, N);
-            AllocateArrayMemory(RestrictionsMatrix, N);
+            AllocateArrayMemory(ConstraintsMatrix, N);
             //
 
             // Setting random values
             OptimizationHelper.RandomizeMatrixA(MatrixA); // N*N
-            OptimizationHelper.RandomizeMatrixA(RestrictionsMatrix); // N*N
+            OptimizationHelper.RandomizeMatrixA(ConstraintsMatrix); // N*N
             OptimizationHelper.RandomizeMatrixC(MatrixCOrRightPart); // N*1
             OptimizationHelper.RandomizeMatrixX1(MatrixX1); // N*1
             //
@@ -99,7 +99,7 @@ namespace BooleanConfiguration
             // Restrictions
             RestrictionHelper.SetXBounds(x_L, x_U);
             m = RestrictionHelper.SetM(N);
-            RestrictionHelper.SetRestrictionsBounds(g_L, g_U, RestrictionsMatrix, Set.MatrixX0, MatrixX1, N);
+            RestrictionHelper.SetRestrictionsBounds(g_L, g_U, ConstraintsMatrix, Set.MatrixX0, MatrixX1, N);
             //
         }
 

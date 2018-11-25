@@ -12,6 +12,7 @@ namespace BooleanConfiguration
             Data data = null;
 
             Output.PrintToConsole(ConsolePrint);
+
             Input.SelectTypeOfStartSet(ref data);
 
             ResultOfResearching res = new RunTask().SolveTheProblem(data ?? throw new Exception("Data is null!"));

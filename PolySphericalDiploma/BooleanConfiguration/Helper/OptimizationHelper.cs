@@ -12,7 +12,7 @@ namespace BooleanConfiguration
             random = new Random();
         }
 
-        private void RandomizeMatrix(double[][] maxtrix)
+        public void RandomizeMatrix(double[][] maxtrix)
         {
             for (int i = 0; i < maxtrix.Length; i++)
             {
@@ -25,7 +25,7 @@ namespace BooleanConfiguration
             }
         }
 
-        internal static void GettingArrayWithLabda(double[][] matrixA, out double[] labdaArray, out double mainLambda)
+        public static void GettingArrayWithLabda(double[][] matrixA, out double[] labdaArray, out double mainLambda)
         {
             labdaArray = new double[matrixA.Length];
             for (int i = 0; i < matrixA.Length; i++)
@@ -51,7 +51,7 @@ namespace BooleanConfiguration
             }
         }
 
-        internal static double[] GettingVariablesVector(Data data)
+        public static double[] GettingVariablesVector(Data data)
         {
             double[] randomStartValues = new double[data.N];
             for (int i = 0; i < randomStartValues.Length; i++)

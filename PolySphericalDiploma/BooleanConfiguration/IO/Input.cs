@@ -11,11 +11,11 @@ namespace BooleanConfiguration
                 switch (Console.ReadLine())
                 {
                     case "1":
-                        data = new Data(Enums.TypeOfSet.BnSet);
+                        data = new Data(Enums.TypeOfSet.BooleanSet);
                         break;
 
                     case "2":
-                        data = new Data(Enums.TypeOfSet.BooleanSet);
+                        data = new Data(Enums.TypeOfSet.BnSet);
                         break;
 
                     case "3":

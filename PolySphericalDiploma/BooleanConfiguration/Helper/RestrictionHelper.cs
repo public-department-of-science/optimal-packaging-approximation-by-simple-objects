@@ -13,13 +13,12 @@ namespace BooleanConfiguration
             }
         }
 
-        internal static int SetM(int N)
+        public static int SetM(int N)
         {
             return N;
         }
 
-
-        internal static void SetRestrictionsBounds(double[] g_L, double[] g_U, double[][] restrictionsMatrix, string matrixX0, double[] matrixX1, int n)
+        public static void SetRestrictionsBounds(double[] g_L, double[] g_U, double[][] restrictionsMatrix, string matrixX0, double[] matrixX1, int n)
         {
             for (int i = 0; i < g_L.Length; i++)
             {
@@ -40,27 +39,34 @@ namespace BooleanConfiguration
             }
         }
 
-        private static double MultiplicationLineByColumn(double[] v, double[] matrixX1)
+        private static double MultiplicationLineByColumn(double[] row, double[] matrixColumn)
         {
             double value = 0.0;
 
-            for (int i = 0; i < v.Length; i++)
+            for (int i = 0; i < row.Length; i++)
             {
-                value += v[i] * matrixX1[i];
+                value += row[i] * matrixColumn[i];
             }
 
             return value;
         }
 
-        private static double MultiplicationLineByColumn(double[] v, string matrixX1)
+        private static double MultiplicationLineByColumn(double[] row, string matrixX0)
         {
-            double[] matrix0Array = new double[v.Length];
+            double[] matrix0Column = GettingOneDemensionArrayFromString(row.Length, matrixX0);
+
+            return MultiplicationLineByColumn(row, matrix0Column);
+        }
+
+        public static double[] GettingOneDemensionArrayFromString(int N, string matrixX0)
+        {
+            double[] matrix0Column = new double[N];
 
             try
             {
-                for (int i = 0; i < matrix0Array.Length; i++)
+                for (int i = 0; i < matrix0Column.Length; i++)
                 {
-                    matrix0Array[i] = double.Parse(v[i].ToString());
+                    matrix0Column[i] = double.Parse(matrixX0[i].ToString());
                 }
             }
             catch (FormatException)
@@ -70,7 +76,7 @@ namespace BooleanConfiguration
             {
             }
 
-            return MultiplicationLineByColumn(matrix0Array, matrix0Array);
+            return matrix0Column;
         }
 
         private static double[][] Multiplication(double[][] restrictionsMatrix, string matrixX0String)
