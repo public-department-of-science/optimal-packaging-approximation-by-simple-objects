@@ -20,12 +20,12 @@ namespace BooleanConfiguration
 
                 for (int j = 0; j < row.Length; j++)
                 {
-                    maxtrix[i][j] = random.Next(0, 26);
+                    maxtrix[i][j] = random.Next(0, 8);
                 }
             }
         }
 
-        public static void GettingArrayWithLabda(double[][] matrixA, out double[] labdaArray, out double mainLambda)
+        public static void GettingArrayWithLabda(double[][] matrixA, ref double[] labdaArray, out double mainLambda)
         {
             labdaArray = new double[matrixA.Length];
             for (int i = 0; i < matrixA.Length; i++)
@@ -47,7 +47,7 @@ namespace BooleanConfiguration
         {
             for (int i = 0; i < maxtrixC.Length; i++)
             {
-                maxtrixC[i] = random.Next(0, 20);
+                maxtrixC[i] = random.Next(0, 10);
             }
         }
 

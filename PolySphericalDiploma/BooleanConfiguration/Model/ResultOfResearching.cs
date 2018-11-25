@@ -20,10 +20,11 @@ namespace BooleanConfiguration
         {
             if (Result.ContainsKey(lambda))
             {
-                while (!Result.ContainsKey(lambda))
+                do
                 {
                     lambda += 0.01;
                 }
+                while (Result.ContainsKey(lambda));
             }
 
             Result.Add(lambda, keyValues);
