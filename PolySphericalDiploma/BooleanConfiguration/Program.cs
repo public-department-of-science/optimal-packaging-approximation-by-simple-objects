@@ -1,4 +1,7 @@
 using System;
+using BooleanConfiguration.IO;
+using BooleanConfiguration.Model;
+using BooleanConfiguration.Solvers;
 
 namespace BooleanConfiguration
 {

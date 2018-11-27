@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace hs071_cs
+namespace hs071_cs.Adapters
 {
     public abstract class BaseAdaptor
     {

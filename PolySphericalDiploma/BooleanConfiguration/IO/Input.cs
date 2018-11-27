@@ -1,6 +1,8 @@
 ﻿using System;
+using BooleanConfiguration.Helper;
+using BooleanConfiguration.Model;
 
-namespace BooleanConfiguration
+namespace BooleanConfiguration.IO
 {
     internal static class Input
     {

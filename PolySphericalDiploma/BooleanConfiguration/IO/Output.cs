@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using BooleanConfiguration.Model;
 
-namespace BooleanConfiguration
+namespace BooleanConfiguration.IO
 {
     internal static class Output
     {
@@ -28,7 +29,7 @@ namespace BooleanConfiguration
             {
                 using (StreamWriter sw = new StreamWriter(writePath, false, System.Text.Encoding.Default))
                 {
-                    sw.WriteLine("<<Table with results below>>");
+                    sw.WriteLine($"<<Table with results below>> N = {lambda.Length}");
 
                     foreach (double item in lambda)
                     {

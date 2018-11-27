@@ -1,6 +1,9 @@
-﻿using static BooleanConfiguration.Enums;
+﻿
+using BooleanConfiguration.Helper;
+using BooleanConfiguration.Interfaces;
+using static BooleanConfiguration.Helper.Enums;
 
-namespace BooleanConfiguration
+namespace BooleanConfiguration.Model
 {
     /// <summary>
     /// Class with optimization parameters
@@ -64,8 +67,8 @@ namespace BooleanConfiguration
 
         public Data(TypeOfSet typeOfSet)
         {
-            const int leftBound = 100;
-            const int rightBound = 600;
+            const int leftBound = 10;
+            const int rightBound = 30;
             OptimizationHelper = new OptimizationHelper();
 
             N = OptimizationHelper.GerIntegerValueInlcudingUpperBound(leftBound, rightBound);

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BooleanConfiguration
+namespace BooleanConfiguration.Helper
 {
     public class RestrictionHelper
     {

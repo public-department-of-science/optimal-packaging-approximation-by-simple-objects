@@ -1,4 +1,4 @@
-﻿namespace BooleanConfiguration
+﻿namespace BooleanConfiguration.Helper
 {
     public class Enums
     {

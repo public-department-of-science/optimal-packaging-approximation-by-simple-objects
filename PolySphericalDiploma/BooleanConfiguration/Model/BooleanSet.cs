@@ -1,6 +1,7 @@
 ﻿using System;
+using BooleanConfiguration.Interfaces;
 
-namespace BooleanConfiguration
+namespace BooleanConfiguration.Model
 {
     public class BooleanSet : IBooleanSet
     {

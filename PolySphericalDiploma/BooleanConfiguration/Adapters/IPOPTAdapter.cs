@@ -1,8 +1,9 @@
 ﻿using System;
 using BooleanConfiguration;
 using BooleanConfiguration.Helper;
+using BooleanConfiguration.Model;
 
-namespace hs071_cs
+namespace hs071_cs.Adapters
 {
     // TODO: TO REALISE IPOPT_adapter
     internal class IPOPTAdapter : BaseAdaptor, IDisposable

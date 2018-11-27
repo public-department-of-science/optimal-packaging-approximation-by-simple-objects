@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using BooleanConfiguration.Helper;
+using BooleanConfiguration.IO;
+using BooleanConfiguration.Model;
 using Cureos.Numerics;
-using hs071_cs;
+using hs071_cs.Adapters;
 
-namespace BooleanConfiguration
+namespace BooleanConfiguration.Solvers
 {
     public class RunTask
     {

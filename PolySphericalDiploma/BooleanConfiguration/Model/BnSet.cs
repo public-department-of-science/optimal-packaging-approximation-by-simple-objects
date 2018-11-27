@@ -1,4 +1,6 @@
-﻿namespace BooleanConfiguration
+﻿using BooleanConfiguration.Interfaces;
+
+namespace BooleanConfiguration.Model
 {
     internal class BnSet : IBnSet
     {

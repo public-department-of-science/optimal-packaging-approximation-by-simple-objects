@@ -1,4 +1,4 @@
-﻿namespace BooleanConfiguration
+﻿namespace BooleanConfiguration.Interfaces
 {
     internal interface IBnSet : ISet
     {

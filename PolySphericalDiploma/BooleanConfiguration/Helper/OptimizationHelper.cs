@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
+using BooleanConfiguration.Model;
 
-namespace BooleanConfiguration
+namespace BooleanConfiguration.Helper
 {
     internal class OptimizationHelper
     {
