@@ -24,6 +24,7 @@ namespace BooleanConfiguration.Solvers
                 // mainLambda => lamdaArray.MaxFromLambdaArray();
                 OptimizationHelper.GettingArrayWithLabda(data.MatrixA, ref LamdaArray, out double mainLambda);
                 data.MainLambda = mainLambda;
+
                 for (int i = 0; i < LamdaArray.Length; i++)
                 {
                     using (Ipopt ipoptSolver = new Ipopt(dataAdapter._n, dataAdapter._x_L, dataAdapter._x_U, dataAdapter._m, dataAdapter._g_L, dataAdapter._g_U,
