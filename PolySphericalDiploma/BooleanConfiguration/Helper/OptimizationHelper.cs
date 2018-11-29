@@ -21,7 +21,7 @@ namespace BooleanConfiguration.Helper
 
                 for (int j = 0; j < row.Length; j++)
                 {
-                    maxtrix[i][j] = random.Next(0, 8);
+                    maxtrix[i][j] = random.Next(0, 10);
                 }
             }
         }
@@ -48,7 +48,7 @@ namespace BooleanConfiguration.Helper
         {
             for (int i = 0; i < maxtrixC.Length; i++)
             {
-                maxtrixC[i] = random.Next(0, 10);
+                maxtrixC[i] = random.Next(-10, 10);
             }
         }
 

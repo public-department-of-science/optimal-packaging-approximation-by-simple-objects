@@ -23,7 +23,7 @@ namespace BooleanConfiguration.Solvers
                 // lamdaArray => labda for each line
                 // mainLambda => lamdaArray.MaxFromLambdaArray();
                 OptimizationHelper.GettingArrayWithLabda(data.MatrixA, ref LamdaArray, out double mainLambda);
-
+                data.MainLambda = mainLambda;
                 for (int i = 0; i < LamdaArray.Length; i++)
                 {
                     using (Ipopt ipoptSolver = new Ipopt(dataAdapter._n, dataAdapter._x_L, dataAdapter._x_U, dataAdapter._m, dataAdapter._g_L, dataAdapter._g_U,
@@ -41,20 +41,40 @@ namespace BooleanConfiguration.Solvers
                         double[] x = OptimizationHelper.GettingVariablesVector(data); // TODO variables array need to be in this one-demension array
                         IpoptReturnCode t = ipoptSolver.SolveProblem(x, out double resultValue, null, null, null, null);
                         taskTime.Stop();
-                        resultOfResearching.AddNewResult(LamdaArray[i], new KeyValuePair<double[], Stopwatch>(x, taskTime));
+                        resultOfResearching.AddNewResult(LamdaArray[i], new KeyValuePair<double[], Stopwatch>(x, taskTime), GetFunctionValue(data.MatrixA, x));
                         // taskTime; => spent time
                     }
                 }
 
                 return resultOfResearching;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
                 Output.ConsolePrint(ex.Message);
                 Console.BackgroundColor = ConsoleColor.White;
                 return null;
             }
+        }
+
+        private double GetFunctionValue(double[][] matrixA, double[] x)
+        {
+            double val = 0.0;
+            for (int i = 0; i < matrixA.Length; i++)
+            {
+                for (int j = 0; j < matrixA[i].Length; j++)
+                {
+                    if (i == j)
+                    {
+                        val += matrixA[i][j] * x[j] * x[j];
+                    }
+                    else
+                    {
+                        val += matrixA[i][j] * x[i] * x[j];
+                    }
+                }
+            }
+            return val;
         }
     }
 }

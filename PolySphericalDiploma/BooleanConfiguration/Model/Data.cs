@@ -28,7 +28,9 @@ namespace BooleanConfiguration.Model
         /// <summary>
         /// 
         /// </summary>
-        public int[] Lamda { get; private set; }
+        public int[] Lambda { get; private set; }
+
+        public double MainLambda { get; set; }
 
         /// <summary>
         /// 
@@ -79,7 +81,7 @@ namespace BooleanConfiguration.Model
             n = N;
 
             // arrays allocation
-            Lamda = new int[N];
+            Lambda = new int[N];
             g_L = new double[N];
             g_U = new double[N];
             x_L = new double[N];

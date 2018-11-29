@@ -33,15 +33,15 @@ namespace BooleanConfiguration.IO
 
                     foreach (double item in lambda)
                     {
-                        KeyValuePair<double[], Stopwatch> result = res.GetResultById(item);
+                        KeyValuePair<KeyValuePair<double[], Stopwatch>, double> result = res.GetResultById(item);
 
                         sw.WriteLine($"_______Lambda = {item.ToString()}___________");
-                        sw.WriteLine($"Time = {result.Value.Elapsed.ToString()}");
-                        sw.WriteLine($"OPTIONAL POINT: ");
+                        sw.WriteLine($"FunctionValue = {result.Value} Time = {result.Key.Value.Elapsed.ToString()}");
+                        sw.WriteLine($"Local optional point: ");
 
-                        for (int i = 0; i < result.Key.Length; i++)
+                        for (int i = 0; i < result.Key.Key.Length; i++)
                         {
-                            double item1 = result.Key[i];
+                            double item1 = result.Key.Key[i];
                             sw.Write($" X[{i + 1}] = " + item1.ToString() + ";");
                         }
 
