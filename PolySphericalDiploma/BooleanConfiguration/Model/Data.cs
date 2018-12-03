@@ -69,8 +69,8 @@ namespace BooleanConfiguration.Model
 
         public Data(TypeOfSet typeOfSet)
         {
-            const int leftBound = 10;
-            const int rightBound = 30;
+            const int leftBound = 300;
+            const int rightBound = 301;
             OptimizationHelper = new OptimizationHelper();
 
             N = OptimizationHelper.GerIntegerValueInlcudingUpperBound(leftBound, rightBound);
