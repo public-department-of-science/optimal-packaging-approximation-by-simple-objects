@@ -13,15 +13,15 @@ namespace BooleanConfiguration.Helper
             random = new Random();
         }
 
-        public void RandomizeMatrix(double[][] maxtrix)
+        public void RandomizeMatrix(double[][] matrix)
         {
-            for (int i = 0; i < maxtrix.Length; i++)
+            for (int i = 0; i < matrix.Length - 1; i++)
             {
-                double[] row = maxtrix[i];
+                double[] row = matrix[i];
 
-                for (int j = 0; j < row.Length; j++)
+                for (int j = i; j < row.Length; j++)
                 {
-                    maxtrix[i][j] = random.Next(0, 10);
+                    matrix[i][j] = matrix[j][i] = (random.Next(0, 10) + random.Next(0, 10)) / 2;
                 }
             }
         }
