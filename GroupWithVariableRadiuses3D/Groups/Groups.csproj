@@ -52,6 +52,8 @@
     <Compile Include="Coordinate2D.cs" />
     <Compile Include="CoordinateBase.cs" />
     <Compile Include="Data.cs" />
+    <Compile Include="DataHelper.cs" />
+    <Compile Include="Enums.cs" />
     <Compile Include="FixedRadius3dAdaptor.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="IOptimalPoints.cs" />

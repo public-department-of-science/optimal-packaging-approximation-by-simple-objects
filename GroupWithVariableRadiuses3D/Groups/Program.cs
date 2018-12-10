@@ -1,21 +1,8 @@
-/* Date: 26-09-2017
- * Author: K. Korobchinskiy
- * Круги в круге
- * Problem:[+] Генерируются начальные точки для 30 кругов, радиусы изменяются от 1 до 50, но целыми;
- *         [+] Решаем с фиксированными радиусами;
- *         [+] Сохраняем результат вычисления;
- *         [*] Выполнить расчёты для групп по 2,3,4,5 кругов подставляя началюное решение
- *         [*] 20фикс + 10п;
- *         [*] 10фикс + 10п + 10п;
- *         [*] 10фикс + 5п + 5п + 5п + 5п;
- *         [*] ;
- *         [*] ;
- ******************************** */
-// Сообщения об ошибках ipopt: https://www.coin-or.org/Ipopt/documentation/node36.html
 using System;
 using System.Diagnostics;
 using System.Linq;
 using Cureos.Numerics;
+using Groups;
 using hs071_cs.ObjectOptimazation;
 
 namespace hs071_cs
@@ -24,17 +11,18 @@ namespace hs071_cs
     {
         private static Random _rnd = new Random();
         private static int ballN;
-        private static readonly int _countVarR = 0; // количество кругов с переменным радиусом
+        private static int _countVarR = 0; // количество кругов с переменным радиусом
 
         public static void Main()
         {
             //Timer tmr = new Timer(Tick, null, 1000, 1000);
-            int ballsCount = 21; // количество кругов
+            int ballsCount = 23; // количество кругов
             const double maxRandRadius = 20; // максимальный радиус кругов r = 1..maxRandRadius
 
             #region Инициализация и обявление переменных
             double[] rSortSum = null; // отсортированный массив радиусов, для ограничений
             int[] groups = new int[ballsCount];
+            DataHelper dataHelper = new DataHelper();
 
             double[] xNach = new double[ballsCount];
             double[] yNach = new double[ballsCount];
@@ -106,127 +94,97 @@ namespace hs071_cs
             Console.WriteLine("\n\n\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             Console.WriteLine("\t ~~~ Решаем с фиксированными радиусами ~~~");
             Console.WriteLine("\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+            #region FixedRadiuses
+
             double[] xyzFixR = new double[3 * ballsCount + 1];
+
             for (int i = 0; i < ballsCount; ++i)
             {
                 xyzFixR[3 * i] = xNach[i];
                 xyzFixR[3 * i + 1] = yNach[i];
                 xyzFixR[3 * i + 2] = zNach[i];
             }
-            xyzFixR[3 * ballsCount] = RNach;
-            Stopwatch fixRTaskTime = new Stopwatch();
-            fixRTaskTime.Start();
 
-            //At first with Fixed radiuses
+            xyzFixR[3 * ballsCount] = RNach;
+
+            Stopwatch fixRTaskTime = new Stopwatch();
             Data startPointData = new Data(xNach, yNach, zNach, rNach, RNach, ballsCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
             OutPut.SaveToFile(startPointData, $"StartPoint");
+
             using (FixedRadius3dAdaptor adaptor = new FixedRadius3dAdaptor(startPointData))
             {
+                fixRTaskTime.Start();
                 RunTask(adaptor, xyzFixR, out xIter, out yIter, out zIter, ballsCount);
+                fixRTaskTime.Stop();
                 RIter = xyzFixR[3 * ballsCount];
                 RNach = xyzFixR[3 * ballsCount];
             }
-            startPointData = new Data(xIter, yIter, zIter, rNach, RNach, ballsCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+
+            startPointData = new Data(xIter, yIter, zIter, rNach, RIter, ballsCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
             OutPut.SaveToFile(startPointData, $"FixedRad{RNach}");
 
-            fixRTaskTime.Stop();
             Console.WriteLine("Выполенение задачи RunTime: " + getElapsedTime(fixRTaskTime));
 
             Console.WriteLine("=== Результат расчётов ===");
             ShowData(xIter, yIter, zIter, rNach, RIter);
             Console.WriteLine("=== ================== ===");
+
             double norma = Norma(xNach, xIter, yNach, yIter, zNach, zIter, rNach, rIter);
+
             Console.WriteLine($"Norma {norma}");
-            //            Console.WriteLine("\n\t\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            //            Console.WriteLine("\t\t ~~           Решаем с группами           ~~");
-            //            Console.WriteLine("\t\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            //            Balls[] balls = new Balls[ballsCount];
-            //            for (int i = 0; i < ballsCount; ++i)
-            //            {
-            //                balls[i] = new Balls
-            //                {
-            //                    Group = 0
-            //                };
-            //                balls[i].Odz.xL = xIter[i] - maxRandRadius;
-            //                balls[i].Odz.xU = xIter[i] + maxRandRadius;
-            //                balls[i].Odz.yL = yIter[i] - maxRandRadius;
-            //                balls[i].Odz.yU = yIter[i] + maxRandRadius;
-            //                balls[i].Odz.zL = zIter[i] - maxRandRadius;
-            //                balls[i].Odz.zU = zIter[i] + maxRandRadius;
-            //                balls[i].Odz.rL = 0; // -rIter.Sum();
-            //                balls[i].Odz.rU = rIter.Sum();
-            //                balls[i].Coordinate.X = xIter[i];
-            //                balls[i].Coordinate.Y = yIter[i];
-            //                balls[i].Coordinate.Z = zIter[i];
-            //                balls[i].Radius = rIter[i]* new Random().NextDouble();
-            //            }
 
-            //            IpoptReturnCode status;
-            //            double[] radius = rNach.OrderBy(a => a).ToArray();
-            //            _countVarR = 0;
-            //            for (int i = 0; i < ballsCount; ++i)
-            //            {
-            //                //20фикс + 10п;
-            //                //if (Circles[i].Radius < radius[10])
-            //                //{
-            //                //    Circles[i].Group = 0;
-            //                //}
+            #endregion
 
-            //                if (i < 7)
-            //                {
-            //                    balls[i].Group = 1;
-            //                    ++_countVarR;
-            //                }
-            //                if (i >= 7 && i <= 12)
-            //                {
-            //                    balls[i].Group = 2;
-            //                    ++_countVarR;
-            //                }
-            //                if (i > 12)
-            //                {
-            //                    balls[i].Group = 3;
-            //                    ++_countVarR;
-            //                }
+            Console.WriteLine("\n\t\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            Console.WriteLine("\t\t ~~           Решаем с группами           ~~");
+            Console.WriteLine("\t\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            Balls[] balls = new Balls[ballsCount];
 
-            //                //if (i > 15 && i <= 22)
-            //                //{
-            //                //    balls[i].Group = 3;
-            //                //    ++ _countVarR;
-            //                //}
-            //                //if (i > 22 && i <= 29)
-            //                //{
-            //                //    balls[i].Group = 4;
-            //                //    ++_countVarR;
-            //                //}
-            //                //if (i > 29 && i <= 36)
-            //                //{
-            //                //    balls[i].Group = 5;
-            //                //    ++ _countVarR;
-            //                //}
-            //                //if (i > 36 && i <= 43)
-            //                //{
-            //                //    balls[i].Group = 6;
-            //                //    ++_countVarR;
-            //                //}
-            //            }
-            //            Stopwatch varRTaskTime = new Stopwatch();
-            //            varRTaskTime.Start();
-            //            using (VariableRadiusPolySpheraAdapter vr = new VariableRadiusPolySpheraAdapter(balls, radius))
-            //            {
-            //                status = RunTask(vr, balls, out xIter, out yIter, out zIter, out rIter, out RIter);
-            //            }
-            //#if DEBUG
-            //            ShowData(xIter, yIter, zIter, rIter, RIter);
-            //#endif
-            //            Data optionalPoint = new Data(xIter, yIter, zIter, rNach, RIter, ballsCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
-            //            OutPut.SaveToFile(optionalPoint, "VariableRadius"); // запись результата в файл
-            //            varRTaskTime.Stop();
-            //            Console.WriteLine("Выполенение задачи RunTime: " + getElapsedTime(varRTaskTime));
+            for (int i = 0; i < ballsCount; ++i)
+            {
+                balls[i] = new Balls
+                {
+                    Group = 0
+                };
 
-            //            fullTaskTime.Stop();
-            //            Console.WriteLine("Выполенение всей задачи RunTime: " + getElapsedTime(fullTaskTime));
-            //            Console.WriteLine("\n\n\n{0} ========= Press <RETURN> to exit... ========= ", Environment.NewLine);
-            //            Console.ReadLine();
+                balls[i].Odz.xL = xIter[i] - maxRandRadius;
+                balls[i].Odz.xU = xIter[i] + maxRandRadius;
+                balls[i].Odz.yL = yIter[i] - maxRandRadius;
+                balls[i].Odz.yU = yIter[i] + maxRandRadius;
+                balls[i].Odz.zL = zIter[i] - maxRandRadius;
+                balls[i].Odz.zU = zIter[i] + maxRandRadius;
+                balls[i].Odz.rL = 0;
+                balls[i].Odz.rU = rIter.Sum();
+                balls[i].Radius = rIter[i] * new Random().NextDouble();
+            }
+
+            dataHelper.RandomizeCoordinate(ref balls, xIter, yIter, zIter, ballsCount);
+            dataHelper.RandomizeRadiuses(ref balls, rIter, ballsCount);
+            dataHelper.SetGroups(balls, ref _countVarR);
+
+            IpoptReturnCode status;
+            double[] radius = rNach.OrderBy(a => a).ToArray();
+
+            Stopwatch varRTaskTime = new Stopwatch();
+            using (VariableRadiusPolySpheraAdapter vr = new VariableRadiusPolySpheraAdapter(balls, radius))
+            {
+                varRTaskTime.Start();
+                status = RunTask(vr, balls, out xIter, out yIter, out zIter, out rIter, out RIter);
+                varRTaskTime.Stop();
+            }
+#if DEBUG
+            ShowData(xIter, yIter, zIter, rIter, RIter);
+#endif
+            Data optionalPoint = new Data(xIter, yIter, zIter, rNach, RIter, ballsCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+            OutPut.SaveToFile(optionalPoint, "VariableRadius"); // запись результата в файл
+
+            Console.WriteLine("Выполенение задачи RunTime: " + getElapsedTime(varRTaskTime));
+
+            fullTaskTime.Stop();
+            Console.WriteLine("Выполенение всей задачи RunTime: " + getElapsedTime(fullTaskTime));
+            Console.WriteLine("\n\n\n{0} ========= Press <RETURN> to exit... ========= ", Environment.NewLine);
+            Console.ReadLine();
         }
 
         private static double Norma(double[] xNach, double[] xIter, double[] yNach, double[] yIter, double[] zNach, double[] zIter, double[] rNach, double[] rIter)
@@ -245,9 +203,9 @@ namespace hs071_cs
         private static IpoptReturnCode RunTask(VariableRadiusPolySpheraAdapter op, Balls[] c, out double[] NewX, out double[] NewY, out double[] NewZ, out double[] NewR, out double CF)
         {
             Stopwatch timer = new Stopwatch();
+
             IpoptReturnCode status;
             double[] x = new double[op._n];
-            timer.Reset();
             timer.Start();
             /* allocate space for the initial point and set the values */
 
@@ -263,13 +221,9 @@ namespace hs071_cs
                 problem.AddOption("output_file", op.ToString() + "_" + DateTime.Now.ToShortDateString() + "_" + DateTime.Now.Hour + "_" + DateTime.Now.Minute + ".txt");
                 //problem.AddOption("file_print_level", 7); // 0..12
                 problem.AddOption("file_print_level", 0);
-                problem.AddOption("max_iter", 100000);
+                problem.AddOption("max_iter", 4000);
                 problem.AddOption("print_level", 3); // 0<= value <= 12, default value is 5
-#if INTERMEDIATE
-        problem.SetIntermediateCallback(p.intermediate);
-#endif
-                /* solve the problem */
-                //Input: Starting point; Output: Optimal solution
+
                 for (int i = 0; i < ballN; ++i)
                 {
                     x[3 * i] = c[i].Coordinate.X;
@@ -284,7 +238,6 @@ namespace hs071_cs
                 // CF = obj;
             }
             timer.Stop();
-            Console.WriteLine("{0}{0}Optimization return status: {1}{0}{0}", Environment.NewLine, status);
             //SaveToFile("d:\\out.txt", r, x, 10);
             NewX = new double[ballN];
             NewY = new double[ballN];
@@ -299,14 +252,10 @@ namespace hs071_cs
                 NewX[i] = x[3 * i];
                 NewY[i] = x[3 * i + 1];
                 NewZ[i] = x[3 * i + 2];
-                NewR[i] = (i >= _countVarR) ? c[i].Radius : x[3 * ballN + i];
-            }
-            for (int i = 0; i < x.Length; ++i)
-            {
-                Console.WriteLine("x[{0}]=    {1}", i, x[i]);
+                NewR[i] = (i < _countVarR) ? x[3 * ballN + i]: c[i].Radius;
             }
 
-            Console.WriteLine("===> RunTime: " + TimeToString(timer));
+            Console.WriteLine("{0}{0}Optimization return status: {1}{0}{0}", Environment.NewLine, status);
             return status;
         }
 
@@ -420,43 +369,12 @@ namespace hs071_cs
                 Console.WriteLine(" x[{0}]=  {1}", iterCount++, dataX[i]);
                 Console.WriteLine(" y[{0}]=  {1}", iterCount++, dataY[i]);
                 Console.WriteLine(" z[{0}]=  {1}", iterCount++, dataZ[i]);
-            }
-            for (int i = 0; i < cicleCount; ++i)
-            {
                 Console.WriteLine(" r[{0}]=  {1}", iterCount++, radius[i]);
             }
 
             Console.WriteLine(" R_External[{0}]=  {1}", iterCount++, R);
         }
 
-        /// <summary>
-        /// Для задачи с фиксированным радиусами
-        /// </summary>
-        /// <param name="data">Данные передаваемы в решатель: переменные</param>
-        /// <param name="radius">Константные радиусы</param>
-        private static void ShowData(double[] data, double[] radius)
-        {
-            int cicleCount = radius.Length;
-            Console.WriteLine("~~~~~~~~~~~ Координата Х ~~~~~~~~~~~");
-            for (int i = 0; i < cicleCount; ++i)
-            {
-                Console.WriteLine(" x[{0}]= {1}", i + 1, data[3 * i]);
-            }
-
-            Console.WriteLine("~~~~~~~~~~~ Координата Y ~~~~~~~~~~~");
-            for (int i = 0; i < cicleCount; ++i)
-            {
-                Console.WriteLine(" y[{0}]= {1}", i + 1, data[3 * i + 1]);
-            }
-
-            Console.WriteLine("~~~~~~~~~~~ Radius ~~~~~~~~~~~");
-            for (int i = 0; i < cicleCount; ++i)
-            {
-                Console.WriteLine(" r[{0}]= {1}", i + 1, radius[i]);
-            }
-
-            Console.WriteLine("\n R = {0}", data[3 * cicleCount]);
-        }
         /// <summary>
         /// Генератор начальных r - радиусов внутренних кругов
         /// в диапазоне от -max(r[i]) до max(r[i])
@@ -476,64 +394,6 @@ namespace hs071_cs
             return arrR;
         }
 
-        /// <summary>
-        /// Генератор начальных r - радиусов внутренних кругов
-        /// r[i] = r[i] + rnd()*min{r}
-        /// </summary>
-        public static double[] rRandomGenerate(double[] radiuses)
-        {
-            int cCount = radiuses.Length;
-            double minR = radiuses.Min();
-            double maxR = radiuses.Max();
-
-            double[] arrR = new double[cCount];
-            for (int i = 0; i < cCount; ++i)
-            {
-                //arrR[i] = radiuses[i] + (_rnd.NextDouble() - 0.5) * minR;
-                arrR[i] = radiuses[i] + 0.5 * (_rnd.NextDouble() - 0.5) * (maxR - minR);
-                if (arrR[i] < minR)
-                {
-                    arrR[i] = minR;
-                }
-
-                if (arrR[i] > maxR)
-                {
-                    arrR[i] = maxR;
-                }
-            }
-
-            return arrR;
-        }
-
-        /// <summary>
-        /// Генератор начальных x and y and R
-        /// в диапазоне от -max(r[i]) до max(r[i])
-        /// </summary>
-        public static void xyRRandomGenerate(int cCount, double[] r, out double[] x, out double[] y, out double[] z, out double R)
-        {
-            x = new double[cCount];
-            y = new double[cCount];
-            z = new double[cCount];
-            // генеририруем R из массивов Х и У
-            double maxX = 0;
-            double maxY = 0;
-            double maxZ = 0;
-            double maxR = 0;
-            double maxRXYZ = 0;
-            for (int i = 0; i < cCount; ++i)
-            {
-                x[i] = r[cCount - 1] * (_rnd.NextDouble() - 0.5);
-                y[i] = r[cCount - 1] * (_rnd.NextDouble() - 0.5);
-                z[i] = r[cCount - 1] * (_rnd.NextDouble() - 0.5);
-
-                maxX = Math.Max(Math.Abs(x[i] + r[i]), Math.Abs(x[i] - r[i]));
-                maxY = Math.Max(Math.Abs(y[i] + r[i]), Math.Abs(y[i] - r[i]));
-                maxZ = Math.Max(Math.Abs(z[i] + r[i]), Math.Abs(z[i] - r[i]));
-                maxR = Math.Max(Math.Max(maxX, maxY), maxZ);
-                maxRXYZ = Math.Max(maxRXYZ, maxR);
-            }
-            R = maxRXYZ; // sumR;
-        }
         /// <summary>
         /// Генератор начальных x and y and R
         /// в диапазоне от -max(r[i]) до max(r[i])

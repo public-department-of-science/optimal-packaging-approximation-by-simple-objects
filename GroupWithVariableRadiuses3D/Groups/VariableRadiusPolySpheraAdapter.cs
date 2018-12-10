@@ -4,6 +4,7 @@
 // MVID: E82B398F-3AFD-42A4-A941-6E0B182418E2
 // Assembly location: H:\Dropbox\диплом\CirclesInCircle\CirclesInCircle\AdapterLibrary.dll
 
+using Cureos.Numerics;
 using hs071_cs.ObjectOptimazation;
 using System;
 using System.Linq;
@@ -33,15 +34,15 @@ namespace hs071_cs
 
         public double[] X { get; private set; }
 
-        public VariableRadiusPolySpheraAdapter(Balls[] balls, double[] ra)
+        public VariableRadiusPolySpheraAdapter(Balls[] balls, double[] trueRadiuses)
         {
-            if (balls.Length != ra.Length)
+            if (balls.Length != trueRadiuses.Length)
             {
-                throw new Exception();
+                throw new Exception("Size of arrays didn't matched!");
             }
 
-            _ra = new double[ra.Length];
-            ra.CopyTo(_ra, 0);
+            _ra = new double[trueRadiuses.Length];
+            trueRadiuses.CopyTo(_ra, 0);
             Balls = new Balls[balls.Length];
             for (int index = 0; index < balls.Length; ++index)
             {
@@ -85,7 +86,7 @@ namespace hs071_cs
                 X[3 * count + index] = Balls[index].Radius;
             }
 
-            X[_n - 1] = 20.0;
+            X[_n - 1] = 70.0;
             _x_L = new double[_n];
             _x_U = new double[_n];
             for (int index = 0; index < count; ++index)
@@ -102,22 +103,9 @@ namespace hs071_cs
                 _x_L[3 * count + index] = Balls[index].Odz.rL;
                 _x_U[3 * count + index] = Balls[index].Odz.rU;
             }
-            _x_L[_n - 1] = ra.Max();
-            _x_U[_n - 1] = ra.Sum();
-            Console.Write(" xL: ");
-            for (int index = 0; index < _x_L.Length; ++index)
-            {
-                Console.Write(string.Format(" [{0}]:{1}", index, _x_L[index].ToString("0.00")));
-            }
+            _x_L[_n - 1] = trueRadiuses.Max();
+            _x_U[_n - 1] = trueRadiuses.Sum();
 
-            Console.WriteLine();
-            Console.Write(" xU: ");
-            for (int index = 0; index < _x_L.Length; ++index)
-            {
-                Console.Write(string.Format(" [{0}]:{1}", index, _x_U[index].ToString("0.00")));
-            }
-
-            Console.WriteLine();
             _nele_jac = 0;
             _m = 0;
 
@@ -139,22 +127,25 @@ namespace hs071_cs
             _nele_jac += CombinatorialHelper.GetOneCountInGroups(_elemGroupCount, _groupCount);
             _g_L = new double[_m];
             _g_U = new double[_m];
+
             int gCount = 0;
             for (int index2 = 0; index2 < count; ++index2)
             {
                 _g_L[gCount] = 0.0;
                 _g_U[gCount++] = 2E+19;
             }
+
             int num2 = 0;
             for (int i = 0; i < count - 1; ++i)
             {
                 for (int j = i + 1; j < count; ++j)
                 {
                     num2 += i < countVarR || j < countVarR ? 0 : 1;
-                    _g_L[gCount] = i < countVarR || j < countVarR ? 0.0 : Math.Pow(ra[i] + ra[j], 2.0);
-                    _g_U[gCount++] = 2E+19;
+                    _g_L[gCount] = i < countVarR || j < countVarR ? 0.0 : Math.Pow(trueRadiuses[i] + trueRadiuses[j], 2.0);
+                    _g_U[gCount++] = Ipopt.PositiveInfinity;
                 }
             }
+
             double[][] elemInGroup = new double[_groupCount][];
             for (int i = 0; i < _groupCount; ++i)
             {
@@ -164,10 +155,11 @@ namespace hs071_cs
                 {
                     if (Balls[j].Group == i)
                     {
-                        elemInGroup[i][num3++] = ra[j];
+                        elemInGroup[i][num3++] = trueRadiuses[j];
                     }
                 }
             }
+
             _raSum = CombinatorialHelper.GetRightPartInCombinatornOgr(elemInGroup);
             for (int i = 1; i < _groupCount; ++i)
             {
@@ -189,6 +181,7 @@ namespace hs071_cs
                 _g_L[gCount] = _raSum[i - 1][_elemGroupCount[i]];
                 _g_U[gCount++] = _raSum[i - 1][_elemGroupCount[i]];
             }
+
             for (int index2 = 0; index2 < _groupCount; ++index2)
             {
                 _indexElemInGroups[index2] = new int[_elemGroupCount[index2]];
