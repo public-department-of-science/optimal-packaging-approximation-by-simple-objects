@@ -40,8 +40,7 @@ namespace hs071_cs.Adapters
 
         public override bool Eval_f(int n, double[] x, bool new_x, out double obj_value)
         {
-            // R -> min
-            obj_value = IPOPTHelper.CalculateFunctionObjValue(MatrixOfCoef, x);// K2 * x[_n - 1] + K2 * C_Multiply_by_Length(x);
+            obj_value = IPOPTHelper.CalculateFunctionObjValue(MatrixOfCoef, x);
             return true;
         }
 

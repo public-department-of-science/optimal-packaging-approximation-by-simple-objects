@@ -12,6 +12,7 @@ namespace BooleanConfiguration.IO
         {
             Console.WriteLine(text);
         }
+
         public static void PrintToConsole(Print ConsolePrint)
         {
             ConsolePrint("Select set type:");
@@ -36,13 +37,13 @@ namespace BooleanConfiguration.IO
                         KeyValuePair<KeyValuePair<double[], Stopwatch>, double> result = res.GetResultById(item);
 
                         sw.WriteLine($"_______Lambda = {item.ToString()}___________");
-                        sw.WriteLine($"FunctionValue = {result.Value} Time = {result.Key.Value.Elapsed.ToString()}");
+                        sw.WriteLine($"FunctionValue = {Math.Ceiling(result.Value).ToString()} Time = {result.Key.Value.Elapsed.ToString()}");
                         sw.WriteLine($"Local optional point: ");
 
                         for (int i = 0; i < result.Key.Key.Length; i++)
                         {
                             double item1 = result.Key.Key[i];
-                            sw.Write($" X[{i + 1}] = " + item1.ToString() + ";");
+                            sw.Write($" X[{i + 1}] = " + Math.Round(item1).ToString() + ";");
                         }
 
                         sw.WriteLine();

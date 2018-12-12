@@ -1,17 +1,3 @@
-/* Date: 26-09-2017
- * Author: K. Korobchinskiy
- * Круги в круге
- * Problem:[+] Генерируются начальные точки для 30 кругов, радиусы изменяются от 1 до 50, но целыми;
- *         [+] Решаем с фиксированными радиусами;
- *         [+] Сохраняем результат вычисления;
- *         [*] Выполнить расчёты для групп по 2,3,4,5 кругов подставляя началюное решение
- *         [*] 20фикс + 10п;
- *         [*] 10фикс + 10п + 10п;
- *         [*] 10фикс + 5п + 5п + 5п + 5п;
- *         [*] ;
- *         [*] ;
- ******************************** */
-// Сообщения об ошибках ipopt: https://www.coin-or.org/Ipopt/documentation/node36.html
 using Cureos.Numerics;
 using hs071_cs.ObjectOptimazation;
 using System;
@@ -30,7 +16,7 @@ namespace hs071_cs
         public static void Main()
         {
             //Timer tmr = new Timer(Tick, null, 1000, 1000);
-            const int circlesCount = 20; // количество кругов
+            const int circlesCount = 15; // количество кругов
             const double maxRandRadius = 30; // максимальный радиус кругов r = 1..maxRandRadius
             #region Инициализация и обявление переменных
             double[] rSortSum = null; // отсортированный массив радиусов, для ограничений
@@ -138,9 +124,14 @@ namespace hs071_cs
                 //    Circles[i].Group = 0;
                 //}
 
-                if (i < 3)
+                if (i < 7)
                 {
                     Circles[i].Group = 1;
+                }
+
+                if (i >= 7)
+                {
+                    Circles[i].Group = 2;
                 }
             }
             Stopwatch varRTaskTime = new Stopwatch();

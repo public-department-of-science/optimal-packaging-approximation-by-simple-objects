@@ -1,4 +1,5 @@
 ﻿
+using System;
 using BooleanConfiguration.Helper;
 using BooleanConfiguration.Interfaces;
 using static BooleanConfiguration.Helper.Enums;
@@ -69,11 +70,16 @@ namespace BooleanConfiguration.Model
 
         public Data(TypeOfSet typeOfSet)
         {
-            const int leftBound = 300;
-            const int rightBound = 301;
             OptimizationHelper = new OptimizationHelper();
 
-            N = OptimizationHelper.GerIntegerValueInlcudingUpperBound(leftBound, rightBound);
+            Console.Write("N = ");
+            N = int.Parse(Console.ReadLine()); // OptimizationHelper.GerIntegerValueInlcudingUpperBound(leftBound, rightBound);
+
+            Console.Write("Set data range:");
+            Console.Write("Left bound = ");
+            int leftBound = int.Parse(Console.ReadLine());
+            Console.Write("Right bound = ");
+            int rightBound = int.Parse(Console.ReadLine());
 
             Set = SelectSet(typeOfSet);
             SetType = typeOfSet;

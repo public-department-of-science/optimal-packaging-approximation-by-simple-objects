@@ -16,8 +16,8 @@ namespace hs071_cs
         public static void Main()
         {
             //Timer tmr = new Timer(Tick, null, 1000, 1000);
-            int ballsCount = 53; // количество кругов
-            const double maxRandRadius = 20; // максимальный радиус кругов r = 1..maxRandRadius
+            int ballsCount = 10; // количество кругов
+            const double maxRandRadius = 30; // максимальный радиус кругов r = 1..maxRandRadius
 
             #region Инициализация и обявление переменных
             double[] rSortSum = null; // отсортированный массив радиусов, для ограничений
