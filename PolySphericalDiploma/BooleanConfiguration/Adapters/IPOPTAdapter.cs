@@ -26,7 +26,7 @@ namespace hs071_cs.Adapters
             ConstraintsMatrix = data.ConstraintsMatrix;
             MatrixX0 = RestrictionHelper.GettingOneDemensionArrayFromString(data.N, data.Set.MatrixX0);
             _n = data.n;
-            _m = data.m;
+            _m = data.m + 1; // 1 it's poly...-sherical shit
 
             _x_L = data.x_L;
             _x_U = data.x_U;
@@ -34,7 +34,7 @@ namespace hs071_cs.Adapters
             _g_L = data.g_L;
             _g_U = data.g_U;
 
-            _nele_jac = data.N * data.N;
+            _nele_jac = data.N * data.N + data.N;
             _nele_hess = 0;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace BooleanConfiguration.Helper
 {
@@ -53,6 +54,9 @@ namespace BooleanConfiguration.Helper
                     g[i] += constraintsMatrix[i][j] * x[j];
                 }
             }
+
+            double[] resriction = new double[1];
+            resriction[0] = x.Sum(y => Math.Pow(y - 0.5, 2) - Math.Sqrt(g.Length) / 2);
         }
 
         public static void CalculateEvalJacRestrictions(double[] x, double[] values, double[][] constraintsMatrix, double[] matrixX0)
@@ -63,14 +67,23 @@ namespace BooleanConfiguration.Helper
             {
                 for (int j = 0; j < constraintsMatrix[i].Length; j++)
                 {
-                    values[valuesCount++] = constraintsMatrix[i][j];
+                    values[valuesCount++] =  constraintsMatrix[i][j];
                 }
+            }
+
+            double[] value = new double[x.Length];
+
+            for (int i = 0; i < x.Length; i++)
+            {
+                value[i] = 2 * (x[i] - 0.5);
             }
         }
 
         public static void SettingNonZeroElementsInJacPosition(int[] iRow, int[] jCol, double[][] constraintsMatrix)
         {
             int lineCount = 0;
+            int t = 0;
+
             for (int i = 0; i < constraintsMatrix.Length; i++)
             {
                 for (int j = 0; j < constraintsMatrix[i].Length; j++)
@@ -79,6 +92,18 @@ namespace BooleanConfiguration.Helper
                     jCol[lineCount] = j;
                     ++lineCount;
                 }
+                t++;
+            }
+
+            int[] row = new int[constraintsMatrix[0].Length];
+            int[] col = new int[constraintsMatrix[0].Length];
+
+            for (int i = 0; i < constraintsMatrix[0].Length; i++)
+            {
+                row[lineCount] = t;
+                col[lineCount] = t;
+                ++lineCount;
+                ++t;
             }
         }
     }
