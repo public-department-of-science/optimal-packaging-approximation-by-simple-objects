@@ -43,7 +43,7 @@ namespace BooleanConfiguration.IO
                         for (int i = 0; i < result.Key.Key.Length; i++)
                         {
                             double item1 = result.Key.Key[i];
-                            sw.Write($" X[{i + 1}] = " + (item1).ToString() + ";");
+                            sw.Write($" X[{i + 1}] = " + Math.Round(item1).ToString() + ";");
                         }
 
                         sw.WriteLine();

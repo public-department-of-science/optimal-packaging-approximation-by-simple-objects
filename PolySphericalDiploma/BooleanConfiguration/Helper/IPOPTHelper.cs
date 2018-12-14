@@ -100,10 +100,8 @@ namespace BooleanConfiguration.Helper
 
             for (int i = 0; i < constraintsMatrix[0].Length; i++)
             {
-                row[lineCount] = t;
-                col[lineCount] = t;
-                ++lineCount;
-                ++t;
+                row[i] = i;
+                col[i] = i;
             }
         }
     }
