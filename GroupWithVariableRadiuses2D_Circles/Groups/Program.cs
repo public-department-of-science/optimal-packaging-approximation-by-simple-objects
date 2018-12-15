@@ -139,38 +139,36 @@ namespace hs071_cs
             Console.WriteLine("\n\t\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             Console.WriteLine("\t\t ~~           Решаем с группами           ~~");
             Console.WriteLine("\t\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            Balls[] balls = new Balls[ballsCount];
+            Circle2D[] circles = new Circle2D[ballsCount];
 
             for (int i = 0; i < ballsCount; ++i)
             {
-                balls[i] = new Balls
+                circles[i] = new Circle2D
                 {
                     Group = 0
                 };
 
-                balls[i].Odz.xL = xIter[i] - maxRandRadius;
-                balls[i].Odz.xU = xIter[i] + maxRandRadius;
-                balls[i].Odz.yL = yIter[i] - maxRandRadius;
-                balls[i].Odz.yU = yIter[i] + maxRandRadius;
-                balls[i].Odz.zL = zIter[i] - maxRandRadius;
-                balls[i].Odz.zU = zIter[i] + maxRandRadius;
-                balls[i].Odz.rL = 0;
-                balls[i].Odz.rU = rIter.Sum();
-                balls[i].Radius = rIter[i] * new Random().NextDouble();
+                circles[i].Odz.xL = xIter[i] - maxRandRadius;
+                circles[i].Odz.xU = xIter[i] + maxRandRadius;
+                circles[i].Odz.yL = yIter[i] - maxRandRadius;
+                circles[i].Odz.yU = yIter[i] + maxRandRadius;
+                circles[i].Odz.rL = 0;
+                circles[i].Odz.rU = rIter.Sum();
+                circles[i].Radius = rIter[i] * new Random().NextDouble();
             }
 
-            dataHelper.RandomizeCoordinate(ref balls, xIter, yIter, zIter, ballsCount);
-            dataHelper.RandomizeRadiuses(ref balls, rIter, ballsCount);
-            dataHelper.SetGroups(balls, ref _countVarR);
+            dataHelper.RandomizeCoordinate(ref circles, xIter, yIter, zIter, ballsCount);
+            dataHelper.RandomizeRadiuses(ref circles, rIter, ballsCount);
+            dataHelper.SetGroups(circles, ref _countVarR);
 
             IpoptReturnCode status;
             double[] radius = rNach.OrderBy(a => a).ToArray();
 
             Stopwatch varRTaskTime = new Stopwatch();
-            using (VariableRadiusAdapter vr = new VariableRadiusAdapter(balls, radius))
+            using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
             {
                 varRTaskTime.Start();
-                status = RunTask(vr, balls, out xIter, out yIter, out zIter, out rIter, out RIter);
+                status = RunTask(vr, circles, out xIter, out yIter, out zIter, out rIter, out RIter);
                 varRTaskTime.Stop();
             }
 #if DEBUG
@@ -194,13 +192,12 @@ namespace hs071_cs
             {
                 norma += Math.Pow(xNach[i] - xIter[i], 2);
                 norma += Math.Pow(yNach[i] - yIter[i], 2);
-                norma += Math.Pow(zNach[i] - zIter[i], 2);
             }
 
             return norma;
         }
 
-        private static IpoptReturnCode RunTask(VariableRadiusAdapter op, Balls[] c, out double[] NewX, out double[] NewY, out double[] NewZ, out double[] NewR, out double CF)
+        private static IpoptReturnCode RunTask(VariableRadiusAdapter op, Circle2D[] c, out double[] NewX, out double[] NewY, out double[] NewZ, out double[] NewR, out double CF)
         {
             Stopwatch timer = new Stopwatch();
 
@@ -226,14 +223,14 @@ namespace hs071_cs
 
                 for (int i = 0; i < ballN; ++i)
                 {
-                    x[3 * i] = c[i].Coordinate.X;
-                    x[3 * i + 1] = c[i].Coordinate.Y;
-                    x[3 * i + 2] = c[i].Coordinate.Z;
+                    x[2 * i] = c[i].Coordinate.X;
+                    x[2 * i + 1] = c[i].Coordinate.Y;
                     if (i < _countVarR)
                     {
-                        x[3 * ballN + i] = c[i].Radius;
+                        x[2 * ballN + i] = c[i].Radius;
                     }
                 }
+                x[x.Length-1] = 30;
                 status = problem.SolveProblem(x, out double obj, null, null, null, null);
                 // CF = obj;
             }
@@ -249,10 +246,9 @@ namespace hs071_cs
                 //Console.WriteLine("x[{0}]=    {1}", i, x[2 * i]);
                 //Console.WriteLine("x[{0}]=    {1}", i, x[2 * i + 1]);
                 //if(i<_countVarR) Console.WriteLine("x[{0}]=    {1}", i, x[2 * _count + i]);
-                NewX[i] = x[3 * i];
-                NewY[i] = x[3 * i + 1];
-                NewZ[i] = x[3 * i + 2];
-                NewR[i] = (i < _countVarR) ? x[3 * ballN + i]: c[i].Radius;
+                NewX[i] = x[2 * i];
+                NewY[i] = x[2 * i + 1];
+                NewR[i] = (i < _countVarR) ? x[2 * ballN + i]: c[i].Radius;
             }
 
             Console.WriteLine("{0}{0}Optimization return status: {1}{0}{0}", Environment.NewLine, status);

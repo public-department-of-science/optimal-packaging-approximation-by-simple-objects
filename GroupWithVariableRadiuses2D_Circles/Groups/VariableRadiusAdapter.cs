@@ -1,17 +1,11 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: hs071_cs.VariableRadiusPolySpheraAdapter
-// Assembly: AdapterLibrary, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
-// MVID: E82B398F-3AFD-42A4-A941-6E0B182418E2
-// Assembly location: H:\Dropbox\диплом\CirclesInCircle\CirclesInCircle\AdapterLibrary.dll
-
-using hs071_cs.ObjectOptimazation;
+﻿using hs071_cs.ObjectOptimazation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace hs071_cs
 {
-    public class VariableRadiusPolySpheraAdapter : IOptimalPoints, IDisposable
+    public class VariableRadiusAdapter : IOptimalPoints, IDisposable
     {
         public int _nele_hess = 0;
         private readonly int count = 0;
@@ -34,15 +28,15 @@ namespace hs071_cs
 
         public double[] X { get; private set; }
 
-        public VariableRadiusPolySpheraAdapter(Circle2D[] c, double[] ra)
+        public VariableRadiusAdapter(Circle2D[] c, double[] trueRadiuses)
         {
-            if (balls.Length != trueRadiuses.Length)
+            if (c.Length != trueRadiuses.Length)
             {
                 throw new Exception("Size of arrays didn't matched!");
             }
 
-            this._ra = new double[ra.Length];
-            ra.CopyTo((Array)this._ra, 0);
+            this._ra = new double[trueRadiuses.Length];
+            trueRadiuses.CopyTo((Array)this._ra, 0);
             this.Circles = new Circle2D[c.Length];
             for (int index = 0; index < c.Length; ++index)
                 this.Circles[index] = new Circle2D();
@@ -86,8 +80,8 @@ namespace hs071_cs
                 this._x_L[2 * this.count + index] = this.Circles[index].Odz.rL;
                 this._x_U[2 * this.count + index] = this.Circles[index].Odz.rU;
             }
-            this._x_L[this._n - 1] = ((IEnumerable<double>)ra).Max();
-            this._x_U[this._n - 1] = ((IEnumerable<double>)ra).Sum();
+            this._x_L[this._n - 1] = ((IEnumerable<double>)trueRadiuses).Max();
+            this._x_U[this._n - 1] = ((IEnumerable<double>)trueRadiuses).Sum();
             Console.Write(" xL: ");
             for (int index = 0; index < this._x_L.Length; ++index)
                 Console.Write(string.Format(" [{0}]:{1}", (object)index, (object)this._x_L[index].ToString("0.00")));
@@ -121,7 +115,7 @@ namespace hs071_cs
                 for (int index3 = index2 + 1; index3 < this.count; ++index3)
                 {
                     num2 += index2 < this.countVarR || index3 < this.countVarR ? 0 : 1;
-                    this._g_L[index1] = index2 < this.countVarR || index3 < this.countVarR ? 0.0 : Math.Pow(ra[index2] + ra[index3], 2.0);
+                    this._g_L[index1] = index2 < this.countVarR || index3 < this.countVarR ? 0.0 : Math.Pow(trueRadiuses[index2] + trueRadiuses[index3], 2.0);
                     this._g_U[index1++] = 2E+19;
                 }
             }
@@ -133,7 +127,7 @@ namespace hs071_cs
                 for (int index3 = 0; index3 < this.count; ++index3)
                 {
                     if (this.Circles[index3].Group == index2)
-                        elemInGroup[index2][num3++] = ra[index3];
+                        elemInGroup[index2][num3++] = trueRadiuses[index3];
                 }
             }
             this._raSum = CombinatorialHelper.GetRightPartInCombinatornOgr(elemInGroup);

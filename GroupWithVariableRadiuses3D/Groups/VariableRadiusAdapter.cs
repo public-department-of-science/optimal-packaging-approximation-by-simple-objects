@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace hs071_cs
 {
-    public class VariableRadiusPolySpheraAdapter : IOptimalPoints, IDisposable
+    public class VariableRadiusAdapter : IOptimalPoints, IDisposable
     {
         public int _nele_hess = 0;
         private readonly int count = 0;
@@ -34,7 +34,7 @@ namespace hs071_cs
 
         public double[] X { get; private set; }
 
-        public VariableRadiusPolySpheraAdapter(Balls[] balls, double[] trueRadiuses)
+        public VariableRadiusAdapter(Balls[] balls, double[] trueRadiuses)
         {
             if (balls.Length != trueRadiuses.Length)
             {
@@ -135,13 +135,11 @@ namespace hs071_cs
                 _g_U[gCount++] = 2E+19;
             }
 
-            int num2 = 0;
             for (int i = 0; i < count - 1; ++i)
             {
                 for (int j = i + 1; j < count; ++j)
                 {
-                    num2 += i < countVarR || j < countVarR ? 0 : 1;
-                    _g_L[gCount] = i < countVarR || j < countVarR ? 0.0 : Math.Pow(trueRadiuses[i] + trueRadiuses[j], 2.0);
+                    _g_L[gCount] =  i < countVarR || j < countVarR ? 0.0 : Math.Pow(trueRadiuses[i] + trueRadiuses[j], 2.0);
                     _g_U[gCount++] = Ipopt.PositiveInfinity;
                 }
             }
