@@ -339,7 +339,7 @@ namespace Groups
                 case "1":
                     break;
                 case "2":
-                    SliceCircles(circles, varRadiuses);
+                    SliceCircles(circles, ref varRadiuses);
                     break;
                 case "3":
                     SetAllCirclesLikeFixed(circles);
@@ -359,7 +359,7 @@ namespace Groups
             }
         }
 
-        private void SliceCircles(Circle2D[] circles, int varRadiuses)
+        private void SliceCircles(Circle2D[] circles, ref int varRadiuses)
         {
             Program.Print("Укажите кол. элементов в группе 3-15".ToUpper());
             int inGroupElements = 0;

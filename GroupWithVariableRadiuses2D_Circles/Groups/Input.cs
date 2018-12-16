@@ -21,7 +21,7 @@ namespace hs071_cs
         {
             try
             {
-                string readPath = @"D:\p234.txt";
+                string readPath = @"D:\p1.txt";
                 FileInfo fileInfo = new FileInfo(readPath);
                 if (fileInfo.Exists)
                 {

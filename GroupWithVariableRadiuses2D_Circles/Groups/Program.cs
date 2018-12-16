@@ -37,7 +37,7 @@ namespace hs071_cs
                 circlesCount = 15;
             }
 
-            const double maxRandRadius = 30; // максимальный радиус кругов r = 1..maxRandRadius
+            const double maxRandRadius = 40; // максимальный радиус кругов r = 1..maxRandRadius
 
             #region Инициализация и обявление переменных
 
@@ -178,10 +178,10 @@ namespace hs071_cs
                     Group = 0
                 };
 
-                circles[i].Odz.xL = xIter[i] - maxRandRadius;
-                circles[i].Odz.xU = xIter[i] + maxRandRadius;
-                circles[i].Odz.yL = yIter[i] - maxRandRadius;
-                circles[i].Odz.yU = yIter[i] + maxRandRadius;
+                circles[i].Odz.xL = Ipopt.NegativeInfinity;// xIter[i] - maxRandRadius;
+                circles[i].Odz.xU = Ipopt.PositiveInfinity;// xIter[i] + maxRandRadius;
+                circles[i].Odz.yL = Ipopt.NegativeInfinity;// yIter[i] - maxRandRadius;
+                circles[i].Odz.yU = Ipopt.PositiveInfinity;// yIter[i] + maxRandRadius;
                 circles[i].Odz.rL = 0;
                 circles[i].Odz.rU = rNach.Max();
                 circles[i].Radius = rNach[i];
@@ -228,7 +228,9 @@ namespace hs071_cs
                         x[2 * ballN + i] = c[i].Radius;
                     }
                 }
-                x[x.Length - 1] = c.Sum(t => t.Radius) / 3;
+
+                double coef = c.Length > 10 ? c.Sum(t => t.Radius) * 0.3 : c.Sum(t => t.Radius);
+                x[x.Length - 1] = coef;
                 status = problem.SolveProblem(x, out double obj, null, null, null, null);
                 // CF = obj;
             }
