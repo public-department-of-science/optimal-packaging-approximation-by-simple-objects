@@ -80,16 +80,10 @@ namespace hs071_cs
                 this._x_L[2 * this.count + index] = this.Circles[index].Odz.rL;
                 this._x_U[2 * this.count + index] = this.Circles[index].Odz.rU;
             }
+
             this._x_L[this._n - 1] = ((IEnumerable<double>)trueRadiuses).Max();
             this._x_U[this._n - 1] = ((IEnumerable<double>)trueRadiuses).Sum();
-            Console.Write(" xL: ");
-            for (int index = 0; index < this._x_L.Length; ++index)
-                Console.Write(string.Format(" [{0}]:{1}", (object)index, (object)this._x_L[index].ToString("0.00")));
-            Console.WriteLine();
-            Console.Write(" xU: ");
-            for (int index = 0; index < this._x_L.Length; ++index)
-                Console.Write(string.Format(" [{0}]:{1}", (object)index, (object)this._x_U[index].ToString("0.00")));
-            Console.WriteLine();
+
             this._nele_jac = 0;
             this._m = 0;
             this._nele_jac += 3 * this.count + this.countVarR;

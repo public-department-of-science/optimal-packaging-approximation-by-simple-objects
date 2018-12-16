@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using hs071_cs;
 using hs071_cs.ObjectOptimazation;
 
 namespace Groups
@@ -17,53 +18,53 @@ namespace Groups
 
         internal void RandomizeCoordinate(ref Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter, int ballsCount)
         {
-            Console.WriteLine("********************************************************");
-            Console.WriteLine("----Указать тип рондомизации координат (X,Y)----".ToUpper());
-            Console.WriteLine("-- 0 --> те, что и были");
-            Console.WriteLine("-- 1 --> Рандом(0,1) для всех координат");
-            Console.WriteLine("-- 2 --> Рандом на интервале (K,P) для всех координат целыми числами");
-            Console.WriteLine("________________________________");
-            Console.WriteLine("-- 3 --> Рандом для Х на (0,1)");
-            Console.WriteLine("-- 4 --> Рандом для Х на (K,P) * x[i]");
-            Console.WriteLine("-- 5 --> Совершенно рандомные координаты для Х на интервале (K,P)");
-            Console.WriteLine("________________________________");
-            Console.WriteLine("-- 6 --> Рнадом для Y на (0,1)");
-            Console.WriteLine("-- 7 --> Рнадом для Y на (K,P) * y[i]");
-            Console.WriteLine("-- 8 --> Совершенно рандомные координаты для Х на интервале (K,P)");
+            Program.Print("********************************************************");
+            Program.Print("----Указать тип рондомизации координат (X,Y)----".ToUpper());
+            Program.Print("-- 1 --> те, что и были");
+            Program.Print("-- 2 --> Рандом(0,1) для всех координат");
+            Program.Print("-- 3 --> Рандом на интервале (K,P) для всех координат целыми числами");
+            Program.Print("________________________________");
+            Program.Print("-- 4 --> Рандом для Х на (0,1)");
+            Program.Print("-- 5 --> Рандом для Х на (K,P) * x[i]");
+            Program.Print("-- 6 --> Совершенно рандомные координаты для Х на интервале (K,P)");
+            Program.Print("________________________________");
+            Program.Print("-- 7 --> Рнадом для Y на (0,1)");
+            Program.Print("-- 8 --> Рнадом для Y на (K,P) * y[i]");
+            Program.Print("-- 9 --> Совершенно рандомные координаты для Х на интервале (K,P)");
 
             switch (Console.ReadLine())
             {
-                case "0":
+                case "1":
                     SetCoordinatesThatWeHadBefore(balls, xIter, yIter, zIter);
                     break;
-                case "1":
+                case "2":
                     RandomizeAllCoordinatesOne0_1Interval(balls, xIter, yIter, zIter);
                     break;
-                case "2":
+                case "3":
                     RandomizeAllCordinatesOnCustomInterval(balls, xIter, yIter, zIter);
                     break;
-                case "3":
+                case "4":
                     RandomizeXCoordinateOn0_1Interval(balls, xIter, yIter, zIter);
                     break;
-                case "4":
+                case "5":
                     RandomizeXCoordinateOnCustomIntervalMultOnPreviousOptionalYCoordinate(balls, xIter, yIter, zIter);
                     break;
-                case "5":
+                case "6":
                     RandomizeAllXCoordinateWithRandomValues(balls, xIter, yIter, zIter);
                     break;
-                case "6":
+                case "7":
                     RandomizeYCoordinateOn0_1Interval(balls, xIter, yIter, zIter);
                     break;
-                case "7":
+                case "8":
                     RandomizeYCoordinateOnCustomIntervalMultOnPreviousOptionalYCoordinate(balls, xIter, yIter, zIter);
                     break;
-                case "8":
+                case "9":
                     RandomizeAllYCoordinateWithRandomValues(balls, xIter, yIter, zIter);
                     break;
                 default:
                     throw new Exception("Incorrect value");
             }
-            Console.WriteLine("********************************************************");
+            Program.Print("********************************************************");
         }
 
         private void RandomizeAllYCoordinateWithRandomValues(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
@@ -154,43 +155,43 @@ namespace Groups
 
         internal void RandomizeRadiuses(ref Circle2D[] balls, double[] rIter, int ballsCount)
         {
-            Console.WriteLine("********************************************************");
-            Console.WriteLine("--- Указать тип рондомизации радиуса----".ToUpper());
-            Console.WriteLine("-- 0 --> Оставить те, что и были");
-            Console.WriteLine("-- 1 --> Radius * Рандом(0,1) для всех");
-            Console.WriteLine("-- 2 --> Рандомные на интервале (K,P)");
-            Console.WriteLine("-- 3 --> \"Центроид по всем раиусам\" + Рoзмах по всем радиусам * {Rnd(0,1) - 0.5}");
-            Console.WriteLine("-- 4 --> \"Центроид по группе\" + Рoзмах по группе * {Rnd(0,1) - 0.5}");
-            Console.WriteLine("-- 5--> Все радиусы равны \"Центроиду по всей системе!\"");
-            Console.WriteLine("-- 6 --> Все радиусы равны \"Центроиду по каждой греппе свой!\"");
+            Program.Print("********************************************************");
+            Program.Print("--- Указать тип рондомизации радиуса----".ToUpper());
+            Program.Print("-- 1 --> Оставить те, что и были");
+            Program.Print("-- 2 --> Radius * Рандом(0,1) для всех");
+            Program.Print("-- 3 --> Рандомные на интервале (K,P)");
+            Program.Print("-- 4 --> \"Центроид по всем раиусам\" + Рoзмах по всем радиусам * {Rnd(0,1) - 0.5}");
+            Program.Print("-- 5 --> \"Центроид по группе\" + Рoзмах по группе * {Rnd(0,1) - 0.5}");
+            Program.Print("-- 6--> Все радиусы равны \"Центроиду по всей системе!\"");
+            Program.Print("-- 7 --> Все радиусы равны \"Центроиду по каждой греппе свой!\"");
 
             switch (Console.ReadLine())
             {
-                case "0":
+                case "1":
                     SetRadiusesThatWeHadBefore(balls, rIter);
                     break;
-                case "1":
+                case "2":
                     RandomizeRadiusesOn0_1Interval(balls, rIter);
                     break;
-                case "2":
+                case "3":
                     RandRadiuses(balls, rIter);
                     break;
-                case "3":
+                case "4":
                     RandRadiusesRangeMultRndMinus05OnFullSystem(balls, rIter);
                     break;
-                case "4":
+                case "5":
                     RandRadiusesRangeMultRndMinus05OnEachGroupBased(balls, rIter);
                     break;
-                case "5":
+                case "6":
                     RadiusesEqualCentroidOnFullSystem(balls, rIter);
                     break;
-                case "6":
+                case "7":
                     RadiusesEqualCentroidBasedOnEachGroup(balls, rIter);
                     break;
                 default:
                     throw new Exception("Incorrect value");
             }
-            Console.WriteLine("********************************************************");
+            Program.Print("********************************************************");
         }
 
         private void RandRadiusesRangeMultRndMinus05OnEachGroupBased(Circle2D[] balls, double[] rIter)
@@ -289,9 +290,9 @@ namespace Groups
             rightBound = 20;
             try
             {
-                Console.WriteLine("Enter Left bound:");
+                Program.Print("Enter Left bound:");
                 leftBound = int.Parse(Console.ReadLine());
-                Console.WriteLine("Enter rigth bound:");
+                Program.Print("Enter rigth bound:");
                 rightBound = int.Parse(Console.ReadLine());
                 if (leftBound > rightBound)
                 {
@@ -302,7 +303,7 @@ namespace Groups
             }
             catch (Exception)
             {
-                Console.WriteLine($"some parsing error occurred Left{leftBound}; RightBound {rightBound}");
+                Program.Print($"some parsing error occurred Left{leftBound}; RightBound {rightBound}");
             }
         }
 
@@ -325,11 +326,42 @@ namespace Groups
             }
         }
 
-        internal void SetGroups(Circle2D[] balls, ref int varRadiuses)
+        internal void SetGroups(ref Circle2D[] circles, ref int varRadiuses)
         {
-            Console.WriteLine("********************************************************");
+            Program.Print("********************************************************");
+            Program.Print("In which way would you like to set group numbers?");
+            Program.Print(" --1 --> Без изменений (как указаны выше)");
+            Program.Print(" --2 --> Нарезать по порядку по N штук");
+            Program.Print(" --3 --> Все фиксированные");
 
-            Console.WriteLine("Укажите кол. элементов в группе 3-15".ToUpper());
+            switch (Console.ReadLine())
+            {
+                case "1":
+                    break;
+                case "2":
+                    SliceCircles(circles, varRadiuses);
+                    break;
+                case "3":
+                    SetAllCirclesLikeFixed(circles);
+                    break;
+                default:
+                    break;
+            }
+
+            ShowHowToCirlesDistributedByGroups(circles);
+        }
+
+        private void ShowHowToCirlesDistributedByGroups(Circle2D[] circles)
+        {
+            foreach (IGrouping<int, Circle2D> item in circles.GroupBy(x => x.Group))
+            {
+                Program.Print($"В группе #{item.FirstOrDefault().Group} {item.Count()} кругов");
+            }
+        }
+
+        private void SliceCircles(Circle2D[] circles, int varRadiuses)
+        {
+            Program.Print("Укажите кол. элементов в группе 3-15".ToUpper());
             int inGroupElements = 0;
 
             try
@@ -343,21 +375,21 @@ namespace Groups
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Program.Print(ex.Message);
                 inGroupElements = 7;
             }
-            Console.WriteLine("********************************************************");
+            Program.Print("********************************************************");
 
-            if (inGroupElements > balls.Length)
+            if (inGroupElements > circles.Length)
             {
-                inGroupElements = balls.Length;
+                inGroupElements = circles.Length;
             }
 
-            int withFixedRad = balls.Length % inGroupElements;
+            int withFixedRad = circles.Length % inGroupElements;
             int elementsCounter = 0;
             int groupNumber = 1;
 
-            for (int i = 0; i < balls.Length - withFixedRad; i++)
+            for (int i = 0; i < circles.Length - withFixedRad; i++)
             {
                 if (elementsCounter == inGroupElements)
                 {
@@ -365,9 +397,17 @@ namespace Groups
                     elementsCounter = 0;
                 }
 
-                balls[i].Group = groupNumber;
+                circles[i].Group = groupNumber;
                 ++elementsCounter;
                 ++varRadiuses;
+            }
+        }
+
+        private void SetAllCirclesLikeFixed(Circle2D[] circles)
+        {
+            foreach (Circle2D item in circles)
+            {
+                item.Group = 0;
             }
         }
 

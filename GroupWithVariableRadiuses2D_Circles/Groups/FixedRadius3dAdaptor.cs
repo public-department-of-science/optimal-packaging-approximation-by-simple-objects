@@ -1,81 +1,63 @@
-﻿using Cureos.Numerics;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
+using Cureos.Numerics;
 
 namespace hs071_cs
 {
-
-
-    class FixedRadius3dAdaptor : BaseAdaptor, IDisposable
+    internal class FixedRadius3dAdaptor : BaseAdaptor, IDisposable
     {
-        public readonly int countCircles; // количество шаров
-        public double[] X { get; } //массив х (входят все координаты и радиусы)
+        public readonly int ballsCount; // количество шаров
         public readonly double[] radius;
         public readonly double[] unsortedRadius;
         private readonly double K1 = 1;
         private readonly double K2 = 1;
-        private List<double[]> _allIteration;
 
-        public List<double[]> AllIteration { get => _allIteration; set => _allIteration = value; }
+        public List<double[]> AllIteration { get; set; }
+
         private double[] Weight { get; set; }
 
         public FixedRadius3dAdaptor(Data data)
         {
             AllIteration = new List<double[]>();
 
-            countCircles = data.ballCount; // задаём количетво кругов
-            _n = countCircles * 3 + 1; // количество переменных в векторе
-            radius = new double[countCircles];
-            unsortedRadius = new double[countCircles];
+            ballsCount = data.ballCount; // задаём количетво кругов
+            _n = ballsCount * 3 + 1; // количество переменных в векторе
+            radius = new double[ballsCount];
+            unsortedRadius = new double[ballsCount];
             //вспомогательные счетчики
             double sumR = 0;
             int it = 0;
 
-            foreach (var item in data.ball)
+            foreach (Ball item in data.ball)
             {
                 radius[it++] = item.R;
                 sumR += item.R;
             }
             radius = radius.OrderBy(a => a).ToArray();
-            X = new double[_n];
-            try
-            {
-                if (data.ball != null && data != null && data.R >= 0)
-                {
-                    for (int i = 0; i < countCircles; i++)
-                    {
-                        X[3 * i] = data.ball[i].X;
-                        X[3 * i + 1] = data.ball[i].Y;
-                        X[3 * i + 2] = data.ball[i].Z;
-                    }
-                    X[_n - 1] = data.R;
-                }
-            }
-            catch (Exception ex)
-            {
-                OutPut.ErrorMessage(ex.Message);
-            }
 
-            /*    Ограничения переменных
+            /*    Restrictions
             * *************************************************************************************/
 
-            if (countCircles <= 10)
+            if (ballsCount <= 10)
+            {
                 K1 = 1;
+            }
             else
+            {
                 K1 = 0.4;
+            }
 
             _x_L = new double[_n];
             _x_U = new double[_n];
 
-            double max = radius[countCircles - 1];
+            double max = radius[ballsCount - 1];
 
             // обнуляем необходимые счетчики
             int countXYZR = 0,
                 countCoordinate = 0;
-            for (int i = 0; i < countCircles; i++)
+            for (int i = 0; i < ballsCount; i++)
             {
                 //if (data.ball[i].ObjectType == (ObjectType)2)
                 //{
@@ -100,7 +82,10 @@ namespace hs071_cs
                 _x_U[3 * i + 2] = 0;// Ipopt.PositiveInfinity; // K1 * DiametrSum(radius) - radius[countCoordinate];
                 //}
                 if (max < radius[countCoordinate])
+                {
                     max = radius[countCoordinate];
+                }
+
                 countCoordinate++;
                 countXYZR++;
             }
@@ -114,13 +99,13 @@ namespace hs071_cs
             _m = 0;
 
             // (R-r[i])^2-x[i]^2-y[i]^2 -z[i]^2 >= 0
-            _nele_jac += 4 * countCircles; // x, y, z , R
-            _m += countCircles;
+            _nele_jac += 4 * ballsCount; // x, y, z , R
+            _m += ballsCount;
 
             // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
-            int v = 3 * countCircles * (countCircles - 1);
+            int v = 3 * ballsCount * (ballsCount - 1);
             _nele_jac += v;  // 2*3 два ограничения по 3 ненулевых частных производных
-            int v1 = countCircles * (countCircles - 1) / 2;
+            int v1 = ballsCount * (ballsCount - 1) / 2;
             _m += v1;
 
             //m[i]*x[i] + count
@@ -130,14 +115,14 @@ namespace hs071_cs
             _g_L = new double[_m];
             _g_U = new double[_m];
             int op = 0;
-            for (int j = 0; j < countCircles; j++) // радиусы от 0 до MAX
+            for (int j = 0; j < ballsCount; j++) // радиусы от 0 до MAX
             {
                 _g_L[op] = 0;
                 _g_U[op++] = Ipopt.PositiveInfinity;
             }
-            for (int i = 0; i < countCircles - 1; i++)
+            for (int i = 0; i < ballsCount - 1; i++)
             {
-                for (int j = i + 1; j < countCircles; j++)
+                for (int j = i + 1; j < ballsCount; j++)
                 {
                     _g_L[op] = Math.Pow((radius[i] + radius[j]), 2);
                     _g_U[op++] = Ipopt.PositiveInfinity;
@@ -159,7 +144,7 @@ namespace hs071_cs
             }
             _nele_hess = 0;
 
-        } // End_Конструктор 
+        }
 
         private void AddNewIteration(object element)
         {
@@ -169,12 +154,8 @@ namespace hs071_cs
         public override bool Eval_f(int n, double[] x, bool new_x, out double obj_value)
         {
             // R -> min
-            int minWorker, minIOC;
-
             obj_value = K2 * x[_n - 1];
-            ThreadPool.GetMinThreads(out minWorker, out minIOC);
-            ThreadPool.SetMaxThreads(minWorker, minIOC);
-            ThreadPool.QueueUserWorkItem(new WaitCallback(AddNewIteration), x);
+            AddNewIteration(x);
             return true;
         }
 
@@ -189,7 +170,7 @@ namespace hs071_cs
             int kk = 0;
             // (R-r[i])^2 - x[i]^2 - y[i]^2 - z^2 >= 0
             // from 0 to count-1
-            Parallel.For(0, countCircles, i =>
+            Parallel.For(0, ballsCount, i =>
             {
                 g[kk++] = Math.Pow((x[_n - 1] - radius[i]), 2) -
                     x[3 * i] * x[3 * i] -          // x
@@ -200,9 +181,9 @@ namespace hs071_cs
             // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
             // from count to count*(count-1)/2 - 1
 
-            for (int i = 0; i < countCircles - 1; i++) // на каждой итерации увеличиваем на 3 счетч. по Z
+            for (int i = 0; i < ballsCount - 1; i++) // на каждой итерации увеличиваем на 3 счетч. по Z
             {
-                for (int j = i + 1; j < countCircles; j++)
+                for (int j = i + 1; j < ballsCount; j++)
                 {
                     g[kk++] = Math.Pow((x[3 * i] - x[3 * j]), 2.0)
                                   + Math.Pow((x[3 * i + 1] - x[3 * j + 1]), 2.0)
@@ -227,7 +208,7 @@ namespace hs071_cs
 
                 // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
                 // позиции R, Х и У, Z
-                for (g = 0; g < countCircles; ++g)
+                for (g = 0; g < ballsCount; ++g)
                 {
                     //R0 -> внешний шар 
                     iRow[kk] = g;
@@ -247,9 +228,9 @@ namespace hs071_cs
                 }
 
                 // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
-                for (int i = 0; i < countCircles - 1; ++i)
+                for (int i = 0; i < ballsCount - 1; ++i)
                 {
-                    for (int j = i + 1; j < countCircles; ++j)
+                    for (int j = i + 1; j < ballsCount; ++j)
                     {
                         // -------  X[i], X[j] ------- 
                         iRow[kk] = g;
@@ -294,7 +275,7 @@ namespace hs071_cs
             {
                 // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
                 int kk = 0;
-                for (int i = 0; i < countCircles; i++)// шаг по Z это каждый третий эл
+                for (int i = 0; i < ballsCount; i++)// шаг по Z это каждый третий эл
                 {
                     values[kk] = 2.0 * (x[_n - 1] - radius[i]); // R0'
                     kk++;
@@ -306,11 +287,11 @@ namespace hs071_cs
                     kk++;
                 }
                 // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
-                //  Console.WriteLine("---------------------------------------");
+                //  Print("---------------------------------------");
 
-                for (int i = 0; i < countCircles - 1; i++)
+                for (int i = 0; i < ballsCount - 1; i++)
                 {
-                    for (int j = i + 1; j < countCircles; j++)
+                    for (int j = i + 1; j < ballsCount; j++)
                     {
                         values[kk++] = 2.0 * (x[3 * i] - x[3 * j]); //X[i]'
                         values[kk++] = -2.0 * (x[3 * i] - x[3 * j]); //X[j]'
@@ -345,8 +326,8 @@ namespace hs071_cs
         // Вычисляем диаметр как сумму всех радиусов
         private double DiametrSum(double[] radius)
         {
-            var sum = 0.0;
-            foreach (var rad in radius)
+            double sum = 0.0;
+            foreach (double rad in radius)
             {
                 sum += 2 * rad;
             }

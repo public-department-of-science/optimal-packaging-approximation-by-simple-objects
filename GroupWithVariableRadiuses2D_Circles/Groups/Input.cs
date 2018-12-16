@@ -11,16 +11,17 @@ namespace hs071_cs
         private static readonly Random rnd = new Random();
 
         // Reading from file while end (x, y, z, r, R)
-        public static void ReadFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalBallCount, string fileName)
+        public static void ReadFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, out int[] arrayWithGroups, ref int TotalBallCount, string fileName)
         {
-            ReadDataFromFile(ref x, ref y, ref z, ref r, ref R, ref TotalBallCount, fileName);
+            arrayWithGroups = new int[TotalBallCount];
+            ReadDataFromFile(ref x, ref y, ref z, ref r, ref R, arrayWithGroups, ref TotalBallCount, fileName);
         }
 
-        private static void ReadDataFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalBallCount, string fileName)
+        private static void ReadDataFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, int[] arrayWithGroups, ref int TotalBallCount, string fileName)
         {
             try
             {
-                string readPath = @"D:\p134.txt";
+                string readPath = @"D:\p234.txt";
                 FileInfo fileInfo = new FileInfo(readPath);
                 if (fileInfo.Exists)
                 {
@@ -51,10 +52,10 @@ namespace hs071_cs
                     }
                     else
                     {
-                        r = new double[TotalBallCount];
                         x = new double[TotalBallCount];
                         y = new double[TotalBallCount];
                         z = new double[TotalBallCount];
+                        r = new double[TotalBallCount];
 
                         for (i = 2; i < arrayOfLines.Length; i++) //// !!!!!! arrayOfLines.Length - 2
                         {
@@ -63,10 +64,11 @@ namespace hs071_cs
                             {
                                 xyzrString[k] = xyzrString[k].Replace('.', ',').Trim();
                             }
-                            r[i - 2] = double.Parse(xyzrString[0]);
-                            x[i - 2] = double.Parse(xyzrString[1]);
-                            y[i - 2] = double.Parse(xyzrString[2]);
-                            z[i - 2] = double.Parse(xyzrString[3]);
+                            x[i - 2] = double.Parse(xyzrString[0]);
+                            y[i - 2] = double.Parse(xyzrString[1]);
+                            z[i - 2] = double.Parse(xyzrString[2]);
+                            r[i - 2] = double.Parse(xyzrString[3]);
+                            arrayWithGroups[i - 2] = int.Parse(xyzrString[4]);
                         }
                         OutPut.WriteLine("Data has been read!");
                     }

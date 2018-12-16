@@ -18,8 +18,9 @@ namespace hs071_cs
 
         public static void WriteLine(string str = "") // Console writeLine For array with index
         {
-            Console.WriteLine("{0}", str);
+            Console.WriteLine($"{str}");
         }
+
         public static void WriteLine(params string[] a)
         {
             foreach (string item in a)
@@ -27,22 +28,26 @@ namespace hs071_cs
                 Write(item + " ");
             }
         }
+
         public static void WriteLine(string str, int index, double value) // Console writeLine For array with index
         {
-            Console.WriteLine(str + "[{0}] = {1}", index, value);
+            Console.WriteLine(str + $"[{index}] = {value}");
         }
+
         public static void ErrorMessage(string str)
         {
             Console.ForegroundColor = ConsoleColor.Red;
             WriteLine(str);
             Console.ForegroundColor = ConsoleColor.Black;
         }
+
         public static void ReturnCodeMessage(string str)
         {
             Console.ForegroundColor = ConsoleColor.Green;
             WriteLine(str);
             Console.ForegroundColor = ConsoleColor.Black;
         }
+
         public static void ShowData(Data data)
         {
             int cicleCount = data.ballCount;
@@ -58,6 +63,7 @@ namespace hs071_cs
             }
             WriteLine("R_External = " + data.R.ToString());
         }
+
         public static void SaveToFileAllIteration(Data data, List<double[]> allIteration, string fileName, bool appandFlag = true)
         {
             try
@@ -88,17 +94,22 @@ namespace hs071_cs
                             sw.Write(allIteration[k][i].ToString().Replace(',', '.') + " ");
                             ++counterXYZ;
                             if (data.TaskClassification == 0) // fix radius
+                            {
                                 if (counterXYZ == 3)
                                 {
                                     sw.Write(data.ball[counterR].R.ToString().Replace(',', '.') + " "); // R
                                     counterXYZ = 0;
                                     ++counterR;
                                 }
+                            }
 
                             if (data.TaskClassification == (TaskClassification)1) // variable radius
                             {
                                 if (counterXYZ == 3)
+                                {
                                     sw.Write(allIteration[k][i].ToString().Replace(',', '.') + " "); // R
+                                }
+
                                 counterXYZ = 0;
                             }
                         }
@@ -126,10 +137,6 @@ namespace hs071_cs
                 }
                 using (StreamWriter sw = new StreamWriter(writePath, true, System.Text.Encoding.Default))
                 {
-                    sw.Write(data.ballCount.ToString().Replace(',', '.')); // ballCount
-                    sw.Write(" ");
-                    sw.Write(data.holeCount.ToString().Replace(',', '.')); // holeCount
-                    sw.Write(" ");
                     sw.Write(data.R.ToString().Replace(',', '.')); // R external
                     sw.WriteLine();
                     for (int i = 0; i < data.ballCount; i++)
@@ -138,8 +145,12 @@ namespace hs071_cs
                         sw.Write(data.ball[i].Y.ToString().Replace(',', '.') + " ");
                         sw.Write(data.ball[i].Z.ToString().Replace(',', '.') + " ");
                         sw.Write(data.ball[i].R.ToString().Replace(',', '.') + " ");
+
                         if (data.ball[i].Weight != 0)
+                        {
                             sw.Write(data.ball[i].Weight.ToString().Replace(',', '.'));
+                        }
+
                         sw.WriteLine();
                     }
                     sw.Close();
@@ -151,6 +162,7 @@ namespace hs071_cs
                 ErrorMessage("Writing Error!! --> " + ex.Message);
             }
         }
+
         public static void SaveToC(double[,] C, int circleCount, string fileName)
         {
             try
@@ -171,12 +183,18 @@ namespace hs071_cs
                         for (int j = 0; j < circleCount; j++)
                         {
                             if (j == (circleCount - 1))
+                            {
                                 sw.Write(C[i, j]);
+                            }
                             else
+                            {
                                 sw.Write(C[i, j] + " ");
+                            }
                         }
                         if (i != circleCount - 1)
+                        {
                             sw.WriteLine();
+                        }
                     }
                     sw.Close();
                     WriteLine("All Data has been written to " + writePath);
@@ -191,7 +209,7 @@ namespace hs071_cs
         public static string TimeToString(Stopwatch Watch)
         {
             TimeSpan ts = Watch.Elapsed;
-            return String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            return string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
         }
         // Форматирует результат конвертирования времени запуска программы 
         public static string getElapsedTime(Stopwatch Watch)
@@ -200,7 +218,7 @@ namespace hs071_cs
             TimeSpan ts = Watch.Elapsed;
             // Format and display the TimeSpan value.
 
-            return String.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
+            return string.Format("{0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds / 10);
         }
         #endregion
         #region Form Interface
