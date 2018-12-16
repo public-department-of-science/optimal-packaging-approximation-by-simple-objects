@@ -43,10 +43,10 @@ namespace hs071_cs
 
             DataHelper dataHelper = new DataHelper();
 
-            double[] xNach = new double[circlesCount];
-            double[] yNach = new double[circlesCount];
+            double[] xStart = new double[circlesCount];
+            double[] yStart = new double[circlesCount];
             double[] zNach = new double[circlesCount];
-            double[] rNach = new double[circlesCount];
+            double[] rStart = new double[circlesCount];
             int[] arrayWithGroups = null;
             double RNach = 0.0;
 
@@ -70,23 +70,23 @@ namespace hs071_cs
             switch (Console.ReadLine())
             {
                 case "1":
-                    Input.ReadFromFile(ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, out arrayWithGroups, ref circlesCount, "");
+                    Input.ReadFromFile(ref xStart, ref yStart, ref zNach, ref rStart, ref RNach, out arrayWithGroups, ref circlesCount, "");
                     break;
                 case "2":
                 {
                     Print("~~~ Randomize StartPoint ~~~");
                     Stopwatch stopWatch = new Stopwatch();
 
-                    rNach = rRandomGenerate(maxRandRadius, circlesCount);
+                    rStart = rRandomGenerate(maxRandRadius, circlesCount);
 
-                    xyRRandomGenerateAvg(circlesCount, ref rNach, ref xNach, ref yNach, ref zNach, ref RNach);
+                    xyRRandomGenerateAvg(circlesCount, ref rStart, ref xStart, ref yStart, ref zNach, ref RNach);
                     Print("\n\t~~~ Генерируем точки с которых будем считать ~~~");
                     for (int i = 0; i < circlesCount; ++i)
                     {
-                        xIter[i] = xNach[i];
-                        yIter[i] = yNach[i];
+                        xIter[i] = xStart[i];
+                        yIter[i] = yStart[i];
                         zIter[i] = zNach[i];
-                        rIter[i] = rNach[i];
+                        rIter[i] = rStart[i];
                     }
 
                     RIter = RNach;
@@ -98,10 +98,10 @@ namespace hs071_cs
             #region StartPoint
 
             Print("=== StartPoint ===");
-            ShowData(xNach, yNach, zNach, rNach, RNach);
+            ShowData(xStart, yStart, zNach, rStart, RNach);
             Print("=== ================== ===");
 
-            Data startPointData = new Data(xNach, yNach, zNach, rNach, RNach, circlesCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+            Data startPointData = new Data(xStart, yStart, zNach, rStart, RNach, circlesCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
             OutPut.SaveToFile(startPointData, $"StartPoint");
 
             #endregion
@@ -113,7 +113,7 @@ namespace hs071_cs
             Print("\t\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
             Circle2D[] circles = new Circle2D[circlesCount];
-            SetCirclesParameters(circlesCount, maxRandRadius, rNach, xIter, yIter, ref circles);
+            SetCirclesParameters(circlesCount, maxRandRadius, rStart, xStart, yStart, ref circles);
 
             ShowGroupsForEachCircle(circles, arrayWithGroups);
 
@@ -121,7 +121,7 @@ namespace hs071_cs
             {
                 dataHelper.SetGroups(ref circles, ref _countVarR);
                 dataHelper.RandomizeCoordinate(ref circles, xIter, yIter, zIter, circlesCount);
-                dataHelper.RandomizeRadiuses(ref circles, rNach, circlesCount);
+                dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
             }
             catch (Exception ex)
             {
@@ -130,7 +130,7 @@ namespace hs071_cs
             }
 
             IpoptReturnCode status;
-            double[] radius = rNach.OrderBy(a => a).ToArray();
+            double[] radius = rStart.OrderBy(a => a).ToArray();
 
             Stopwatch varRTaskTime = new Stopwatch();
             using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
@@ -148,7 +148,7 @@ namespace hs071_cs
             #endregion
 
             Print("RunTime: " + getElapsedTime(varRTaskTime));
-            Print($"Norma Var = {Norma(xNach, xIter, yNach, yIter, zNach, zIter, rNach, rIter)}");
+            Print($"Norma Var = {Norma(xStart, xIter, yStart, yIter, zNach, zIter, rStart, rIter)}");
             Console.ReadLine();
         }
 
@@ -178,10 +178,10 @@ namespace hs071_cs
                     Group = 0
                 };
 
-                circles[i].Odz.xL = Ipopt.NegativeInfinity;// xIter[i] - maxRandRadius;
-                circles[i].Odz.xU = Ipopt.PositiveInfinity;// xIter[i] + maxRandRadius;
-                circles[i].Odz.yL = Ipopt.NegativeInfinity;// yIter[i] - maxRandRadius;
-                circles[i].Odz.yU = Ipopt.PositiveInfinity;// yIter[i] + maxRandRadius;
+                circles[i].Odz.xL = xIter[i] - maxRandRadius;
+                circles[i].Odz.xU = xIter[i] + maxRandRadius;
+                circles[i].Odz.yL = yIter[i] - maxRandRadius;
+                circles[i].Odz.yU = yIter[i] + maxRandRadius;
                 circles[i].Odz.rL = 0;
                 circles[i].Odz.rU = rNach.Max();
                 circles[i].Radius = rNach[i];
@@ -229,10 +229,9 @@ namespace hs071_cs
                     }
                 }
 
-                double coef = c.Length > 10 ? c.Sum(t => t.Radius) * 0.3 : c.Sum(t => t.Radius);
+                double coef = c.Sum(t => t.Radius) / 3;
                 x[x.Length - 1] = coef;
                 status = problem.SolveProblem(x, out double obj, null, null, null, null);
-                // CF = obj;
             }
             timer.Stop();
 
