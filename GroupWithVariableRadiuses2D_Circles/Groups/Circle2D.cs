@@ -14,8 +14,8 @@ namespace hs071_cs.ObjectOptimazation
 
         public Circle2D()
         {
-            this.Coordinate = new Coordinate2D();
-            this.Odz = new Odz2D();
+             Coordinate = new Coordinate2D();
+             Odz = new Odz2D();
         }
     }
 }

@@ -14,7 +14,7 @@ namespace hs071_cs.ObjectOptimazation
 
         public Coordinate2D()
         {
-            this.X = this.Y = 0.0;
+             X =  Y = 0.0;
         }
     }
 }

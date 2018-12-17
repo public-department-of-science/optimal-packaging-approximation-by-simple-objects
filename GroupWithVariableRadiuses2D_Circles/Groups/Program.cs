@@ -14,7 +14,7 @@ namespace hs071_cs
 
         private static Random _rnd = new Random();
         private static int ballN;
-        private static int _countVarR = 0; // количество кругов с переменным радиусом
+        private static int counterOfCirclesWithVariableRadius = 0; // количество кругов с переменным радиусом
 
         public static Print Print { get; set; }
         static Program()
@@ -53,7 +53,7 @@ namespace hs071_cs
             double[] rIter = new double[circlesCount];
             double[] xIter = new double[circlesCount];
             double[] yIter = new double[circlesCount];
-            double[] zIter = new double[circlesCount];
+            double[] zStart = new double[circlesCount];
 
             double[] rBest = new double[circlesCount];
             double[] xBest = new double[circlesCount];
@@ -85,14 +85,15 @@ namespace hs071_cs
                     {
                         xIter[i] = xStart[i];
                         yIter[i] = yStart[i];
-                        zIter[i] = zNach[i];
+                        zStart[i] = zNach[i];
                         rIter[i] = rStart[i];
                     }
 
                     RIter = RNach;
                 }
                 break;
-                default: return;
+                default:
+                    return;
             }
 
             #region StartPoint
@@ -113,14 +114,14 @@ namespace hs071_cs
             Print("\t\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
             Circle2D[] circles = new Circle2D[circlesCount];
-            SetCirclesParameters(circlesCount, maxRandRadius, rStart, xStart, yStart, ref circles);
 
-            ShowGroupsForEachCircle(circles, arrayWithGroups);
+            SetCirclesParameters(circlesCount, maxRandRadius, rStart, xStart, yStart, ref circles);
 
             try
             {
-                dataHelper.SetGroups(ref circles, ref _countVarR);
-                dataHelper.RandomizeCoordinate(ref circles, xIter, yIter, zIter, circlesCount);
+                SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
+                dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius);
+                dataHelper.RandomizeCoordinate(ref circles, xStart, yStart, zStart, circlesCount);
                 dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
             }
             catch (Exception ex)
@@ -136,35 +137,46 @@ namespace hs071_cs
             using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
             {
                 varRTaskTime.Start();
-                status = RunTask(vr, circles, out xIter, out yIter, out zIter, out rIter, out RIter);
+                status = RunTask(vr, circles, out xIter, out yIter, out zStart, out rIter, out RIter);
                 varRTaskTime.Stop();
             }
 
-            ShowData(xIter, yIter, zIter, rIter, RIter);
+            ShowData(xIter, yIter, zStart, rIter, RIter);
 
-            Data optionalPoint = new Data(xIter, yIter, zIter, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+            Data optionalPoint = new Data(xIter, yIter, zStart, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
             OutPut.SaveToFile(optionalPoint, "VariableRadius");
 
             #endregion
 
             Print("RunTime: " + getElapsedTime(varRTaskTime));
-            Print($"Norma Var = {Norma(xStart, xIter, yStart, yIter, zNach, zIter, rStart, rIter)}");
+            Print($"Norma Var = {Norma(xStart, xIter, yStart, yIter, zNach, zStart, rStart, rIter)}");
             Console.ReadLine();
         }
 
-        private static void ShowGroupsForEachCircle(Circle2D[] circles, int[] arrayWithGroups = null)
+        private static void SetAndShowGroupsForEachCircle(ref Circle2D[] circles, int[] arrayWithGroups, ref int counterOfCirclesWithVariableRadius)
         {
+            counterOfCirclesWithVariableRadius = 0;
             int i = 0;
+            if (arrayWithGroups is null)
+            {
+                Print("All elements in fixedRadius group!!");
+                return;
+            }
+
             foreach (Circle2D item in circles)
             {
-                if (arrayWithGroups is null)
+                if (arrayWithGroups[i] != 0)
                 {
-                    Print($"Circle[{i}].Group = {circles[i].Group}");
+                    item.Group = arrayWithGroups[i];
+                    ++counterOfCirclesWithVariableRadius;
                 }
-                else
-                {
-                    Print($"Circle[{i}].Group = {arrayWithGroups[i]}");
-                }
+                ++i;
+            }
+
+            i = 0;
+            foreach (Circle2D item in circles)
+            {
+                Print($"Circle[{i}].Group = {circles[i].Group}");
                 ++i;
             }
         }
@@ -178,10 +190,10 @@ namespace hs071_cs
                     Group = 0
                 };
 
-                circles[i].Odz.xL = xIter[i] - maxRandRadius;
-                circles[i].Odz.xU = xIter[i] + maxRandRadius;
-                circles[i].Odz.yL = yIter[i] - maxRandRadius;
-                circles[i].Odz.yU = yIter[i] + maxRandRadius;
+                circles[i].Odz.xL = Ipopt.NegativeInfinity;// xIter[i] - maxRandRadius;
+                circles[i].Odz.xU = Ipopt.PositiveInfinity;// xIter[i] + maxRandRadius;
+                circles[i].Odz.yL = Ipopt.NegativeInfinity;// yIter[i] - maxRandRadius;
+                circles[i].Odz.yU = Ipopt.PositiveInfinity;// yIter[i] + maxRandRadius;
                 circles[i].Odz.rL = 0;
                 circles[i].Odz.rU = rNach.Max();
                 circles[i].Radius = rNach[i];
@@ -223,13 +235,13 @@ namespace hs071_cs
                 {
                     x[2 * i] = c[i].Coordinate.X;
                     x[2 * i + 1] = c[i].Coordinate.Y;
-                    if (i < _countVarR)
+                    if (c[i].Group != 0)
                     {
                         x[2 * ballN + i] = c[i].Radius;
                     }
                 }
 
-                double coef = c.Sum(t => t.Radius) / 3;
+                double coef = c.OrderByDescending(t => t.Radius).Take(4).Sum(t => t.Radius) * 0.4;
                 x[x.Length - 1] = coef;
                 status = problem.SolveProblem(x, out double obj, null, null, null, null);
             }
@@ -245,7 +257,7 @@ namespace hs071_cs
             {
                 NewX[i] = x[2 * i];
                 NewY[i] = x[2 * i + 1];
-                NewR[i] = (i < _countVarR) ? x[2 * ballN + i] : c[i].Radius;
+                NewR[i] = c[i].Group != 0 ? x[2 * ballN + i] : c[i].Radius;
             }
 
             Print($"Optimization return status: {status}");

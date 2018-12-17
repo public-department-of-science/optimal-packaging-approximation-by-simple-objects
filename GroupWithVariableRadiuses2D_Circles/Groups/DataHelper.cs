@@ -361,6 +361,7 @@ namespace Groups
 
         private void SliceCircles(Circle2D[] circles, ref int varRadiuses)
         {
+            varRadiuses = 0;
             Program.Print("Укажите кол. элементов в группе 3-15".ToUpper());
             int inGroupElements = 0;
 
@@ -378,6 +379,7 @@ namespace Groups
                 Program.Print(ex.Message);
                 inGroupElements = 7;
             }
+
             Program.Print("********************************************************");
 
             if (inGroupElements > circles.Length)

@@ -22,7 +22,7 @@ namespace hs071_cs.ObjectOptimazation
 
         public Odz2D()
         {
-            this.rL = this.rU = this.xL = this.xU = this.yL = this.yU = 0.0;
+             rL =  rU =  xL =  xU =  yL =  yU = 0.0;
         }
     }
 }

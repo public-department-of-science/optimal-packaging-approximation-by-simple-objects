@@ -54,9 +54,9 @@
         }
         public Data(double[] x, double[] y, double[] z, double[] r, double R, int ballCount, int holeCount, TaskClassification taskClassification, ObjectType[] type = null, double[] Weight = null, double[,] C = null) : this(ballCount)
         {
-            this.R = R;
-            this.ballCount = ballCount;
-            this.holeCount = holeCount;
+             R = R;
+             ballCount = ballCount;
+             holeCount = holeCount;
             TaskClassification = taskClassification;
 
             for (int i = 0; i < ball.Length; i++)
@@ -68,7 +68,7 @@
                 ball[i].ObjectType = (type != null) ? type[i] : (ObjectType)(-1);
                 ball[i].Weight = (Weight != null) ? Weight[i] : 0;
             }
-            this.C = C ?? null;
+             C = C ?? null;
         }
     }
 }
