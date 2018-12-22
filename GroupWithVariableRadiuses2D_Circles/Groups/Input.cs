@@ -21,7 +21,7 @@ namespace hs071_cs
         {
             try
             {
-                string readPath = @"D:\p1.txt";
+                string readPath = @"D:\Folder\RandomPoint_.txt";
                 FileInfo fileInfo = new FileInfo(readPath);
                 if (fileInfo.Exists)
                 {
@@ -60,16 +60,19 @@ namespace hs071_cs
                         for (i = 2; i < arrayOfLines.Length; i++) //// !!!!!! arrayOfLines.Length - 2
                         {
                             xyzrString = arrayOfLines[i].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
                             for (int k = 0; k < xyzrString.Length; k++)
                             {
                                 xyzrString[k] = xyzrString[k].Replace('.', ',').Trim();
                             }
+
                             x[i - 2] = double.Parse(xyzrString[0]);
                             y[i - 2] = double.Parse(xyzrString[1]);
                             z[i - 2] = double.Parse(xyzrString[2]);
                             r[i - 2] = double.Parse(xyzrString[3]);
                             arrayWithGroups[i - 2] = int.Parse(xyzrString[4]);
                         }
+
                         OutPut.WriteLine("Data has been read!");
                     }
                 }

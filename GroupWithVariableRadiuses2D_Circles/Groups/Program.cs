@@ -37,7 +37,7 @@ namespace hs071_cs
                 circlesCount = 15;
             }
 
-            const double maxRandRadius = 40; // максимальный радиус кругов r = 1..maxRandRadius
+            const double maxRandRadius = 30; // максимальный радиус кругов r = 1..maxRandRadius
 
             #region Инициализация и обявление переменных
 
@@ -51,8 +51,8 @@ namespace hs071_cs
             double RNach = 0.0;
 
             double[] rIter = new double[circlesCount];
-            double[] xIter = new double[circlesCount];
-            double[] yIter = new double[circlesCount];
+            double[] xFixedIter = new double[circlesCount];
+            double[] yFixedIter = new double[circlesCount];
             double[] zStart = new double[circlesCount];
 
             double[] rBest = new double[circlesCount];
@@ -83,8 +83,8 @@ namespace hs071_cs
                     Print("\n\t~~~ Генерируем точки с которых будем считать ~~~");
                     for (int i = 0; i < circlesCount; ++i)
                     {
-                        xIter[i] = xStart[i];
-                        yIter[i] = yStart[i];
+                        xFixedIter[i] = xStart[i];
+                        yFixedIter[i] = yStart[i];
                         zStart[i] = zNach[i];
                         rIter[i] = rStart[i];
                     }
@@ -103,7 +103,20 @@ namespace hs071_cs
             Print("=== ================== ===");
 
             Data startPointData = new Data(xStart, yStart, zNach, rStart, RNach, circlesCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
-            OutPut.SaveToFile(startPointData, $"StartPoint");
+            OutPut.SaveToFile(startPointData, $"RandomPoint");
+
+            //Fixed radius
+            using (FixedRadius3dAdaptor adaptor = new FixedRadius3dAdaptor(startPointData))
+            {
+                XyzFixR(out double[] xyzFixR, xStart, yStart, zNach, RNach, circlesCount);
+
+                RunTask(adaptor, xyzFixR, out xFixedIter, out yFixedIter, out zNach, circlesCount);
+                RIter = xyzFixR[3 * circlesCount];
+                rStart = adaptor.radius;
+            }
+
+            Data optionalPointFixedPoint = new Data(xFixedIter, yFixedIter, zStart, rStart, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask);
+            OutPut.SaveToFile(optionalPointFixedPoint, $"FixedRad {RIter}");
 
             #endregion
 
@@ -115,41 +128,96 @@ namespace hs071_cs
 
             Circle2D[] circles = new Circle2D[circlesCount];
 
-            SetCirclesParameters(circlesCount, maxRandRadius, rStart, xStart, yStart, ref circles);
+            SetCirclesParameters(circlesCount, maxRandRadius, rStart, xFixedIter, yFixedIter, ref circles);
 
-            try
+            //#region 5*10
+
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    Console.WriteLine($"\n5*10 ==> {i}");
+
+            //    try
+            //    {
+            //        SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
+            //        dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "2");
+            //        dataHelper.RandomizeCoordinate(ref circles, xFixedIter, yFixedIter, zNach, circlesCount);
+            //        dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Print(ex.Message);
+            //        return;
+            //    }
+
+            //    IpoptReturnCode status;
+            //    double[] radius = rStart.OrderBy(a => a).ToArray();
+
+
+            //    Stopwatch varRTaskTime = new Stopwatch();
+            //    using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
+            //    {
+            //        varRTaskTime.Start();
+            //        status = RunTask(vr, circles, out xBest, out yBest, out zBest, out rIter, out RIter);
+            //        varRTaskTime.Stop();
+            //    }
+
+            //    ShowData(xBest, yBest, zBest, rIter, RIter);
+
+            //    Data optionalPoint = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+            //    OutPut.SaveToFile(optionalPoint, $"VariableRadius_5_by_10_{i}_R={RIter}");
+
+            //    Print("RunTime: " + getElapsedTime(varRTaskTime));
+            //    Print($"Norma Var = {Norma(xStart, xFixedIter, yStart, yFixedIter, zNach, zStart, rStart, rIter)}");
+            //}
+
+            //#endregion
+
+            #region 10max var
+
+            for (int i = 0; i < 10; i++)
             {
-                SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
-                dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius);
-                dataHelper.RandomizeCoordinate(ref circles, xStart, yStart, zStart, circlesCount);
-                dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
+                Console.WriteLine($"\n 10max var {i}");
+
+                try
+                {
+                    SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
+                    dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "1");
+                    dataHelper.RandomizeCoordinate(ref circles, xFixedIter, yFixedIter, zNach, circlesCount);
+                    dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
+                }
+                catch (Exception ex)
+                {
+                    Print(ex.Message);
+                    return;
+                }
+
+                IpoptReturnCode status;
+                double[] radius = rStart.OrderBy(a => a).ToArray();
+
+
+                Stopwatch varRTaskTime = new Stopwatch();
+                using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
+                {
+                    varRTaskTime.Start();
+                    status = RunTask(vr, circles, out xBest, out yBest, out zBest, out rIter, out RIter);
+                    varRTaskTime.Stop();
+                }
+
+                ShowData(xBest, yBest, zBest, rIter, RIter);
+
+                Data optionalPoint = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+                OutPut.SaveToFile(optionalPoint, $"VariableRadius_10MaxVar_OthersFixed_{i}_R={RIter}");
+
+                Print("RunTime: " + getElapsedTime(varRTaskTime));
+                Print($"Norma Var = {Norma(xStart, xFixedIter, yStart, yFixedIter, zNach, zStart, rStart, rIter)}");
             }
-            catch (Exception ex)
-            {
-                Print(ex.Message);
-                return;
-            }
-
-            IpoptReturnCode status;
-            double[] radius = rStart.OrderBy(a => a).ToArray();
-
-            Stopwatch varRTaskTime = new Stopwatch();
-            using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
-            {
-                varRTaskTime.Start();
-                status = RunTask(vr, circles, out xIter, out yIter, out zStart, out rIter, out RIter);
-                varRTaskTime.Stop();
-            }
-
-            ShowData(xIter, yIter, zStart, rIter, RIter);
-
-            Data optionalPoint = new Data(xIter, yIter, zStart, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
-            OutPut.SaveToFile(optionalPoint, "VariableRadius");
 
             #endregion
 
-            Print("RunTime: " + getElapsedTime(varRTaskTime));
-            Print($"Norma Var = {Norma(xStart, xIter, yStart, yIter, zNach, zStart, rStart, rIter)}");
+
+            #endregion
+
+
             Console.ReadLine();
         }
 
@@ -235,6 +303,7 @@ namespace hs071_cs
                 {
                     x[2 * i] = c[i].Coordinate.X;
                     x[2 * i + 1] = c[i].Coordinate.Y;
+
                     if (c[i].Group != 0)
                     {
                         x[2 * ballN + i] = c[i].Radius;
@@ -264,6 +333,38 @@ namespace hs071_cs
             return status;
         }
 
+        private static void RunTask(FixedRadius3dAdaptor op, double[] xyz, out double[] NewX, out double[] NewY, out double[] NewZ, int ballN)
+        {
+            Stopwatch taskWatch = new Stopwatch();
+            IpoptReturnCode status;
+            taskWatch.Start();
+            using (Ipopt problem = new Ipopt(op._n, op._x_L, op._x_U, op._m, op._g_L, op._g_U, op._nele_jac, op._nele_hess, op.Eval_f, op.Eval_g, op.Eval_grad_f, op.Eval_jac_g, op.Eval_h))
+            {
+                // https://www.coin-or.org/Ipopt/documentation/node41.html#opt:print_options_documentation
+                problem.AddOption("tol", 1e-2);
+                problem.AddOption("mu_strategy", "adaptive");
+                problem.AddOption("hessian_approximation", "limited-memory");
+                problem.AddOption("max_iter", 3000);
+                problem.AddOption("print_level", 3); // 0 <= value <= 12, default is 5
+
+                /* solve the problem */
+                status = problem.SolveProblem(xyz, out double obj, null, null, null, null);
+            }
+            taskWatch.Stop();
+            Print("\nOptimization return status: " + status);
+
+            NewX = new double[ballN];
+            NewY = new double[ballN];
+            NewZ = new double[ballN];
+
+            for (int i = 0; i < ballN; i++)
+            {
+                NewX[i] = xyz[3 * i];
+                NewY[i] = xyz[3 * i + 1];
+                NewZ[i] = xyz[3 * i + 2];
+            }
+            Print("RunTime: " + OutPut.getElapsedTime(taskWatch));
+        }
 
         private static string getElapsedTime(Stopwatch Watch)
         {
@@ -287,14 +388,14 @@ namespace hs071_cs
             Print($" R_External[{iterCount++}] = {R}");
         }
 
-        public static double[] rRandomGenerate(double maxRandRadius, int cCount)
+        public static double[] rRandomGenerate(double maxRandRadius, int ciclesCount)
         {
-            double[] arrR = new double[cCount];
+            double[] arrR = new double[ciclesCount];
             maxRandRadius--;
 
-            for (int i = 0; i < cCount; ++i)
+            for (int i = 0; i < ciclesCount; ++i)
             {
-                arrR[i] = 2 + Math.Round(_rnd.NextDouble() * maxRandRadius);
+                arrR[i] = Math.Round(ciclesCount * _rnd.NextDouble()) + 1;
             }
 
             return arrR;
@@ -343,6 +444,21 @@ namespace hs071_cs
             }
 
             return arrSumR;
+        }
+
+        private static void XyzFixR(out double[] xyzFixR, double[] xNach, double[] yNach, double[] zNach, double RNach, int ballCount)
+        {
+            xyzFixR = new double[3 * ballCount + 1];
+
+            int j = 0;
+            for (int i = 0; i < ballCount; i++)
+            {
+                xyzFixR[j] = xNach[i];
+                xyzFixR[++j] = yNach[i];
+                xyzFixR[++j] = zNach[i];
+                j++;
+            }
+            xyzFixR[3 * ballCount] = RNach;
         }
     }
 }

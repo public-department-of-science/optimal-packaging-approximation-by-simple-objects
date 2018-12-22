@@ -96,7 +96,7 @@ namespace hs071_cs
             }
 
             _x_L[_n - 1] = ((IEnumerable<double>)trueRadiuses).Max();
-            _x_U[_n - 1] = c.OrderByDescending(t => t.Radius).Take(10).Sum(t => t.Radius);
+            _x_U[_n - 1] = c.Sum(t => t.Radius);
 
             _nele_jac = 0;
             _m = 0;

@@ -32,7 +32,7 @@ namespace Groups
             Program.Print("-- 8 --> Рнадом для Y на (K,P) * y[i]");
             Program.Print("-- 9 --> Совершенно рандомные координаты для Х на интервале (K,P)");
 
-            switch (Console.ReadLine())
+            switch ("3")
             {
                 case "1":
                     SetCoordinatesThatWeHadBefore(balls, xIter, yIter, zIter);
@@ -165,7 +165,7 @@ namespace Groups
             Program.Print("-- 6--> Все радиусы равны \"Центроиду по всей системе!\"");
             Program.Print("-- 7 --> Все радиусы равны \"Центроиду по каждой греппе свой!\"");
 
-            switch (Console.ReadLine())
+            switch ("5")///Console.ReadLine())
             {
                 case "1":
                     SetRadiusesThatWeHadBefore(balls, rIter);
@@ -286,8 +286,9 @@ namespace Groups
 
         private static void SetLeftAndRightBounds(out int leftBound, out int rightBound)
         {
-            leftBound = 0;
-            rightBound = 20;
+            leftBound = -10;
+            rightBound = 10;
+            return;
             try
             {
                 Program.Print("Enter Left bound:");
@@ -326,7 +327,7 @@ namespace Groups
             }
         }
 
-        internal void SetGroups(ref Circle2D[] circles, ref int varRadiuses)
+        internal void SetGroups(ref Circle2D[] circles, ref int varRadiuses, string @case = "")
         {
             Program.Print("********************************************************");
             Program.Print("In which way would you like to set group numbers?");
@@ -334,7 +335,7 @@ namespace Groups
             Program.Print(" --2 --> Нарезать по порядку по N штук");
             Program.Print(" --3 --> Все фиксированные");
 
-            switch (Console.ReadLine())
+            switch (@case)// = Console.ReadLine())
             {
                 case "1":
                     break;
@@ -344,11 +345,31 @@ namespace Groups
                 case "3":
                     SetAllCirclesLikeFixed(circles);
                     break;
+                case "4":
+                    TenMaxRadiusesWithVarRadiuses(circles, ref varRadiuses);
+                    break;
                 default:
                     break;
             }
 
             ShowHowToCirlesDistributedByGroups(circles);
+        }
+
+        private void TenMaxRadiusesWithVarRadiuses(Circle2D[] circles, ref int varRadiuses)
+        {
+            Circle2D[] orderedCircles = circles.OrderByDescending(x => x.Radius).ToArray();
+            for (int i = 0; i < orderedCircles.Count(); i++)
+            {
+                if (i < 10)
+                {
+                    orderedCircles[i].Group = 1;
+                    ++varRadiuses;
+                }
+                else
+                {
+                    orderedCircles[i].Group = 0;
+                };
+            }
         }
 
         private void ShowHowToCirlesDistributedByGroups(Circle2D[] circles)
@@ -367,7 +388,7 @@ namespace Groups
 
             try
             {
-                inGroupElements = int.Parse(Console.ReadLine());
+                inGroupElements = 10; // int.Parse(Console.ReadLine());
 
                 if (inGroupElements < 3 || inGroupElements > 15)
                 {

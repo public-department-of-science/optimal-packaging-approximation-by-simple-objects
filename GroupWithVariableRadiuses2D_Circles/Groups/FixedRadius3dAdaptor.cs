@@ -42,7 +42,7 @@ namespace hs071_cs
 
             if (ballsCount <= 10)
             {
-                K1 = 1;
+                K1 = 0.8;
             }
             else
             {

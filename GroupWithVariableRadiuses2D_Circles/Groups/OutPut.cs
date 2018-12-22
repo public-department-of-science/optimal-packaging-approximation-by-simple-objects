@@ -68,7 +68,7 @@ namespace hs071_cs
         {
             try
             {
-                string writePath = @"D:\" + fileName + ".txt";
+                string writePath = @"D:\Folder\" + fileName + ".txt";
                 FileInfo fi = new FileInfo(writePath);
                 if (fi.Exists && appandFlag)
                 {
@@ -129,7 +129,7 @@ namespace hs071_cs
         {
             try
             {
-                string writePath = @"D:\" + fileName + ".txt";
+                string writePath = @"D:\Folder\" + fileName + ".txt";
                 FileInfo fi = new FileInfo(writePath);
                 if (fi.Exists)
                 {
