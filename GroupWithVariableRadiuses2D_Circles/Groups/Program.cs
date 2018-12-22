@@ -131,7 +131,7 @@ namespace hs071_cs
             }
 
             IpoptReturnCode status;
-            double[] radius = rStart.OrderBy(a => a).ToArray();
+            double[] radius = GetVariableRadiuses(circles);
 
             Stopwatch varRTaskTime = new Stopwatch();
             using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
@@ -152,6 +152,28 @@ namespace hs071_cs
             Print($"Norma Var = {Norma(xStart, xIter, yStart, yIter, zNach, zStart, rStart, rIter)}");
             Console.ReadLine();
         }
+
+        private static double[] GetVariableRadiuses(Circle2D[] circles)
+        {
+            double[] arrayWithSortedRadiuses = null;
+            int amountOfVariableRad = circles.Where(x => x.Group != 0).Count();
+
+            if (amountOfVariableRad != 0)
+            {
+                arrayWithSortedRadiuses = new double[amountOfVariableRad];
+
+                for (int i = 0, j = 0; i < circles.Length; i++)
+                {
+                    if (circles[i].Group != 0)
+                    {
+                        arrayWithSortedRadiuses[j] = circles[i].Radius;
+                    }
+                }
+            }
+
+            return arrayWithSortedRadiuses.OrderBy(x => x).ToArray();
+        }
+
 
         private static void SetAndShowGroupsForEachCircle(ref Circle2D[] circles, int[] arrayWithGroups, ref int counterOfCirclesWithVariableRadius)
         {
