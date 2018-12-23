@@ -131,58 +131,19 @@ namespace hs071_cs
 
             SetCirclesParameters(circlesCount, maxRandRadius, rStart, xFixedIter, yFixedIter, ref circles);
 
-            //#region 5*10
+            Data[] optionalPoint5_10 = new Data[10];
+            Data[] optionalPoint10Max = new Data[10];
 
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    Console.WriteLine($"\n5*10 ==> {i}");
-
-            //    try
-            //    {
-            //        SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
-            //        dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "2");
-            //        dataHelper.RandomizeCoordinate(ref circles, xFixedIter, yFixedIter, zNach, circlesCount);
-            //        dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Print(ex.Message);
-            //        return;
-            //    }
-
-            //    IpoptReturnCode status;
-            //    double[] radius = rStart.OrderBy(a => a).ToArray();
-
-
-            //    Stopwatch varRTaskTime = new Stopwatch();
-            //    using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
-            //    {
-            //        varRTaskTime.Start();
-            //        status = RunTask(vr, circles, out xBest, out yBest, out zBest, out rIter, out RIter);
-            //        varRTaskTime.Stop();
-            //    }
-
-            //    ShowData(xBest, yBest, zBest, rIter, RIter);
-
-            //    Data optionalPoint = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
-            //    OutPut.SaveToFile(optionalPoint, $"VariableRadius_5_by_10_{i}_R={RIter}");
-
-            //    Print("RunTime: " + getElapsedTime(varRTaskTime));
-            //    Print($"Norma Var = {Norma(xStart, xFixedIter, yStart, yFixedIter, zNach, zStart, rStart, rIter)}");
-            //}
-
-            //#endregion
-
-            #region 10max var
+            #region 5*10
 
             for (int i = 0; i < 10; i++)
             {
-                Console.WriteLine($"\n 10max var {i}");
+                Console.WriteLine($"\n5*10 ==> {i}");
 
                 try
                 {
                     SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
-                    dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "1");
+                    dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "2");
                     dataHelper.RandomizeCoordinate(ref circles, xFixedIter, yFixedIter, zNach, circlesCount);
                     dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
                 }
@@ -193,7 +154,8 @@ namespace hs071_cs
                 }
 
                 IpoptReturnCode status;
-                double[] radius = GetVariableRadiuses(circles);
+                double[] radius = rStart.OrderBy(a => a).ToArray();
+
 
                 Stopwatch varRTaskTime = new Stopwatch();
                 using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
@@ -205,8 +167,8 @@ namespace hs071_cs
 
                 ShowData(xBest, yBest, zBest, rIter, RIter);
 
-                Data optionalPoint = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
-                OutPut.SaveToFile(optionalPoint, $"VariableRadius_10MaxVar_OthersFixed_{i}_R={RIter}");
+                optionalPoint5_10[i] = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+                OutPut.SaveToFile(optionalPoint5_10[i], $"VariableRadius_5_by_10_{i}_R={RIter}");
 
                 Print("RunTime: " + getElapsedTime(varRTaskTime));
                 Print($"Norma Var = {Norma(xStart, xFixedIter, yStart, yFixedIter, zNach, zStart, rStart, rIter)}");
@@ -214,11 +176,178 @@ namespace hs071_cs
 
             #endregion
 
+            #region TryToImprove5_10
+
+            int indexOfOptional5_10 = 0;
+            double minRad = optionalPoint5_10[0].R;
+
+            for (int i = 0; i < optionalPoint5_10.Length; i++)
+            {
+                if (optionalPoint5_10[i].R < minRad)
+                {
+                    indexOfOptional5_10 = i;
+                }
+            }
+
+            GetXYZR(out double[] xNewStart, out double[] yNewStart, out double[] zNewStart, out double[] rNewStart, optionalPoint5_10[indexOfOptional5_10]);
+
+            SetCirclesParameters(circlesCount, maxRandRadius, rNewStart, xNewStart, yNewStart, ref circles);
+
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine($"\n5*10_TryImprove ==> {i}");
+
+                try
+                {
+                    SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
+                    dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "2");
+                    dataHelper.RandomizeCoordinate(ref circles, xNewStart, yNewStart, rNewStart, circlesCount);
+                    dataHelper.RandomizeRadiuses(ref circles, rNewStart, circlesCount);
+                }
+                catch (Exception ex)
+                {
+                    Print(ex.Message);
+                    return;
+                }
+
+                IpoptReturnCode status;
+                double[] radius = rStart.OrderBy(a => a).ToArray();
+
+                Stopwatch varRTaskTime = new Stopwatch();
+                using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
+                {
+                    varRTaskTime.Start();
+                    status = RunTask(vr, circles, out xBest, out yBest, out zBest, out rIter, out RIter);
+                    varRTaskTime.Stop();
+                }
+
+                ShowData(xBest, yBest, zBest, rIter, RIter);
+
+                optionalPoint5_10[i] = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+                OutPut.SaveToFile(optionalPoint5_10[i], $"\\TryInprove\\VariableRadius_5_by_10_{i}_R={RIter}");
+
+                Print("RunTime: " + getElapsedTime(varRTaskTime));
+                Print($"Norma Var = {Norma(xNewStart, xBest, yNewStart, yBest, zNewStart, zBest, rNewStart, rIter)}");
+            }
 
             #endregion
 
+            #region 10max var
+
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine($"\n 10max var {i}");
+
+                try
+                {
+                    SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
+                    dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "2");
+                    dataHelper.RandomizeCoordinate(ref circles, xFixedIter, yFixedIter, zNach, circlesCount);
+                    dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
+                }
+                catch (Exception ex)
+                {
+                    Print(ex.Message);
+                    return;
+                }
+
+                IpoptReturnCode status;
+                double[] radius = rStart.OrderBy(y => y).ToArray(); // GetVariableRadiuses(circles);
+
+                Stopwatch varRTaskTime = new Stopwatch();
+                using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
+                {
+                    varRTaskTime.Start();
+                    status = RunTask(vr, circles, out xBest, out yBest, out zBest, out rIter, out RIter);
+                    varRTaskTime.Stop();
+                }
+
+                ShowData(xBest, yBest, zBest, rIter, RIter);
+
+                optionalPoint10Max[i] = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+                OutPut.SaveToFile(optionalPoint10Max[i], $"VariableRadius_10MaxVar_OthersFixed_{i}_R={RIter}");
+
+                Print("RunTime: " + getElapsedTime(varRTaskTime));
+                Print($"Norma Var = {Norma(xStart, xFixedIter, yStart, yFixedIter, zNach, zStart, rStart, rIter)}");
+            }
+
+            #endregion
+
+            #region TryToImprove5_10
+
+            int indexOfOptional10Max = 0;
+            double minRad10Max = optionalPoint10Max[0].R;
+
+            for (int i = 0; i < optionalPoint10Max.Length; i++)
+            {
+                if (optionalPoint5_10[i].R < minRad10Max)
+                {
+                    indexOfOptional10Max = i;
+                }
+            }
+
+            GetXYZR(out double[] xNewStartMax10, out double[] yNewStartMax10, out double[] zNewStartMax10, out double[] rNewStartMax10, optionalPoint10Max[indexOfOptional10Max]);
+
+            SetCirclesParameters(circlesCount, maxRandRadius, rNewStartMax10, xNewStartMax10, yNewStartMax10, ref circles);
+
+            for (int i = 0; i < 10; i++)
+            {
+                Console.WriteLine($"\n5*10_TryImprove ==> {i}");
+
+                try
+                {
+                    SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
+                    dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "2");
+                    dataHelper.RandomizeCoordinate(ref circles, xNewStartMax10, yNewStartMax10, rNewStartMax10, circlesCount);
+                    dataHelper.RandomizeRadiuses(ref circles, rNewStartMax10, circlesCount);
+                }
+                catch (Exception ex)
+                {
+                    Print(ex.Message);
+                    return;
+                }
+
+                IpoptReturnCode status;
+                double[] radius = rStart.OrderBy(a => a).ToArray();
+
+                Stopwatch varRTaskTime = new Stopwatch();
+                using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
+                {
+                    varRTaskTime.Start();
+                    status = RunTask(vr, circles, out xBest, out yBest, out zBest, out rIter, out RIter);
+                    varRTaskTime.Stop();
+                }
+
+                ShowData(xBest, yBest, zBest, rIter, RIter);
+
+                optionalPoint5_10[i] = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+                OutPut.SaveToFile(optionalPoint5_10[i], $"\\TryInprove\\VariableRadius_10MaxVar_OthersFixed_{i}_R={RIter}");
+
+                Print("RunTime: " + getElapsedTime(varRTaskTime));
+                Print($"Norma Var = {Norma(xNewStart, xBest, yNewStart, yBest, zNewStart, zBest, rNewStart, rIter)}");
+            }
+
+            #endregion
+
+            #endregion
 
             Console.ReadLine();
+        }
+
+        private static void GetXYZR(out double[] xNewStart, out double[] yNewStart, out double[] zNewStart, out double[] rNewStart, Data data)
+        {
+            xNewStart = new double[data.ballCount];
+            yNewStart = new double[data.ballCount];
+            zNewStart = new double[data.ballCount];
+            rNewStart = new double[data.ballCount];
+
+            for (int i = 0; i < data.ball.Length; i++)
+            {
+                xNewStart[i] = data.ball[i].X;
+                yNewStart[i] = data.ball[i].Y;
+                zNewStart[i] = data.ball[i].Z;
+                rNewStart[i] = data.ball[i].R;
+            }
         }
 
         private static double[] GetVariableRadiuses(Circle2D[] circles)
