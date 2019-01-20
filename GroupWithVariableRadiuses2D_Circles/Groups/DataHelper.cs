@@ -32,7 +32,7 @@ namespace Groups
             Program.Print("-- 8 --> Рнадом для Y на (K,P) * y[i]");
             Program.Print("-- 9 --> Совершенно рандомные координаты для Х на интервале (K,P)");
 
-            switch ("3")
+            switch (Console.ReadLine())
             {
                 case "1":
                     SetCoordinatesThatWeHadBefore(balls, xIter, yIter, zIter);
@@ -157,6 +157,7 @@ namespace Groups
         {
             Program.Print("********************************************************");
             Program.Print("--- Указать тип рондомизации радиуса----".ToUpper());
+            Program.Print("0 --- Среднее значение по радиусу");
             Program.Print("-- 1 --> Оставить те, что и были");
             Program.Print("-- 2 --> Radius * Рандом(0,1) для всех");
             Program.Print("-- 3 --> Рандомные на интервале (K,P)");
@@ -165,8 +166,11 @@ namespace Groups
             Program.Print("-- 6--> Все радиусы равны \"Центроиду по всей системе!\"");
             Program.Print("-- 7 --> Все радиусы равны \"Центроиду по каждой греппе свой!\"");
 
-            switch ("5")///Console.ReadLine())
+            switch (Console.ReadLine())
             {
+                case "0":
+                    SetAVGValueForRadiuses(balls, rIter);
+                    break;
                 case "1":
                     SetRadiusesThatWeHadBefore(balls, rIter);
                     break;
@@ -192,6 +196,15 @@ namespace Groups
                     throw new Exception("Incorrect value");
             }
             Program.Print("********************************************************");
+        }
+
+        private void SetAVGValueForRadiuses(Circle2D[] balls, double[] rIter)
+        {
+            double avgRadius = balls.Average(x => x.Radius);
+            for (int i = 0; i < balls.Length; i++)
+            {
+                balls[i].Radius = avgRadius;
+            }
         }
 
         private void RandRadiusesRangeMultRndMinus05OnEachGroupBased(Circle2D[] balls, double[] rIter)
@@ -335,7 +348,7 @@ namespace Groups
             Program.Print(" --2 --> Нарезать по порядку по N штук");
             Program.Print(" --3 --> Все фиксированные");
 
-            switch (@case)// = Console.ReadLine())
+            switch (@case = Console.ReadLine())
             {
                 case "1":
                     break;

@@ -129,60 +129,18 @@ namespace hs071_cs
 
             Circle2D[] circles = new Circle2D[circlesCount];
 
-            SetCirclesParameters(circlesCount, maxRandRadius, rStart, xFixedIter, yFixedIter, ref circles);
+            SetCirclesParameters(circlesCount, maxRandRadius, rStart, xStart, yStart, ref circles); //xFixedIter, yFixedIter, ref circles);
 
-            //#region 5*10
+            #region 5*10
 
-            //for (int i = 0; i < 10; i++)
-            //{
-            //    Console.WriteLine($"\n5*10 ==> {i}");
-
-            //    try
-            //    {
-            //        SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
-            //        dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "2");
-            //        dataHelper.RandomizeCoordinate(ref circles, xFixedIter, yFixedIter, zNach, circlesCount);
-            //        dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Print(ex.Message);
-            //        return;
-            //    }
-
-            //    IpoptReturnCode status;
-            //    double[] radius = rStart.OrderBy(a => a).ToArray();
-
-
-            //    Stopwatch varRTaskTime = new Stopwatch();
-            //    using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
-            //    {
-            //        varRTaskTime.Start();
-            //        status = RunTask(vr, circles, out xBest, out yBest, out zBest, out rIter, out RIter);
-            //        varRTaskTime.Stop();
-            //    }
-
-            //    ShowData(xBest, yBest, zBest, rIter, RIter);
-
-            //    Data optionalPoint = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
-            //    OutPut.SaveToFile(optionalPoint, $"VariableRadius_5_by_10_{i}_R={RIter}");
-
-            //    Print("RunTime: " + getElapsedTime(varRTaskTime));
-            //    Print($"Norma Var = {Norma(xStart, xFixedIter, yStart, yFixedIter, zNach, zStart, rStart, rIter)}");
-            //}
-
-            //#endregion
-
-            #region 10max var
-
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1; i++)
             {
-                Console.WriteLine($"\n 10max var {i}");
+                Console.WriteLine($"\n5*10 ==> {i}");
 
                 try
                 {
                     SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
-                    dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "1");
+                    dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius);
                     dataHelper.RandomizeCoordinate(ref circles, xFixedIter, yFixedIter, zNach, circlesCount);
                     dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
                 }
@@ -193,7 +151,7 @@ namespace hs071_cs
                 }
 
                 IpoptReturnCode status;
-                double[] radius = GetVariableRadiuses(circles);
+                double[] radius = rStart.OrderBy(a => a).ToArray();
 
                 Stopwatch varRTaskTime = new Stopwatch();
                 using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
@@ -206,11 +164,52 @@ namespace hs071_cs
                 ShowData(xBest, yBest, zBest, rIter, RIter);
 
                 Data optionalPoint = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
-                OutPut.SaveToFile(optionalPoint, $"VariableRadius_10MaxVar_OthersFixed_{i}_R={RIter}");
+                OutPut.SaveToFile(optionalPoint, $"VariableRadius_5_by_10_{i}_R={RIter}");
 
                 Print("RunTime: " + getElapsedTime(varRTaskTime));
                 Print($"Norma Var = {Norma(xStart, xFixedIter, yStart, yFixedIter, zNach, zStart, rStart, rIter)}");
             }
+
+            #endregion
+
+            #region 10max var
+
+            //for (int i = 0; i < 10; i++)
+            //{
+            //    Console.WriteLine($"\n 10max var {i}");
+
+            //    try
+            //    {
+            //        SetAndShowGroupsForEachCircle(ref circles, arrayWithGroups, ref counterOfCirclesWithVariableRadius);
+            //        dataHelper.SetGroups(ref circles, ref counterOfCirclesWithVariableRadius, "1");
+            //        dataHelper.RandomizeCoordinate(ref circles, xFixedIter, yFixedIter, zNach, circlesCount);
+            //        dataHelper.RandomizeRadiuses(ref circles, rStart, circlesCount);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        Print(ex.Message);
+            //        return;
+            //    }
+
+            //    IpoptReturnCode status;
+            //    double[] radius = GetVariableRadiuses(circles);
+
+            //    Stopwatch varRTaskTime = new Stopwatch();
+            //    using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
+            //    {
+            //        varRTaskTime.Start();
+            //        status = RunTask(vr, circles, out xBest, out yBest, out zBest, out rIter, out RIter);
+            //        varRTaskTime.Stop();
+            //    }
+
+            //    ShowData(xBest, yBest, zBest, rIter, RIter);
+
+            //    Data optionalPoint = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+            //    OutPut.SaveToFile(optionalPoint, $"VariableRadius_10MaxVar_OthersFixed_{i}_R={RIter}");
+
+            //    Print("RunTime: " + getElapsedTime(varRTaskTime));
+            //    Print($"Norma Var = {Norma(xStart, xFixedIter, yStart, yFixedIter, zNach, zStart, rStart, rIter)}");
+            ///}
 
             #endregion
 
