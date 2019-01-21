@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using Cureos.Numerics;
 using Groups;
 using hs071_cs.ObjectOptimazation;
@@ -154,6 +155,7 @@ namespace hs071_cs
                 double[] radius = rStart.OrderBy(a => a).ToArray();
 
                 Stopwatch varRTaskTime = new Stopwatch();
+                RIter = RIter * 0.5;
                 using (VariableRadiusAdapter vr = new VariableRadiusAdapter(circles, radius))
                 {
                     varRTaskTime.Start();
@@ -164,7 +166,7 @@ namespace hs071_cs
                 ShowData(xBest, yBest, zBest, rIter, RIter);
 
                 Data optionalPoint = new Data(xBest, yBest, zBest, rIter, RIter, circlesCount, holeCount: 0, taskClassification: TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
-                OutPut.SaveToFile(optionalPoint, $"VariableRadius_5_by_10_{i}_R={RIter}");
+                OutPut.SaveToFile(optionalPoint, $"VariableRadius_5GorupsBy12_R={RIter}");
 
                 Print("RunTime: " + getElapsedTime(varRTaskTime));
                 Print($"Norma Var = {Norma(xStart, xFixedIter, yStart, yFixedIter, zNach, zStart, rStart, rIter)}");
@@ -415,7 +417,8 @@ namespace hs071_cs
 
             for (int i = 0; i < ciclesCount; ++i)
             {
-                arrR[i] = Math.Round(ciclesCount * _rnd.NextDouble()) + 1;
+                arrR[i] = 5 + (int)(new Random().NextDouble() * 80);
+                Thread.Sleep(20);
             }
 
             return arrR;
@@ -435,10 +438,11 @@ namespace hs071_cs
             double maxZ = 0;
             double maxR = 0;
             double maxRXYZ = 0;
+
             for (int i = 0; i < cCount; ++i)
             {
-                x[i] = 10 * avgCircle * (_rnd.NextDouble() - 0.5);
-                y[i] = 10 * avgCircle * (_rnd.NextDouble() - 0.5);
+                x[i] = 15 * avgCircle * (_rnd.NextDouble() - 0.5);
+                y[i] = 15 * avgCircle * (_rnd.NextDouble() - 0.5);
                 z[i] = 0;// 10 * avgCircle * (_rnd.NextDouble() - 0.5);
 
                 maxX = Math.Max(Math.Abs(x[i] + r[i]), Math.Abs(x[i] - r[i]));

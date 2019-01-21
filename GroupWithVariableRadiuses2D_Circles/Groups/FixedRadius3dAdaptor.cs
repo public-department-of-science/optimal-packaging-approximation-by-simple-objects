@@ -57,6 +57,7 @@ namespace hs071_cs
             // обнуляем необходимые счетчики
             int countXYZR = 0,
                 countCoordinate = 0;
+
             for (int i = 0; i < ballsCount; i++)
             {
                 //if (data.ball[i].ObjectType == (ObjectType)2)
@@ -91,7 +92,7 @@ namespace hs071_cs
             }
 
             _x_L[_n - 1] = max;
-            _x_U[_n - 1] = sumR*0.55 * K1;
+            _x_U[_n - 1] = sumR * 0.48 * K1;
 
             /*    Огрaничения
              **************************************************************************************/

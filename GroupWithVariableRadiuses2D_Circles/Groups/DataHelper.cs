@@ -348,7 +348,7 @@ namespace Groups
             Program.Print(" --2 --> Нарезать по порядку по N штук");
             Program.Print(" --3 --> Все фиксированные");
 
-            switch (@case = Console.ReadLine())
+            switch (Console.ReadLine())
             {
                 case "1":
                     break;
@@ -401,7 +401,7 @@ namespace Groups
 
             try
             {
-                inGroupElements = 10; // int.Parse(Console.ReadLine());
+                inGroupElements = int.Parse(Console.ReadLine());
 
                 if (inGroupElements < 3 || inGroupElements > 15)
                 {

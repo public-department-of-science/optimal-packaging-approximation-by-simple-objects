@@ -21,7 +21,7 @@ namespace hs071_cs
         {
             try
             {
-                string readPath = @"D:\VariableRadius_5_by_10_0_R=35,0782757752872.txt";
+                string readPath = @"D:\RandomPoint.txt";
                 FileInfo fileInfo = new FileInfo(readPath);
                 if (fileInfo.Exists)
                 {
