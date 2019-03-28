@@ -19,7 +19,7 @@ namespace hs071_cs
         public double[] _x_U;
         public double[] _g_L;
         public double[] _g_U;
-        private readonly Circle2D[] Circles;
+        private readonly Circle[] Circles;
         private readonly double[] _ra;
         private readonly double[][] _raSum;
         private readonly int _groupCount;
@@ -28,7 +28,7 @@ namespace hs071_cs
 
         public double[] X { get; private set; }
 
-        public VariableRadiusAdapter(Circle2D[] c, double[] trueRadiuses)
+        public VariableRadiusAdapter(Circle[] c, double[] trueRadiuses)
         {
             if (c.Length != trueRadiuses.Length)
             {
@@ -37,10 +37,10 @@ namespace hs071_cs
 
             _ra = new double[trueRadiuses.Length];
             trueRadiuses.CopyTo(_ra, 0);
-            Circles = new Circle2D[c.Length];
+            Circles = new Circle[c.Length];
             for (int index = 0; index < c.Length; ++index)
             {
-                Circles[index] = new Circle2D();
+                Circles[index] = new Circle();
             }
 
             c.CopyTo(Circles, 0);

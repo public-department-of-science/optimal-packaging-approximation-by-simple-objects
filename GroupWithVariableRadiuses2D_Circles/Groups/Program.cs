@@ -113,7 +113,7 @@ namespace hs071_cs
             Print("\t\t ~~           Groups           ~~");
             Print("\t\t ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-            Circle2D[] circles = new Circle2D[circlesCount];
+            Circle[] circles = new Circle[circlesCount];
 
             SetCirclesParameters(circlesCount, maxRandRadius, rStart, xStart, yStart, ref circles);
 
@@ -153,7 +153,7 @@ namespace hs071_cs
             Console.ReadLine();
         }
 
-        private static double[] GetVariableRadiuses(Circle2D[] circles)
+        private static double[] GetVariableRadiuses(Circle[] circles)
         {
             double[] arrayWithSortedRadiuses = null;
             int amountOfVariableRad = circles.Where(x => x.Group != 0).Count();
@@ -174,8 +174,7 @@ namespace hs071_cs
             return arrayWithSortedRadiuses.OrderBy(x => x).ToArray();
         }
 
-
-        private static void SetAndShowGroupsForEachCircle(ref Circle2D[] circles, int[] arrayWithGroups, ref int counterOfCirclesWithVariableRadius)
+        private static void SetAndShowGroupsForEachCircle(ref Circle[] circles, int[] arrayWithGroups, ref int counterOfCirclesWithVariableRadius)
         {
             counterOfCirclesWithVariableRadius = 0;
             int i = 0;
@@ -185,7 +184,7 @@ namespace hs071_cs
                 return;
             }
 
-            foreach (Circle2D item in circles)
+            foreach (Circle item in circles)
             {
                 if (arrayWithGroups[i] != 0)
                 {
@@ -196,18 +195,18 @@ namespace hs071_cs
             }
 
             i = 0;
-            foreach (Circle2D item in circles)
+            foreach (Circle item in circles)
             {
                 Print($"Circle[{i}].Group = {circles[i].Group}");
                 ++i;
             }
         }
 
-        private static void SetCirclesParameters(int ballsCount, double maxRandRadius, double[] rNach, double[] xIter, double[] yIter, ref Circle2D[] circles)
+        private static void SetCirclesParameters(int ballsCount, double maxRandRadius, double[] rNach, double[] xIter, double[] yIter, ref Circle[] circles)
         {
             for (int i = 0; i < ballsCount; ++i)
             {
-                circles[i] = new Circle2D
+                circles[i] = new Circle
                 {
                     Group = 0
                 };
@@ -234,7 +233,7 @@ namespace hs071_cs
             return norma;
         }
 
-        private static IpoptReturnCode RunTask(VariableRadiusAdapter op, Circle2D[] c, out double[] NewX, out double[] NewY, out double[] NewZ, out double[] NewR, out double R0)
+        private static IpoptReturnCode RunTask(VariableRadiusAdapter op, Circle[] c, out double[] NewX, out double[] NewY, out double[] NewZ, out double[] NewR, out double R0)
         {
             Stopwatch timer = new Stopwatch();
 
@@ -285,7 +284,6 @@ namespace hs071_cs
             Print($"Optimization return status: {status}");
             return status;
         }
-
 
         private static string getElapsedTime(Stopwatch Watch)
         {

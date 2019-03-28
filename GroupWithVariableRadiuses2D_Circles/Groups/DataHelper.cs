@@ -16,7 +16,7 @@ namespace Groups
 
         #region CoordinatesRegions
 
-        internal void RandomizeCoordinate(ref Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter, int ballsCount)
+        internal void RandomizeCoordinate(ref Circle[] balls, double[] xIter, double[] yIter, double[] zIter, int ballsCount)
         {
             Program.Print("********************************************************");
             Program.Print("----Указать тип рондомизации координат (X,Y)----".ToUpper());
@@ -67,7 +67,7 @@ namespace Groups
             Program.Print("********************************************************");
         }
 
-        private void RandomizeAllYCoordinateWithRandomValues(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
+        private void RandomizeAllYCoordinateWithRandomValues(Circle[] balls, double[] xIter, double[] yIter, double[] zIter)
         {
             SetLeftAndRightBounds(out int leftBound, out int rightBound);
             for (int i = 0; i < balls.Length; i++)
@@ -77,7 +77,7 @@ namespace Groups
             }
         }
 
-        private void RandomizeAllXCoordinateWithRandomValues(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
+        private void RandomizeAllXCoordinateWithRandomValues(Circle[] balls, double[] xIter, double[] yIter, double[] zIter)
         {
             SetLeftAndRightBounds(out int leftBound, out int rightBound);
             for (int i = 0; i < balls.Length; i++)
@@ -87,7 +87,7 @@ namespace Groups
             }
         }
 
-        private void RandomizeYCoordinateOnCustomIntervalMultOnPreviousOptionalYCoordinate(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
+        private void RandomizeYCoordinateOnCustomIntervalMultOnPreviousOptionalYCoordinate(Circle[] balls, double[] xIter, double[] yIter, double[] zIter)
         {
             SetLeftAndRightBounds(out int leftBound, out int rightBound);
             for (int i = 0; i < balls.Length; i++)
@@ -97,7 +97,7 @@ namespace Groups
             }
         }
 
-        private void RandomizeXCoordinateOnCustomIntervalMultOnPreviousOptionalYCoordinate(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
+        private void RandomizeXCoordinateOnCustomIntervalMultOnPreviousOptionalYCoordinate(Circle[] balls, double[] xIter, double[] yIter, double[] zIter)
         {
             SetLeftAndRightBounds(out int leftBound, out int rightBound);
             for (int i = 0; i < balls.Length; i++)
@@ -107,7 +107,7 @@ namespace Groups
             }
         }
 
-        private void RandomizeAllCordinatesOnCustomInterval(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
+        private void RandomizeAllCordinatesOnCustomInterval(Circle[] balls, double[] xIter, double[] yIter, double[] zIter)
         {
             SetLeftAndRightBounds(out int leftBound, out int rightBound);
             for (int i = 0; i < balls.Length; i++)
@@ -117,7 +117,7 @@ namespace Groups
             }
         }
 
-        private void RandomizeYCoordinateOn0_1Interval(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
+        private void RandomizeYCoordinateOn0_1Interval(Circle[] balls, double[] xIter, double[] yIter, double[] zIter)
         {
             for (int i = 0; i < balls.Length; i++)
             {
@@ -126,7 +126,7 @@ namespace Groups
             }
         }
 
-        private void RandomizeXCoordinateOn0_1Interval(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
+        private void RandomizeXCoordinateOn0_1Interval(Circle[] balls, double[] xIter, double[] yIter, double[] zIter)
         {
             for (int i = 0; i < balls.Length; i++)
             {
@@ -135,7 +135,7 @@ namespace Groups
             }
         }
 
-        private void RandomizeAllCoordinatesOne0_1Interval(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
+        private void RandomizeAllCoordinatesOne0_1Interval(Circle[] balls, double[] xIter, double[] yIter, double[] zIter)
         {
             for (int i = 0; i < balls.Length; i++)
             {
@@ -144,7 +144,7 @@ namespace Groups
             }
         }
 
-        private void SetCoordinatesThatWeHadBefore(Circle2D[] balls, double[] xIter, double[] yIter, double[] zIter)
+        private void SetCoordinatesThatWeHadBefore(Circle[] balls, double[] xIter, double[] yIter, double[] zIter)
         {
             for (int i = 0; i < balls.Length; i++)
             {
@@ -153,7 +153,7 @@ namespace Groups
             }
         }
 
-        internal void RandomizeRadiuses(ref Circle2D[] balls, double[] rIter, int ballsCount)
+        internal void RandomizeRadiuses(ref Circle[] balls, double[] rIter, int ballsCount)
         {
             Program.Print("********************************************************");
             Program.Print("--- Указать тип рондомизации радиуса----".ToUpper());
@@ -194,9 +194,9 @@ namespace Groups
             Program.Print("********************************************************");
         }
 
-        private void RandRadiusesRangeMultRndMinus05OnEachGroupBased(Circle2D[] balls, double[] rIter)
+        private void RandRadiusesRangeMultRndMinus05OnEachGroupBased(Circle[] balls, double[] rIter)
         {
-            foreach (IGrouping<int, Circle2D> item in balls.GroupBy(x => x.Group))
+            foreach (IGrouping<int, Circle> item in balls.GroupBy(x => x.Group))
             {
                 double maxRadius = item.Max(y => y.Radius);
                 double minRadius = item.Min(y => y.Radius);
@@ -215,9 +215,9 @@ namespace Groups
             }
         }
 
-        private void RadiusesEqualCentroidBasedOnEachGroup(Circle2D[] balls, double[] rIter)
+        private void RadiusesEqualCentroidBasedOnEachGroup(Circle[] balls, double[] rIter)
         {
-            foreach (IGrouping<int, Circle2D> item in balls.GroupBy(x => x.Group))
+            foreach (IGrouping<int, Circle> item in balls.GroupBy(x => x.Group))
             {
                 double maxRadius = item.Max(y => y.Radius);
                 double minRadius = item.Min(y => y.Radius);
@@ -234,7 +234,7 @@ namespace Groups
             }
         }
 
-        private void RadiusesEqualCentroidOnFullSystem(Circle2D[] balls, double[] rIter)
+        private void RadiusesEqualCentroidOnFullSystem(Circle[] balls, double[] rIter)
         {
             double centroid = (rIter[rIter.Length - 1] + rIter[0]) / 2;
 
@@ -247,7 +247,7 @@ namespace Groups
             }
         }
 
-        private void RandRadiusesRangeMultRndMinus05OnFullSystem(Circle2D[] balls, double[] rIter)
+        private void RandRadiusesRangeMultRndMinus05OnFullSystem(Circle[] balls, double[] rIter)
         {
             double centroid = (rIter[rIter.Length - 1] + rIter[0]) / 2;
             double range = (rIter[rIter.Length - 1] - rIter[0]) / 2;
@@ -261,7 +261,7 @@ namespace Groups
             }
         }
 
-        private void RandRadiuses(Circle2D[] balls, double[] rIter)
+        private void RandRadiuses(Circle[] balls, double[] rIter)
         {
             SetLeftAndRightBounds(out int leftBound, out int rightBound);
 
@@ -279,7 +279,7 @@ namespace Groups
             }
         }
 
-        private static bool NotFixedGroup(Circle2D[] balls, int i)
+        private static bool NotFixedGroup(Circle[] balls, int i)
         {
             return balls[i].Group != 0;
         }
@@ -307,7 +307,7 @@ namespace Groups
             }
         }
 
-        private void RandomizeRadiusesOn0_1Interval(Circle2D[] balls, double[] rIter)
+        private void RandomizeRadiusesOn0_1Interval(Circle[] balls, double[] rIter)
         {
             for (int i = 0; i < balls.Length; i++)
             {
@@ -318,7 +318,7 @@ namespace Groups
             }
         }
 
-        private void SetRadiusesThatWeHadBefore(Circle2D[] balls, double[] rIter)
+        private void SetRadiusesThatWeHadBefore(Circle[] balls, double[] rIter)
         {
             for (int i = 0; i < balls.Length; i++)
             {
@@ -326,7 +326,7 @@ namespace Groups
             }
         }
 
-        internal void SetGroups(ref Circle2D[] circles, ref int varRadiuses)
+        internal void SetGroups(ref Circle[] circles, ref int varRadiuses)
         {
             Program.Print("********************************************************");
             Program.Print("In which way would you like to set group numbers?");
@@ -351,15 +351,15 @@ namespace Groups
             ShowHowToCirlesDistributedByGroups(circles);
         }
 
-        private void ShowHowToCirlesDistributedByGroups(Circle2D[] circles)
+        private void ShowHowToCirlesDistributedByGroups(Circle[] circles)
         {
-            foreach (IGrouping<int, Circle2D> item in circles.GroupBy(x => x.Group))
+            foreach (IGrouping<int, Circle> item in circles.GroupBy(x => x.Group))
             {
                 Program.Print($"В группе #{item.FirstOrDefault().Group} {item.Count()} кругов");
             }
         }
 
-        private void SliceCircles(Circle2D[] circles, ref int varRadiuses)
+        private void SliceCircles(Circle[] circles, ref int varRadiuses)
         {
             varRadiuses = 0;
             Program.Print("Укажите кол. элементов в группе 3-15".ToUpper());
@@ -405,9 +405,9 @@ namespace Groups
             }
         }
 
-        private void SetAllCirclesLikeFixed(Circle2D[] circles)
+        private void SetAllCirclesLikeFixed(Circle[] circles)
         {
-            foreach (Circle2D item in circles)
+            foreach (Circle item in circles)
             {
                 item.Group = 0;
             }
