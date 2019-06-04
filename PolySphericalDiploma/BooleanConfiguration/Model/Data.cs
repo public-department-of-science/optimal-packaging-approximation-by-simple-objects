@@ -11,6 +11,8 @@ namespace BooleanConfiguration.Model
     /// </summary>
     public class Data
     {
+        public bool Ovipuckelije { get; set; } = false;
+
         /// <summary>
         /// 
         /// </summary>

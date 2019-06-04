@@ -34,5 +34,29 @@ namespace BooleanConfiguration.IO
                 Output.ConsolePrint(ex.Message);
             }
         }
+
+        public static void SetOvipucklenije(ref Data data, Print outStream)
+        {
+            try
+            {
+                outStream("Хотете использовать овыпукление функции? 1 (Да) / другое значение (Нет) : ");
+                string value = Console.ReadLine();
+
+                switch (value)
+                {
+                    case "1":
+                        data.Ovipuckelije = true;
+                        break;
+
+                    default:
+                        data.Ovipuckelije = false;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Output.ConsolePrint(ex.Message);
+            }
+        }
     }
 }

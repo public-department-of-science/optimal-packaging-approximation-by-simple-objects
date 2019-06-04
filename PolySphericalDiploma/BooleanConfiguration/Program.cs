@@ -1,7 +1,7 @@
-using System;
 using BooleanConfiguration.IO;
 using BooleanConfiguration.Model;
 using BooleanConfiguration.Solvers;
+using System;
 
 namespace BooleanConfiguration
 {
@@ -16,7 +16,10 @@ namespace BooleanConfiguration
             ResultOfResearching res = null;
 
             Output.PrintToConsole(ConsolePrint);
+
             Input.SelectTypeOfStartSet(ref data, Console.ReadLine(), ConsolePrint);
+
+            Input.SetOvipucklenije(ref data, ConsolePrint);
 
             try
             {
@@ -29,7 +32,7 @@ namespace BooleanConfiguration
                 Console.BackgroundColor = ConsoleColor.White;
             }
 
-            Output.SaveToFile(res ?? new ResultOfResearching(), RunTask.LamdaArray);
+            Output.SaveToFile(res ?? new ResultOfResearching(), RunTask.LamdaArray, data);
             Console.ReadLine();
         }
     }

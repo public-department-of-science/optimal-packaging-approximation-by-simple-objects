@@ -6,6 +6,7 @@ using hs071_cs.Adapters;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace BooleanConfiguration.Solvers
 {
@@ -20,12 +21,23 @@ namespace BooleanConfiguration.Solvers
                 IPOPTAdapter dataAdapter = new IPOPTAdapter(data);
                 ResultOfResearching resultOfResearching = new ResultOfResearching();
 
-                // lamdaArray => labda for each line
-                // mainLambda => lamdaArray.MaxFromLambdaArray();
-                OptimizationHelper.GettingArrayWithLabda(data.MatrixA, ref LamdaArray, out double mainLambda);
-                data.MainLambda = mainLambda;
+                int howManyIterationsToRun = 0;
+                //lamdaArray => lambda for each line
+                //mainLambda => lamdaArray.MaxFromLambdaArray();
+                if (data.Ovipuckelije)
+                {
+                    OptimizationHelper.GettingArrayWithLabda(data.MatrixA, ref LamdaArray);
+                    data.MainLambda = LamdaArray.Max();
+                    howManyIterationsToRun = LamdaArray.Length;
+                }
+                else
+                {
+                    Console.WriteLine("Ввудите количество итераций цикла:");
+                    int.TryParse(Console.ReadLine(), out howManyIterationsToRun);
+                    LamdaArray = new double[howManyIterationsToRun];
+                }
 
-                for (int i = 0; i < LamdaArray.Length; i++)
+                for (int i = 0; i < howManyIterationsToRun; i++)
                 {
                     using (Ipopt ipoptSolver = new Ipopt(dataAdapter._n, dataAdapter._x_L, dataAdapter._x_U, dataAdapter._m, dataAdapter._g_L, dataAdapter._g_U,
                         dataAdapter._nele_jac, dataAdapter._nele_hess, dataAdapter.Eval_f, dataAdapter.Eval_g, dataAdapter.Eval_grad_f, dataAdapter.Eval_jac_g, dataAdapter.Eval_h))
@@ -42,7 +54,12 @@ namespace BooleanConfiguration.Solvers
                         double[] x = OptimizationHelper.GettingVariablesVector(data); // TODO variables array need to be in this one-demension array
                         IpoptReturnCode ipoptOperationStatusCode = ipoptSolver.SolveProblem(x, out double resultValue, null, null, null, null);
                         taskTime.Stop();
-                        resultOfResearching.AddNewResult(LamdaArray[i], new KeyValuePair<double[], Stopwatch>(x, taskTime), GetFunctionValue(data.MatrixA, x), ipoptOperationStatusCode);
+                        resultOfResearching.AddNewResult(data.Ovipuckelije ? LamdaArray[i] : i, new KeyValuePair<double[], Stopwatch>(x, taskTime), GetFunctionValue(data.MatrixA, x), ipoptOperationStatusCode);
+
+                        if (!data.Ovipuckelije)
+                        {
+                            LamdaArray[i] = i;
+                        }
                         // taskTime; => spent time
                     }
                 }

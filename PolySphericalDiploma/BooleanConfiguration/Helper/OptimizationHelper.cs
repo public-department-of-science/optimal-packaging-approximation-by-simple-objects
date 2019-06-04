@@ -26,7 +26,7 @@ namespace BooleanConfiguration.Helper
             }
         }
 
-        public static void GettingArrayWithLabda(double[][] matrixA, ref double[] labdaArray, out double mainLambda)
+        public static void GettingArrayWithLabda(double[][] matrixA, ref double[] labdaArray)
         {
             labdaArray = new double[matrixA.Length];
             for (int i = 0; i < matrixA.Length; i++)
@@ -35,7 +35,6 @@ namespace BooleanConfiguration.Helper
                 labdaArray[i] = matrixA[i].Sum(x => x) - matrixA[i][i];
             }
 
-            mainLambda = labdaArray.Max();
             labdaArray = labdaArray.OrderBy(x => x).ToArray();
         }
 

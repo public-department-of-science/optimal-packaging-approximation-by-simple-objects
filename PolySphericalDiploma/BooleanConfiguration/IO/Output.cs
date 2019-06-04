@@ -1,8 +1,8 @@
-﻿using System;
+﻿using BooleanConfiguration.Model;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using BooleanConfiguration.Model;
 
 namespace BooleanConfiguration.IO
 {
@@ -32,7 +32,7 @@ namespace BooleanConfiguration.IO
             Console.Write("Choose type of set: ");
         }
 
-        public static void SaveToFile(ResultOfResearching res, double[] lambda)
+        public static void SaveToFile(ResultOfResearching res, double[] lambda, Data data)
         {
             string writePath = AppDomain.CurrentDomain.BaseDirectory + res.ToString() + ".txt";
 
@@ -40,17 +40,20 @@ namespace BooleanConfiguration.IO
             {
                 using (StreamWriter sw = new StreamWriter(writePath, false, System.Text.Encoding.Default))
                 {
-                    sw.WriteLine($"<<Table with results below>> N = {lambda.Length}");
+                    sw.WriteLine($"Result");
+                    sw.WriteLine($"Овыпукление функции использовалось: {data.Ovipuckelije}");
+                    sw.WriteLine($"Количество итераций цикла: {lambda.Length}");
 
                     foreach (double item in lambda)
                     {
-                        var result = res.GetResultById(item);
-                        var taskStatus = res.GetTaskStatusById(item);
+                        KeyValuePair<KeyValuePair<double[], Stopwatch>, double> result = res.GetResultById(item);
+                        Cureos.Numerics.IpoptReturnCode taskStatus = res.GetTaskStatusById(item);
 
-                        sw.WriteLine($"Status = {taskStatus.ToString()} ");
-                        sw.WriteLine($"_______Lambda = {item.ToString()}___________");
-                        sw.WriteLine($"FunctionValue = {result.Value.ToString("0.00")} Time = {result.Key.Value.Elapsed.ToString()}");
-                        sw.WriteLine($"Local optional point: ");
+                        sw.WriteLine($"Статус по текущей задаче = {taskStatus.ToString()} ");
+                        string text = data.Ovipuckelije ? "Лямбда-значение" : "Итерация №";
+                        sw.WriteLine($" {text}= {item.ToString()}");
+                        sw.WriteLine($"Значение функции = {result.Value.ToString("0.00000")} Время выполнения = {result.Key.Value.Elapsed.ToString()}");
+                        sw.WriteLine($"Значение для локально-оптимальной точки: ");
 
                         for (int i = 0; i < result.Key.Key.Length; i++)
                         {
