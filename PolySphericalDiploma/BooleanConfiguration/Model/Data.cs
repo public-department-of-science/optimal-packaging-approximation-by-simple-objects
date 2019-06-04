@@ -1,7 +1,7 @@
 ﻿
-using System;
 using BooleanConfiguration.Helper;
 using BooleanConfiguration.Interfaces;
+using System;
 using static BooleanConfiguration.Helper.Enums;
 
 namespace BooleanConfiguration.Model
@@ -22,7 +22,7 @@ namespace BooleanConfiguration.Model
         public double[][] ConstraintsMatrix { get; private set; }
 
         /// <summary>
-        /// Dimension of space
+        /// Dimension of space, variables amount
         /// </summary>
         public int N { get; private set; }
 
@@ -55,7 +55,6 @@ namespace BooleanConfiguration.Model
 
         public ISet Set { get; set; }
 
-
         public double[] g_L { get; set; }
 
         public double[] g_U { get; set; }
@@ -64,54 +63,64 @@ namespace BooleanConfiguration.Model
 
         public double[] x_U { get; set; }
 
-        public int m { get; set; } // restrictions amount
+        public int Constraints { get; set; } // restrictions amount
 
-        public int n { get; set; } // variables amount
-
-        public Data(TypeOfSet typeOfSet)
+        public Data(TypeOfSet typeOfSet, Print outStream)
         {
             OptimizationHelper = new OptimizationHelper();
 
-            Console.Write("N = ");
-            N = int.Parse(Console.ReadLine()); // OptimizationHelper.GerIntegerValueInlcudingUpperBound(leftBound, rightBound);
+            outStream("N = ");
+            int.TryParse(Console.ReadLine(), out int N); // OptimizationHelper.GerIntegerValueInlcudingUpperBound(leftBound, rightBound);
 
-            Console.Write("Set data range:");
-            Console.Write("Left bound = ");
-            int leftBound = int.Parse(Console.ReadLine());
-            Console.Write("Right bound = ");
-            int rightBound = int.Parse(Console.ReadLine());
+            this.N = N;
+
+            outStream("Set data range:", needPrintNewLine: true);
+
+            outStream("Left bound = ");
+            int.TryParse(Console.ReadLine(), out int leftBound);
+
+            outStream("Right bound = ");
+            int.TryParse(Console.ReadLine(), out int rightBound);
+
+            outStream("How many constraints = ");
+            int.TryParse(Console.ReadLine(), out int constraints);
 
             Set = SelectSet(typeOfSet);
             SetType = typeOfSet;
 
-            n = N;
-
             // arrays allocation
             Lambda = new int[N];
-            g_L = new double[N];
-            g_U = new double[N];
+
             x_L = new double[N];
             x_U = new double[N];
             MatrixCOrRightPart = new double[N];
             MatrixX1 = new double[N];
             MatrixA = new double[N][];
-            ConstraintsMatrix = new double[N][];
             AllocateArrayMemory(MatrixA, N);
-            AllocateArrayMemory(ConstraintsMatrix, N);
-            //
 
-            // Setting random values
-            OptimizationHelper.RandomizeMatrixA(MatrixA); // N*N
-            OptimizationHelper.RandomizeMatrixA(ConstraintsMatrix); // N*N
-            OptimizationHelper.RandomizeMatrixC(MatrixCOrRightPart); // N*1
+
+            if (constraints > 0)
+            {
+                outStream("CBQP - Solving constraint binary quadratic problem", needPrintNewLine: true);
+                ConstraintsMatrix = new double[constraints][];
+                Constraints = RestrictionHelper.SetM(constraints);
+                AllocateArrayMemory(ConstraintsMatrix, N);
+                g_L = new double[constraints];
+                g_U = new double[constraints];
+                OptimizationHelper.RandomizeMatrixNxNSize(ConstraintsMatrix, leftBound, rightBound); // N*N
+                RestrictionHelper.SetRestrictionsBounds(g_L, g_U, ConstraintsMatrix, Set.MatrixX0, MatrixX1, N);
+            }
+            else
+            {
+                outStream("UBQP - Solving unconstraint binary quadratic problem", needPrintNewLine: true);
+            }
+
+            // Setting random values in the certain range
+            OptimizationHelper.RandomizeMatrixNxNSize(MatrixA, leftBound, rightBound); // N*N
+            OptimizationHelper.RandomizeMatrixC(MatrixCOrRightPart, leftBound, rightBound); // N*1
             OptimizationHelper.RandomizeMatrixX1(MatrixX1); // N*1
-            //
 
-            // Restrictions
             RestrictionHelper.SetXBounds(x_L, x_U);
-            m = RestrictionHelper.SetM(N);
-            RestrictionHelper.SetRestrictionsBounds(g_L, g_U, ConstraintsMatrix, Set.MatrixX0, MatrixX1, N);
-            //
         }
 
         private ISet SelectSet(TypeOfSet typeOfSet)
@@ -137,9 +146,12 @@ namespace BooleanConfiguration.Model
 
         private void AllocateArrayMemory(double[][] array, int n)
         {
-            for (int i = 0; i < array.Length; i++)
+            if (n > 0)
             {
-                array[i] = new double[n];
+                for (int i = 0; i < array.Length; i++)
+                {
+                    array[i] = new double[n];
+                }
             }
         }
     }

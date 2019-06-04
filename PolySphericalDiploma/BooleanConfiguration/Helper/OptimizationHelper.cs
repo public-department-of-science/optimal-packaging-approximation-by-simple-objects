@@ -1,6 +1,6 @@
-﻿using System;
+﻿using BooleanConfiguration.Model;
+using System;
 using System.Linq;
-using BooleanConfiguration.Model;
 
 namespace BooleanConfiguration.Helper
 {
@@ -13,15 +13,15 @@ namespace BooleanConfiguration.Helper
             random = new Random();
         }
 
-        public void RandomizeMatrix(double[][] matrix)
+        public void RandomizeMatrix(double[][] matrix, int leftBound, int rightBound)
         {
-            for (int i = 0; i < matrix.Length - 1; i++)
+            for (int i = 0; i < matrix.Length; i++)
             {
                 double[] row = matrix[i];
 
                 for (int j = i; j < row.Length; j++)
                 {
-                    matrix[i][j] = matrix[j][i] = (random.Next(0, 10) + random.Next(0, 10)) / 2;
+                    matrix[i][j] = random.Next(leftBound, rightBound); //matrix[j][i] = // + random.Next(0, 10)) / 2;
                 }
             }
         }
@@ -44,11 +44,11 @@ namespace BooleanConfiguration.Helper
             return random.Next(v1, v2 + 1);
         }
 
-        public void RandomizeMatrixC(double[] maxtrixC)
+        public void RandomizeMatrixC(double[] maxtrixC, int leftBound, int rightBound)
         {
             for (int i = 0; i < maxtrixC.Length; i++)
             {
-                maxtrixC[i] = random.Next(-10, 10);
+                maxtrixC[i] = random.Next(leftBound, rightBound);
             }
         }
 
@@ -63,9 +63,9 @@ namespace BooleanConfiguration.Helper
             return randomStartValues;
         }
 
-        public void RandomizeMatrixA(double[][] maxtrixA)
+        public void RandomizeMatrixNxNSize(double[][] maxtrixA, int leftBound, int rightBound)
         {
-            RandomizeMatrix(maxtrixA);
+            RandomizeMatrix(maxtrixA, leftBound, rightBound);
         }
 
         public void RandomizeMatrixX1(double[] matrixX1)

@@ -1,27 +1,27 @@
-﻿using System;
-using BooleanConfiguration.Helper;
+﻿using BooleanConfiguration.Helper;
 using BooleanConfiguration.Model;
+using System;
 
 namespace BooleanConfiguration.IO
 {
     internal static class Input
     {
-        public static void SelectTypeOfStartSet(ref Data data)
+        public static void SelectTypeOfStartSet(ref Data data, string setType, Print outStream)
         {
             try
             {
-                switch (Console.ReadLine())
+                switch (setType)
                 {
                     case "1":
-                        data = new Data(Enums.TypeOfSet.BooleanSet);
+                        data = new Data(Enums.TypeOfSet.BooleanSet, outStream);
                         break;
 
                     case "2":
-                        data = new Data(Enums.TypeOfSet.BnSet);
+                        data = new Data(Enums.TypeOfSet.BnSet, outStream);
                         break;
 
                     case "3":
-                        data = new Data(Enums.TypeOfSet.SphericalLocatedBnSet);
+                        data = new Data(Enums.TypeOfSet.SphericalLocatedBnSet, outStream);
                         break;
 
                     default:

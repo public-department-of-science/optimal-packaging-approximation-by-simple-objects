@@ -20,6 +20,11 @@ namespace BooleanConfiguration.Helper
 
         public static void SetRestrictionsBounds(double[] g_L, double[] g_U, double[][] restrictionsMatrix, string matrixX0, double[] matrixX1, int n)
         {
+            if (restrictionsMatrix == null)
+            {
+                return;
+            }
+
             for (int i = 0; i < g_L.Length; i++)
             {
                 // Cx0 > Cx1 ==  p0 is upper bount else it's lower bound

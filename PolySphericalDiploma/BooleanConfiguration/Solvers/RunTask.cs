@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using BooleanConfiguration.Helper;
+﻿using BooleanConfiguration.Helper;
 using BooleanConfiguration.IO;
 using BooleanConfiguration.Model;
 using Cureos.Numerics;
 using hs071_cs.Adapters;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BooleanConfiguration.Solvers
 {
@@ -40,9 +40,9 @@ namespace BooleanConfiguration.Solvers
 
                         taskTime.Start();
                         double[] x = OptimizationHelper.GettingVariablesVector(data); // TODO variables array need to be in this one-demension array
-                        IpoptReturnCode t = ipoptSolver.SolveProblem(x, out double resultValue, null, null, null, null);
+                        IpoptReturnCode ipoptOperationStatusCode = ipoptSolver.SolveProblem(x, out double resultValue, null, null, null, null);
                         taskTime.Stop();
-                        resultOfResearching.AddNewResult(LamdaArray[i], new KeyValuePair<double[], Stopwatch>(x, taskTime), GetFunctionValue(data.MatrixA, x));
+                        resultOfResearching.AddNewResult(LamdaArray[i], new KeyValuePair<double[], Stopwatch>(x, taskTime), GetFunctionValue(data.MatrixA, x), ipoptOperationStatusCode);
                         // taskTime; => spent time
                     }
                 }

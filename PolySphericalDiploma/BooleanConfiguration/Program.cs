@@ -5,7 +5,7 @@ using BooleanConfiguration.Solvers;
 
 namespace BooleanConfiguration
 {
-    public delegate void Print(string text);
+    public delegate void Print(string text, bool needPrintNewLine = false);
 
     public class Program
     {
@@ -16,7 +16,7 @@ namespace BooleanConfiguration
             ResultOfResearching res = null;
 
             Output.PrintToConsole(ConsolePrint);
-            Input.SelectTypeOfStartSet(ref data);
+            Input.SelectTypeOfStartSet(ref data, Console.ReadLine(), ConsolePrint);
 
             try
             {
@@ -25,7 +25,7 @@ namespace BooleanConfiguration
             catch (Exception ex)
             {
                 Console.BackgroundColor = ConsoleColor.Red;
-                ConsolePrint($"Problem can't be solved! {ex.Message} Check previous message.");
+                ConsolePrint($"Problem can't be solved! {ex.Message} Check previous message.", needPrintNewLine: true);
                 Console.BackgroundColor = ConsoleColor.White;
             }
 

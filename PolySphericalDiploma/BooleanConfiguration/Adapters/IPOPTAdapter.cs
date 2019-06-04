@@ -1,7 +1,6 @@
-﻿using System;
-using BooleanConfiguration;
-using BooleanConfiguration.Helper;
+﻿using BooleanConfiguration.Helper;
 using BooleanConfiguration.Model;
+using System;
 
 namespace hs071_cs.Adapters
 {
@@ -25,16 +24,19 @@ namespace hs071_cs.Adapters
             MatrixOfCoef = data.MatrixA;
             ConstraintsMatrix = data.ConstraintsMatrix;
             MatrixX0 = RestrictionHelper.GettingOneDemensionArrayFromString(data.N, data.Set.MatrixX0);
-            _n = data.n;
-            _m = data.m;// + 1; // 1 it's poly...-sherical shit
+            _n = data.N;
+            _m = data.Constraints;// + 1; // 1 it's poly...-sherical shit
 
             _x_L = data.x_L;
             _x_U = data.x_U;
 
-            _g_L = data.g_L;
-            _g_U = data.g_U;
+            if (data.Constraints != 0)
+            {
+                _g_L = data.g_L;
+                _g_U = data.g_U;
+                _nele_jac = ConstraintsMatrix.Length * ConstraintsMatrix[0].Length;// data.N * data.N;// + data.N;
+            }
 
-            _nele_jac = data.N * data.N;// + data.N;
             _nele_hess = 0;
         }
 
