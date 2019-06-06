@@ -53,16 +53,16 @@ namespace BooleanConfiguration.Solvers
                         taskTime.Start();
                         double[] x = OptimizationHelper.GettingVariablesVector(data);
 
-                        for (int j = 0; j < x.Length; j++)
-                        {
-                            x[j] = Math.Round(x[j]);
-                        }
-
                         double[] startPoint = new double[x.Length];
 
                         for (int j = 0; j < x.Length; j++)
                         {
                             startPoint[j] = x[j];
+                        }
+
+                        for (int j = 0; j < x.Length; j++)
+                        {
+                            x[j] = Math.Round(x[j]);
                         }
 
                         IpoptReturnCode ipoptOperationStatusCode = ipoptSolver.SolveProblem(x, out double resultValue, null, null, null, null);

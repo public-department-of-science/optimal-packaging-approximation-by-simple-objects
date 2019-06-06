@@ -55,21 +55,27 @@ namespace BooleanConfiguration.IO
                         sw.WriteLine();
                     }
 
-                    sw.WriteLine($"Количество ограничений {data.Constraints}");
-                    sw.WriteLine($"Матрица ограничений");
-
-                    for (int i = 0; i < data.ConstraintsMatrix.Length; i++)
+                    if (data.ConstraintsMatrix != null)
                     {
-                        for (int j = 0; j < data.ConstraintsMatrix[i].Length; j++)
-                        {
-                            sw.Write(data.ConstraintsMatrix[i][j] + " ");
-                        }
-                        sw.WriteLine();
-                    }
-                    sw.Write("\n");
+                        sw.WriteLine($"Количество ограничений {data.Constraints}");
+                        sw.WriteLine($"Матрица ограничений");
 
-                    sw.WriteLine($"Овыпукление функции использовалось: {data.Ovipuckelije}");
-                    sw.Write("\n");
+                        for (int i = 0; i < data.ConstraintsMatrix.Length; i++)
+                        {
+                            for (int j = 0; j < data.ConstraintsMatrix[i].Length; j++)
+                            {
+                                sw.Write(data.ConstraintsMatrix[i][j] + " ");
+                            }
+                            sw.WriteLine();
+                        }
+                        sw.Write("\n");
+                    }
+
+                    if (data.Ovipuckelije)
+                    {
+                        sw.WriteLine($"Овыпукление функции использовалось: {data.Ovipuckelije}");
+                        sw.Write("\n");
+                    }
 
                     sw.WriteLine($"Количество итераций цикла: {lambda.Length}");
 
@@ -94,7 +100,7 @@ namespace BooleanConfiguration.IO
                         double[] t = res.GetStartPointById(item);
                         for (int i = 0; i < t.Length; i++)
                         {
-                            sw.Write($"{t[i]}");
+                            sw.Write($"{t[i].ToString("0.00")}" + " ");
                         }
                         sw.WriteLine();
 
