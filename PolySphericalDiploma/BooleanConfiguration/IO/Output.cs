@@ -38,10 +38,39 @@ namespace BooleanConfiguration.IO
 
             try
             {
+
                 using (StreamWriter sw = new StreamWriter(writePath, false, System.Text.Encoding.Default))
                 {
-                    sw.WriteLine($"Result");
+                    double mostEffectiveSolution = 0.0;
+                    double[] mostEffectivePoint = null;
+                    sw.WriteLine($"Результат");
+
+                    sw.WriteLine($"Матрица А");
+                    for (int i = 0; i < data.MatrixA.Length; i++)
+                    {
+                        for (int j = 0; j < data.MatrixA[i].Length; j++)
+                        {
+                            sw.Write(data.MatrixA[i][j] + " ");
+                        }
+                        sw.WriteLine();
+                    }
+
+                    sw.WriteLine($"Количество ограничений {data.Constraints}");
+                    sw.WriteLine($"Матрица ограничений");
+
+                    for (int i = 0; i < data.ConstraintsMatrix.Length; i++)
+                    {
+                        for (int j = 0; j < data.ConstraintsMatrix[i].Length; j++)
+                        {
+                            sw.Write(data.ConstraintsMatrix[i][j] + " ");
+                        }
+                        sw.WriteLine();
+                    }
+                    sw.Write("\n");
+
                     sw.WriteLine($"Овыпукление функции использовалось: {data.Ovipuckelije}");
+                    sw.Write("\n");
+
                     sw.WriteLine($"Количество итераций цикла: {lambda.Length}");
 
                     foreach (double item in lambda)
@@ -52,19 +81,44 @@ namespace BooleanConfiguration.IO
                         sw.WriteLine($"Статус по текущей задаче = {taskStatus.ToString()} ");
                         string text = data.Ovipuckelije ? "Лямбда-значение" : "Итерация №";
                         sw.WriteLine($" {text}= {item.ToString()}");
-                        sw.WriteLine($"Значение функции = {result.Value.ToString("0.00000")} Время выполнения = {result.Key.Value.Elapsed.ToString()}");
+
+                        if (result.Value < mostEffectiveSolution)
+                        {
+                            mostEffectiveSolution = result.Value;
+                            mostEffectivePoint = result.Key.Key;
+                        }
+
+                        sw.WriteLine($"Значение функции в локально-оптимальной точке = {result.Value.ToString("0")} Время поиска решения = {result.Key.Value.Elapsed.ToString()}");
+
+                        sw.WriteLine($"Значение для стартовой точки: ");
+                        double[] t = res.GetStartPointById(item);
+                        for (int i = 0; i < t.Length; i++)
+                        {
+                            sw.Write($"{t[i]}");
+                        }
+                        sw.WriteLine();
+
                         sw.WriteLine($"Значение для локально-оптимальной точки: ");
 
                         for (int i = 0; i < result.Key.Key.Length; i++)
                         {
                             double item1 = result.Key.Key[i];
                             //sw.Write($" X[{i + 1}] = " + Math.Round(item1).ToString() + ";");
-                            sw.Write($" X[{i + 1}] = " + item1.ToString("0.00") + ";");
+                            // sw.Write($" X[{i + 1}] = " + item1.ToString("0.00") + ";");
+                            sw.Write($"{ Math.Round(item1)}");//.ToString("0")}"+ " ");
                         }
 
                         sw.WriteLine();
                         sw.WriteLine();
                     }
+
+                    string optionalPoint = "";
+                    for (int i = 0; i < mostEffectivePoint.Length; i++)
+                    {
+                        optionalPoint += $"{ Math.Round(mostEffectivePoint[i])}";
+                    }
+
+                    sw.WriteLine($"Наилучшее значение функции: F = {mostEffectiveSolution.ToString("0")}, Точка: {optionalPoint}");
 
                     sw.Close();
                 }

@@ -51,10 +51,26 @@ namespace BooleanConfiguration.Solvers
                         ipoptSolver.AddOption("print_level", 3); // 0 <= value <= 12, default is 5
 
                         taskTime.Start();
-                        double[] x = OptimizationHelper.GettingVariablesVector(data); // TODO variables array need to be in this one-demension array
+                        double[] x = OptimizationHelper.GettingVariablesVector(data);
+
+                        for (int j = 0; j < x.Length; j++)
+                        {
+                            x[j] = Math.Round(x[j]);
+                        }
+
+                        double[] startPoint = new double[x.Length];
+
+                        for (int j = 0; j < x.Length; j++)
+                        {
+                            startPoint[j] = x[j];
+                        }
+
                         IpoptReturnCode ipoptOperationStatusCode = ipoptSolver.SolveProblem(x, out double resultValue, null, null, null, null);
                         taskTime.Stop();
-                        resultOfResearching.AddNewResult(data.Ovipuckelije ? LamdaArray[i] : i, new KeyValuePair<double[], Stopwatch>(x, taskTime), GetFunctionValue(data.MatrixA, x), ipoptOperationStatusCode);
+                        resultOfResearching.AddNewResult(data.Ovipuckelije ? LamdaArray[i] : i,
+                            new KeyValuePair<double[], Stopwatch>(x, taskTime), GetFunctionValue(data.MatrixA, x),
+                            ipoptOperationStatusCode,
+                            startPoint);
 
                         if (!data.Ovipuckelije)
                         {

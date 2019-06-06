@@ -15,13 +15,16 @@ namespace BooleanConfiguration.Model
 
         private Dictionary<double, IpoptReturnCode> ipoptReturnCode;
 
+        private Dictionary<double, double[]> StartPoint;
+
         public ResultOfResearching()
         {
             Result = new Dictionary<double, KeyValuePair<KeyValuePair<double[], Stopwatch>, double>>();
             ipoptReturnCode = new Dictionary<double, IpoptReturnCode>();
+            StartPoint = new Dictionary<double, double[]>();
         }
 
-        public void AddNewResult(double lambda, KeyValuePair<double[], Stopwatch> keyValues, double functionValue, IpoptReturnCode ipoptReturnCode)
+        public void AddNewResult(double lambda, KeyValuePair<double[], Stopwatch> keyValues, double functionValue, IpoptReturnCode ipoptReturnCode, double[] startPoint)
         {
             if (Result.ContainsKey(lambda))
             {
@@ -41,6 +44,7 @@ namespace BooleanConfiguration.Model
 
             Result.Add(lambda, new KeyValuePair<KeyValuePair<double[], Stopwatch>, double>(keyValues, functionValue));
             this.ipoptReturnCode.Add(lambda, ipoptReturnCode);
+            StartPoint.Add(lambda, startPoint);
         }
 
         public void ShowAllResults()
@@ -74,6 +78,18 @@ namespace BooleanConfiguration.Model
             else
             {
                 return IpoptReturnCode.Internal_Error;
+            }
+        }
+
+        public double[] GetStartPointById(double lambda)
+        {
+            if (StartPoint.ContainsKey(lambda))
+            {
+                return StartPoint[lambda];
+            }
+            else
+            {
+                return null;
             }
         }
     }
