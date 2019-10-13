@@ -67,8 +67,10 @@ namespace hs071_cs
             Adapter ad = new Adapter(data1232);
             try
             {
+                OutPut.SaveResultToFileStartPoint(data1232);
                 Data optionalPoint = solverHelper.SolveTheProblem(dataAdapter: ad, data: data1232);
                 OutPut.SaveResultToFile(optionalPoint);
+                OutPut.SaveToFileAllIteration(optionalPoint);
             }
             catch (System.Exception ex)
             {
