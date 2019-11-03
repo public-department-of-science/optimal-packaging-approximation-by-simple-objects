@@ -50,10 +50,7 @@
   <ItemGroup>
     <Reference Include="Cureos.Numerics, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>baseClasses\Cureos.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="hs071_cs">
-      <HintPath>..\hs071_cs\bin\Debug\hs071_cs.dll</HintPath>
+      <HintPath>..\..\Cureos.Numerics\Cureos.Numerics\bin\x86\Release\Cureos.Numerics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
