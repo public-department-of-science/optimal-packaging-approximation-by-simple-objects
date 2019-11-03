@@ -12,9 +12,9 @@ namespace hs071_cs
     class FixedRadius3dAdaptor : BaseAdaptor, IDisposable
     {
         public readonly int countCircles; // количество шаров
+        public readonly int countOfCombinedObjects; // количество шаров
         public double[] X { get; } //массив х (входят все координаты и радиусы)
         public readonly double[] radius;
-        public readonly double[] unsortedRadius;
         private double K1 = 1;
         private double K2 = 1;
         private List<double[]> _allIteration;
@@ -30,7 +30,6 @@ namespace hs071_cs
             countCircles = data.ballCount; // задаём количетво кругов
             _n = countCircles * 3 + 1; // количество переменных в векторе
             radius = new double[countCircles];
-            unsortedRadius = new double[countCircles];
             //вспомогательные счетчики
             double sumR = 0;
             int it = 0;
@@ -41,32 +40,18 @@ namespace hs071_cs
                 sumR += item.R;
             }
             radius = radius.OrderBy(a => a).ToArray();
-            X = new double[_n];
-            try
-            {
-                if (data.ball != null && data != null && data.R >= 0)
-                {
-                    for (int i = 0; i < countCircles; i++)
-                    {
-                        X[3 * i] = data.ball[i].X;
-                        X[3 * i + 1] = data.ball[i].Y;
-                        X[3 * i + 2] = data.ball[i].Z;
-                    }
-                    X[_n - 1] = data.R;
-                }
-            }
-            catch (Exception ex)
-            {
-                new PrintErrorMessageDel(OutPut.ErrorMessage)(ex.Message);
-            }
 
             /*    Ограничения переменных
             * *************************************************************************************/
 
             if (countCircles <= 10)
+            {
                 K1 = 1;
+            }
             else
+            {
                 K1 = 0.4;
+            }
 
             _x_L = new double[_n];
             _x_U = new double[_n];
@@ -78,36 +63,28 @@ namespace hs071_cs
                 countCoordinate = 0;
             for (int i = 0; i < countCircles; i++)
             {
-                //if (data.ball[i].ObjectType == (ObjectType)2)
-                //{
-                //    _x_L[3 * i] = data.ball[i].X;
-                //    _x_U[3 * i] = data.ball[i].X;
+                _x_L[3 * i] = Ipopt.NegativeInfinity;
+                _x_U[3 * i] = Ipopt.PositiveInfinity;
 
-                //    _x_L[3 * i + 1] = data.ball[i].Y;
-                //    _x_U[3 * i + 1] = data.ball[i].Y;
+                _x_L[3 * i + 1] = Ipopt.NegativeInfinity;
+                _x_U[3 * i + 1] = Ipopt.PositiveInfinity;
 
-                //    _x_L[3 * i + 2] = data.ball[i].Z;
-                //    _x_U[3 * i + 2] = data.ball[i].Z;
-                //}
-                //else
-                //{
-                _x_L[3 * i] = Ipopt.NegativeInfinity;// -K1 * DiametrSum(radius) + radius[countCoordinate];
-                _x_U[3 * i] = Ipopt.PositiveInfinity;// K1 * DiametrSum(radius) - radius[countCoordinate];
+                _x_L[3 * i + 2] = Ipopt.NegativeInfinity;
+                _x_U[3 * i + 2] = Ipopt.PositiveInfinity;
 
-                _x_L[3 * i + 1] = Ipopt.NegativeInfinity; // - K1 * DiametrSum(radius) + radius[countCoordinate];
-                _x_U[3 * i + 1] = Ipopt.PositiveInfinity;// K1 * DiametrSum(radius) - radius[countCoordinate];
-
-                _x_L[3 * i + 2] = Ipopt.NegativeInfinity;// - K1 * DiametrSum(radius) + radius[countCoordinate];
-                _x_U[3 * i + 2] = Ipopt.PositiveInfinity; // K1 * DiametrSum(radius) - radius[countCoordinate];
-                //}
                 if (max < radius[countCoordinate])
+                {
                     max = radius[countCoordinate];
+                }
+
                 countCoordinate++;
                 countXYZR++;
             }
 
             _x_L[_n - 1] = max;
             _x_U[_n - 1] = sumR * K1;
+
+            countCircles = data.amountOfCombinedObjectsInEachObject[0];
 
             /*    Огрaничения
              **************************************************************************************/
@@ -118,9 +95,26 @@ namespace hs071_cs
             _nele_jac += 4 * countCircles; // x, y, z , R
             _m += countCircles;
 
+            // добавляем количество якобианов для комбинир. объектов
+            for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
+            {
+                countOfCombinedObjects += data.amountOfCombinedObjectsInEachObject[i];
+                _nele_jac += 4 * data.amountOfCombinedObjectsInEachObject[i];
+            }
+            _m += countOfCombinedObjects;// добавляем ограничений для попадания для комбинир. объектов в область
+
             // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
-            int v = 3 * countCircles * (countCircles - 1);
+            //var amountOfNormalObjects = data.amountOfCombinedObjectsInEachObject[0];
+
+            int v = 3 * countCircles * (countCircles - 1); // amount of not intersations among normal objects
             _nele_jac += v;  // 2*3 два ограничения по 3 ненулевых частных производных
+
+            //int y = 0;
+            //for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
+            //{
+            //    y += 3 * data.amountOfCombinedObjectsInEachObject[0] * (data.amountOfCombinedObjectsInEachObject[i]);
+            //}
+
             int v1 = countCircles * (countCircles - 1) / 2;
             _m += v1;
 
@@ -136,6 +130,14 @@ namespace hs071_cs
                 _g_L[op] = 0;
                 _g_U[op++] = Ipopt.PositiveInfinity;
             }
+
+            // для комбинир объектов 
+            for (int j = countCircles; j < countCircles + countOfCombinedObjects; j++) // радиусы от 0 до MAX
+            {
+                _g_L[op] = 0;
+                _g_U[op++] = Ipopt.PositiveInfinity;
+            }
+
             for (int i = 0; i < countCircles - 1; i++)
             {
                 for (int j = i + 1; j < countCircles; j++)
@@ -144,6 +146,8 @@ namespace hs071_cs
                     _g_U[op++] = Ipopt.PositiveInfinity;
                 }
             }
+
+
 
             double eps = Ipopt.PositiveInfinity;
 
@@ -245,6 +249,16 @@ namespace hs071_cs
                     x[3 * i + 1] * x[3 * i + 1] -  // y
                     x[3 * i + 2] * x[3 * i + 2];   // z
             });
+
+            // для комбинир. объектов
+            Parallel.For(countCircles, countCircles + countOfCombinedObjects, i =>
+             {
+                 g[kk++] = Math.Pow((x[_n - 1] - radius[i]), 2) -
+                     x[3 * i] * x[3 * i] -          // x
+                     x[3 * i + 1] * x[3 * i + 1] -  // y
+                     x[3 * i + 2] * x[3 * i + 2];   // z
+             });
+
             // kk = count
             // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
             // from count to count*(count-1)/2 - 1
@@ -277,6 +291,26 @@ namespace hs071_cs
                 // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
                 // позиции R, Х и У, Z
                 for (g = 0; g < countCircles; ++g)
+                {
+                    //R0 -> внешний шар 
+                    iRow[kk] = g;
+                    jCol[kk++] = _n - 1;
+
+                    //X
+                    iRow[kk] = g;
+                    jCol[kk++] = 3 * g;
+
+                    //Y
+                    iRow[kk] = g;
+                    jCol[kk++] = 3 * g + 1;
+
+                    //Z
+                    iRow[kk] = g;
+                    jCol[kk++] = 3 * g + 2;
+                }
+
+                // для комбинированных объектов
+                for (g = countCircles; g < countCircles + countOfCombinedObjects; ++g)
                 {
                     //R0 -> внешний шар 
                     iRow[kk] = g;
@@ -343,7 +377,7 @@ namespace hs071_cs
             {
                 // (R-r[i])^2 - x[i]^2 - y[i]^2 - z[i]^2 >= 0
                 int kk = 0;
-                for (int i = 0; i < countCircles; i++)// шаг по Z это каждый третий эл
+                for (int i = 0; i < countCircles; i++)
                 {
                     values[kk] = 2.0 * (x[_n - 1] - radius[i]); // R0'
                     kk++;
@@ -354,6 +388,20 @@ namespace hs071_cs
                     values[kk] = -2.0 * x[3 * i + 2]; //Z'
                     kk++;
                 }
+
+                // для комбинированных объектов
+                for (int i = countCircles; i < countCircles + countOfCombinedObjects; i++)
+                {
+                    values[kk] = 2.0 * (x[_n - 1] - radius[i]); // R0'
+                    kk++;
+                    values[kk] = -2.0 * x[3 * i]; //X'
+                    kk++;
+                    values[kk] = -2.0 * x[3 * i + 1]; //Y'
+                    kk++;
+                    values[kk] = -2.0 * x[3 * i + 2]; //Z'
+                    kk++;
+                }
+
                 // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
                 //  Console.WriteLine("---------------------------------------");
 
