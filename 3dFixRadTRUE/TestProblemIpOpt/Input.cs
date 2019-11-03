@@ -76,7 +76,7 @@ namespace hs071_cs
         }
 
         //Type Reading data
-        public static void ChooseTypeReadingData(out int TotalBallCount, out int holesCount, out double[] xNach, out double[] yNach, out double[] zNach, out double[] rNach, out double RNach, out double maxRandRadius, out double[] rSortSum)
+        public static void ChooseTypeReadingData(out int TotalBallCount, out int holesCount, out double[] xNach, out double[] yNach, out double[] zNach, out double[] rNach, out double RNach, out double maxRandRadius, out double[] rSortSum, out int combinedObjectsCount)
         {
             xNach = new double[ball];
             yNach = new double[ball];
@@ -86,12 +86,13 @@ namespace hs071_cs
             holesCount = 0;
             RNach = 0;
             maxRandRadius = 0;
+            combinedObjectsCount = 0;
             rSortSum = new double[ball];
 
-            TypeOFReadingData(ref TotalBallCount, ref holesCount, ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref maxRandRadius, ref rSortSum);
+            TypeOFReadingData(ref TotalBallCount, ref holesCount, ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref maxRandRadius, ref rSortSum, ref combinedObjectsCount);
         }
         private static void TypeOFReadingData(ref int TotalBallCount, ref int holesCount, ref double[] xNach, ref double[] yNach,
-            ref double[] zNach, ref double[] rNach, ref double RNach, ref double maxRandRadius, ref double[] rSortSum)
+            ref double[] zNach, ref double[] rNach, ref double RNach, ref double maxRandRadius, ref double[] rSortSum, ref int combinedObjectsCount)
         {
             int keyCode;
             try
@@ -109,9 +110,9 @@ namespace hs071_cs
                 case 1:
                     try
                     {
-                        new ReadResultFromFileDel(ReadFromFile)(ref xNach, ref yNach, ref zNach,
-                            ref rNach, ref RNach, ref TotalBallCount, ref holesCount, "ChangedCoordinateWithHoles");
-                        rSortSum = new RadiusSumGenerateDel(raSumGenerate)(rNach); // отсортированные радиусы r[0]; r[0] + r[1];
+                        ReadFromFile(ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref TotalBallCount, ref holesCount,
+                            "ChangedCoordinateWithHolesAndCombinedObjects", ref combinedObjectsCount);
+                        rSortSum = raSumGenerate(rNach); // отсортированные радиусы r[0]; r[0] + r[1];
                     }
                     catch (IOException exIO)
                     {
@@ -240,12 +241,12 @@ namespace hs071_cs
         }
 
         // Reading from file while end (x, y, z, r, R)
-        public static void ReadFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalBallCount, ref int holesCount, string fileName)
+        public static void ReadFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalBallCount, ref int holesCount, string fileName, ref int combinedObjectsCount)
         {
-            ReadDataFromFile(ref x, ref y, ref z, ref r, ref R, ref TotalBallCount, ref holesCount, fileName);
+            ReadDataFromFile(ref x, ref y, ref z, ref r, ref R, ref TotalBallCount, ref holesCount, fileName, ref combinedObjectsCount);
         }
 
-        private static void ReadDataFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalBallCount, ref int holesCount, string fileName)
+        private static void ReadDataFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalObjectsCount, ref int holesCount, string fileName, ref int combinedObjectsCount)
         {
             try
             {
@@ -254,10 +255,10 @@ namespace hs071_cs
                 if (fileInfo.Exists)
                 {
                     StreamReader sr = new StreamReader(readPath);
-                    string allReadedSymbols = "";
                     string[] xyzrString = new string[4];
                     string currentLine = "";
                     int i = 0;
+                    string allReadedSymbols = "";
                     while (currentLine != null)
                     {
                         currentLine = sr.ReadLine();
@@ -269,24 +270,27 @@ namespace hs071_cs
                     }
 
                     string[] arrayOfLines = allReadedSymbols.Split(';');
-                    TotalBallCount = Convert.ToInt32(arrayOfLines[0].Split(' ')[0].Trim()); // amount balls
-                    Ball = TotalBallCount;
+                    TotalObjectsCount = Convert.ToInt32(arrayOfLines[0].Split(' ')[0].Trim()); // amount balls
+                    Ball = TotalObjectsCount;
                     holesCount = Convert.ToInt32(arrayOfLines[0].Split(' ')[1].Trim()); //  amount holes
+
+                    combinedObjectsCount = Convert.ToInt32(arrayOfLines[0].Split(' ')[2].Trim());
                     R = Convert.ToDouble(arrayOfLines[1].Split(' ')[3].Replace('.', ',').Trim()); // external radius
 
                     // check demention
-                    if ((i - 1) != (TotalBallCount + 1)) /// (i-2)
+                    //if ((i - 1) != (TotalObjectsCount + 1)) /// (i-2)
+                    //{
+                    //    throw new Exception("Dimension do not match!");
+                    //}
+                    //else
                     {
-                        throw new Exception("Dimension do not match!");
-                    }
-                    else
-                    {
-                        x = new double[TotalBallCount];
-                        y = new double[TotalBallCount];
-                        z = new double[TotalBallCount];
-                        r = new double[TotalBallCount];
+                        x = new double[TotalObjectsCount];
+                        y = new double[TotalObjectsCount];
+                        z = new double[TotalObjectsCount];
+                        r = new double[TotalObjectsCount];
 
-                        for (i = 2; i < arrayOfLines.Length - 1; i++) //// !!!!!! arrayOfLines.Length - 2
+                        var normalObjectsCount = arrayOfLines.Length - 1 - combinedObjectsCount;
+                        for (i = 2; i < normalObjectsCount; i++) //// !!!!!! arrayOfLines.Length - 2
                         {
                             xyzrString = arrayOfLines[i].Split(' ');
                             for (int k = 0; k < xyzrString.Length; k++)
@@ -298,14 +302,49 @@ namespace hs071_cs
                             z[i - 2] = Convert.ToDouble(xyzrString[2]);
                             r[i - 2] = Convert.ToDouble(xyzrString[3]);
                         }
-                        new PrintTextDel(OutPut.WriteLine)("Data has been read!");
+
+                        for (i = normalObjectsCount; i < normalObjectsCount + combinedObjectsCount; i++)
+                        {
+                            xyzrString = arrayOfLines[i].Split(' ');
+
+                            if (!int.TryParse(xyzrString[0], out int combinedBallsInOneObjectCount) || (combinedBallsInOneObjectCount * 4 != xyzrString.Length - 1))
+                            {
+                                throw new Exception($"combined object wrong formatted! Check combined object information {i}");
+                            }
+
+                            var xCoordinatesOfCombinedObjects = new double[combinedBallsInOneObjectCount];
+                            var yCoordinatesOfCombinedObjects = new double[combinedBallsInOneObjectCount];
+                            var zCoordinatesOfCombinedObjects = new double[combinedBallsInOneObjectCount];
+                            var rCoordinatesOfCombinedObjects = new double[combinedBallsInOneObjectCount];
+
+                            for (int k = 1; k < xyzrString.Length; k++)
+                            {
+                                xyzrString[k] = xyzrString[k].Replace('.', ',').Trim();
+                            }
+
+                            for (int j = 0, rowValuesCounter = 1; j < combinedBallsInOneObjectCount; j++)
+                            {
+                                xCoordinatesOfCombinedObjects[j] = Convert.ToDouble(xyzrString[rowValuesCounter++]);
+                                yCoordinatesOfCombinedObjects[j] = Convert.ToDouble(xyzrString[rowValuesCounter++]);
+                                zCoordinatesOfCombinedObjects[j] = Convert.ToDouble(xyzrString[rowValuesCounter++]);
+                                rCoordinatesOfCombinedObjects[j] = Convert.ToDouble(xyzrString[rowValuesCounter++]);
+                            }
+
+                            x = x.Concat(xCoordinatesOfCombinedObjects).ToArray();
+                            y = y.Concat(yCoordinatesOfCombinedObjects).ToArray();
+                            z = z.Concat(zCoordinatesOfCombinedObjects).ToArray();
+                            r = r.Concat(rCoordinatesOfCombinedObjects).ToArray();
+                            Ball += combinedBallsInOneObjectCount;
+                            TotalObjectsCount += combinedBallsInOneObjectCount;
+                        }
+                        OutPut.WriteLine("Data has been read!");
                     }
                 }
             }
             catch (Exception ex)
             {
                 PrintError(string.Format("Data not readed! Error --> {0}", ex.Message));
-                new PrintTextDel(OutPut.WriteLine)("We generate random coordinate from 0 to 10");
+                OutPut.WriteLine("We generate random coordinate from 0 to 10");
 
                 r = RadiusRandomGenerate(10, Ball); //"~~~ Генерирования случайными числами начальных радиусов ~~~
                 XyzRRandomGenerateAvg(Ball, r, out x, out y, out z, out R); // генерируем начальные точки x,y,r,R
