@@ -2,6 +2,7 @@
 // Message of ipopt Errors: https://www.coin-or.org/Ipopt/documentation/node36.html
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -76,12 +77,13 @@ namespace hs071_cs
         }
 
         //Type Reading data
-        public static void ChooseTypeReadingData(out int TotalBallCount, out int holesCount, out double[] xNach, out double[] yNach, out double[] zNach, out double[] rNach, out double RNach, out double maxRandRadius, out double[] rSortSum, out int combinedObjectsCount)
+        public static void ChooseTypeReadingData(out int TotalBallCount, out int holesCount, out double[] xNach, out double[] yNach, out double[] zNach, out double[] rNach, out double RNach, out double maxRandRadius, out double[] rSortSum, out int combinedObjectsCount, out int[] amountOfCombinedObjectsInEachObject)
         {
             xNach = new double[ball];
             yNach = new double[ball];
             zNach = new double[ball];
             rNach = new double[ball];
+            amountOfCombinedObjectsInEachObject = new int[ball];
             TotalBallCount = 0;
             holesCount = 0;
             RNach = 0;
@@ -89,10 +91,11 @@ namespace hs071_cs
             combinedObjectsCount = 0;
             rSortSum = new double[ball];
 
-            TypeOFReadingData(ref TotalBallCount, ref holesCount, ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref maxRandRadius, ref rSortSum, ref combinedObjectsCount);
+            TypeOFReadingData(ref TotalBallCount, ref holesCount, ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref maxRandRadius, ref rSortSum, ref combinedObjectsCount, ref amountOfCombinedObjectsInEachObject);
         }
+
         private static void TypeOFReadingData(ref int TotalBallCount, ref int holesCount, ref double[] xNach, ref double[] yNach,
-            ref double[] zNach, ref double[] rNach, ref double RNach, ref double maxRandRadius, ref double[] rSortSum, ref int combinedObjectsCount)
+            ref double[] zNach, ref double[] rNach, ref double RNach, ref double maxRandRadius, ref double[] rSortSum, ref int combinedObjectsCount, ref int[] amountOfCombinedObjectsInEachObject)
         {
             int keyCode;
             try
@@ -111,7 +114,7 @@ namespace hs071_cs
                     try
                     {
                         ReadFromFile(ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref TotalBallCount, ref holesCount,
-                            "ChangedCoordinateWithHolesAndCombinedObjects", ref combinedObjectsCount);
+                            "ChangedCoordinateWithHolesAndCombinedObjects", ref combinedObjectsCount, ref amountOfCombinedObjectsInEachObject);
                         rSortSum = raSumGenerate(rNach); // отсортированные радиусы r[0]; r[0] + r[1];
                     }
                     catch (IOException exIO)
@@ -241,12 +244,13 @@ namespace hs071_cs
         }
 
         // Reading from file while end (x, y, z, r, R)
-        public static void ReadFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalBallCount, ref int holesCount, string fileName, ref int combinedObjectsCount)
+        public static void ReadFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalBallCount, ref int holesCount, string fileName, ref int combinedObjectsCount, ref int[] amountOfCombinedObjectsInEachObject)
         {
-            ReadDataFromFile(ref x, ref y, ref z, ref r, ref R, ref TotalBallCount, ref holesCount, fileName, ref combinedObjectsCount);
+            ReadDataFromFile(ref x, ref y, ref z, ref r, ref R, ref TotalBallCount, ref holesCount, fileName, ref combinedObjectsCount, ref amountOfCombinedObjectsInEachObject);
         }
 
-        private static void ReadDataFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalObjectsCount, ref int holesCount, string fileName, ref int combinedObjectsCount)
+        private static void ReadDataFromFile(ref double[] x, ref double[] y, ref double[] z, ref double[] r, ref double R, ref int TotalObjectsCount, ref int holesCount,
+               string fileName, ref int combinedObjectsCount, ref int[] amountOfCombinedObjectsInEachObject)
         {
             try
             {
@@ -303,6 +307,9 @@ namespace hs071_cs
                             r[i - 2] = Convert.ToDouble(xyzrString[3]);
                         }
 
+                        var listWithAmountOfCombinedObjectsInOne = new List<int>();
+                        listWithAmountOfCombinedObjectsInOne.Add(Ball); // first line will contain amount of normal objects
+
                         for (i = normalObjectsCount; i < normalObjectsCount + combinedObjectsCount; i++)
                         {
                             xyzrString = arrayOfLines[i].Split(' ');
@@ -311,7 +318,7 @@ namespace hs071_cs
                             {
                                 throw new Exception($"combined object wrong formatted! Check combined object information {i}");
                             }
-
+                            listWithAmountOfCombinedObjectsInOne.Add(combinedBallsInOneObjectCount);
                             var xCoordinatesOfCombinedObjects = new double[combinedBallsInOneObjectCount];
                             var yCoordinatesOfCombinedObjects = new double[combinedBallsInOneObjectCount];
                             var zCoordinatesOfCombinedObjects = new double[combinedBallsInOneObjectCount];
@@ -337,6 +344,8 @@ namespace hs071_cs
                             Ball += combinedBallsInOneObjectCount;
                             TotalObjectsCount += combinedBallsInOneObjectCount;
                         }
+
+                        amountOfCombinedObjectsInEachObject = amountOfCombinedObjectsInEachObject.Concat(listWithAmountOfCombinedObjectsInOne).ToArray();
                         OutPut.WriteLine("Data has been read!");
                     }
                 }

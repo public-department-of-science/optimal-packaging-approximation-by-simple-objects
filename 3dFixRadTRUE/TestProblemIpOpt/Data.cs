@@ -36,8 +36,9 @@
         public int ballCount;
         public int holeCount;
         public int combinedObjectsCount;
+        public int[] amountOfCombinedObjectsInEachObject;
         public Ball[] ball;
-        public double[,] C; // матрица связей
+        public double[,] C;
         public double R;
         public TaskClassification TaskClassification;
 
@@ -51,12 +52,13 @@
             C = new double[circleCount, circleCount];
         }
 
-        public Data(double[] x, double[] y, double[] z, double[] r, double R, int ballCount, int holeCount, TaskClassification taskClassification, int combinedObjectsCount, ObjectType[] type = null, double[] Weight = null, double[,] C = null) : this(ballCount)
+        public Data(double[] x, double[] y, double[] z, double[] r, double R, int ballCount, int holeCount, TaskClassification taskClassification, int combinedObjectsCount, int[] amountOfCombinedObjectsInEachObject, ObjectType[] type = null, double[] Weight = null, double[,] C = null) : this(ballCount)
         {
             this.R = R;
             this.ballCount = ballCount;
             this.holeCount = holeCount;
             this.combinedObjectsCount = combinedObjectsCount;
+            this.amountOfCombinedObjectsInEachObject = amountOfCombinedObjectsInEachObject;
             TaskClassification = taskClassification;
 
             for (int i = 0; i < ball.Length; i++)

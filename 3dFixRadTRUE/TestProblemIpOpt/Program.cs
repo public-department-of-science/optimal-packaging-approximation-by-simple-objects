@@ -44,7 +44,7 @@ namespace hs071_cs
 
             #region Reading Data
             Print("\nSelect input method \n 1 --> Read from File \n 2 --> Random generate");
-            Input.ChooseTypeReadingData(out int TotalBallCount, out int holesCount, out xNach, out yNach, out zNach, out rNach, out RNach, out double maxRandRadius, out rSortSum, out int combinedObjectsCount);
+            Input.ChooseTypeReadingData(out int TotalBallCount, out int holesCount, out xNach, out yNach, out zNach, out rNach, out RNach, out double maxRandRadius, out rSortSum, out int combinedObjectsCount, out int[] amountOfCombinedObjectsInEachObject);
             #endregion
             double[] xIter = new double[TotalBallCount]; double[] yIter = new double[TotalBallCount];
             double[] zIter = new double[TotalBallCount]; double[] rIter = new double[TotalBallCount];
@@ -67,7 +67,7 @@ namespace hs071_cs
             Input.SetC(out lengthBond);
             OutPut.SaveToC(lengthBond, TotalBallCount, "MatrixC");
             #endregion
-            Data startPointData = new Data(xNach, yNach, zNach, rNach, RNach, TotalBallCount, holesCount, TaskClassification.FixedRadiusTask, combinedObjectsCount, type: null, Weight: null, C: lengthBond);
+            Data startPointData = new Data(xNach, yNach, zNach, rNach, RNach, TotalBallCount, holesCount, TaskClassification.FixedRadiusTask, combinedObjectsCount, amountOfCombinedObjectsInEachObject, type: null, Weight: null, C: lengthBond);
             #region Set Object Type; Set Weight Object; 
             CreateArrayWithObjectType(startPointData, out ObjectType[] objectType);
             CalculateWeight(startPointData, out double[] weight);
@@ -102,9 +102,12 @@ namespace hs071_cs
 
             fixRTaskTime.Stop(); // Stop time
             Print("\nВыполенение задачи RunTime: " + OutPut.getElapsedTime(fixRTaskTime));
-
             Print("\n=== Результат расчётов ===");
-            Data optionalPoint = new Data(xIter, yIter, zIter, rNach, RIter, TotalBallCount, holeCount: holesCount, taskClassification: TaskClassification.FixedRadiusTask,combinedObjectsCount: combinedObjectsCount, type: objectType, Weight: weight, C: lengthBond);
+
+            Data optionalPoint = new Data(xIter, yIter, zIter, rNach, RIter, TotalBallCount, holeCount: holesCount, taskClassification: TaskClassification.FixedRadiusTask,
+                combinedObjectsCount: combinedObjectsCount, amountOfCombinedObjectsInEachObject: amountOfCombinedObjectsInEachObject,
+                type: objectType, Weight: weight, C: lengthBond);
+
             Show(optionalPoint);
             Print("\nQuality of solution = " + Density(rNach, RIter));
 
