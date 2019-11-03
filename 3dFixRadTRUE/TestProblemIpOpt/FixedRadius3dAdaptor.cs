@@ -15,9 +15,11 @@ namespace hs071_cs
         public readonly int countOfCombinedObjects; // количество шаров
         public double[] X { get; } //массив х (входят все координаты и радиусы)
         public readonly double[] radius;
+        public readonly int[] amountOfCombinedObjectsInEachObject;
         private double K1 = 1;
         private double K2 = 1;
         private List<double[]> _allIteration;
+        private List<double[]> listWithDistances = new List<double[]>();
 
         public List<double[]> AllIteration { get => _allIteration; set => _allIteration = value; }
         private double[] Weight { get; set; }
@@ -26,8 +28,10 @@ namespace hs071_cs
         public FixedRadius3dAdaptor(Data data)
         {
             AllIteration = new List<double[]>();
-
+            amountOfCombinedObjectsInEachObject = new int[data.amountOfCombinedObjectsInEachObject.Length - 1];
+            Array.Copy(data.amountOfCombinedObjectsInEachObject, 1, amountOfCombinedObjectsInEachObject, 0, data.amountOfCombinedObjectsInEachObject.Length - 1);
             countCircles = data.ballCount; // задаём количетво кругов
+
             _n = countCircles * 3 + 1; // количество переменных в векторе
             radius = new double[countCircles];
             //вспомогательные счетчики
@@ -39,7 +43,6 @@ namespace hs071_cs
                 radius[it++] = item.R;
                 sumR += item.R;
             }
-            radius = radius.OrderBy(a => a).ToArray();
 
             /*    Ограничения переменных
             * *************************************************************************************/
@@ -56,7 +59,7 @@ namespace hs071_cs
             _x_L = new double[_n];
             _x_U = new double[_n];
 
-            double max = radius[countCircles - 1];
+            double max = radius.Max();
 
             // обнуляем необходимые счетчики
             int countXYZR = 0,
@@ -108,19 +111,54 @@ namespace hs071_cs
 
             int v = 3 * countCircles * (countCircles - 1); // amount of not intersations among normal objects
             _nele_jac += v;  // 2*3 два ограничения по 3 ненулевых частных производных
-
-            //int y = 0;
-            //for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
-            //{
-            //    y += 3 * data.amountOfCombinedObjectsInEachObject[0] * (data.amountOfCombinedObjectsInEachObject[i]);
-            //}
-
             int v1 = countCircles * (countCircles - 1) / 2;
             _m += v1;
 
-            //m[i]*x[i] + count
-            // _nele_jac += 3 * countCircles;
-            // _m += countCircles;
+
+            // для комбинир. объектов
+            int y = 0;
+            for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
+            {
+                y += 2 * 3 * data.amountOfCombinedObjectsInEachObject[0] * (data.amountOfCombinedObjectsInEachObject[i]);
+            }
+            _nele_jac += y;
+
+            int v2 = 0;
+
+            for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
+            {
+                v2 += data.amountOfCombinedObjectsInEachObject[0] * (data.amountOfCombinedObjectsInEachObject[i]);
+            }
+            _m += v2;
+
+            // фиксация расстояния 
+            y = 0;
+            for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
+            {
+                for (int j = data.amountOfCombinedObjectsInEachObject[i]; j > 1; j--)
+                {
+                    if (data.amountOfCombinedObjectsInEachObject[i] > 2)
+                    {
+                        y += 3 * (j - 1);
+                    }
+                    else
+                    {
+                        y += 2*3;
+                    }
+                }
+            }
+            _nele_jac += y;
+
+            v2 = 0;
+            for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
+            {
+                for (int j = data.amountOfCombinedObjectsInEachObject[i]; j > 1; j--)
+                {
+                    v2 += (j - 1);
+                }
+            }
+
+            _m += v2;
 
             _g_L = new double[_m];
             _g_U = new double[_m];
@@ -138,6 +176,7 @@ namespace hs071_cs
                 _g_U[op++] = Ipopt.PositiveInfinity;
             }
 
+            // попарное непересечение 
             for (int i = 0; i < countCircles - 1; i++)
             {
                 for (int j = i + 1; j < countCircles; j++)
@@ -147,27 +186,77 @@ namespace hs071_cs
                 }
             }
 
-
+            // комбинир. объекты
+            for (int i = 0; i < countCircles; i++)
+            {
+                for (int j = countCircles; j < countCircles + countOfCombinedObjects; j++)
+                {
+                    _g_L[op] = Math.Pow((radius[i] + radius[j]), 2);
+                    _g_U[op++] = Ipopt.PositiveInfinity;
+                }
+            }
 
             double eps = Ipopt.PositiveInfinity;
 
-            //Constraints of variebles For  Weight[i] * X[i] + Weight[i] * Y[i] + Weight[i] * Z[i]
-            //for (int i = 0; i < countCircles; i++)
-            //{
-            //    _g_L[op] = 0;
-            //    _g_U[op++] = eps;
-            //}
+            // фиксация расстояния!!!!!!!!!
 
-            //Hesian
+            for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
+            {
+                var distances = GetDistansces(data, i);
+                listWithDistances.Add(distances);
+                for (int j = 0; j < distances.Length; j++)
+                {
+                    _g_L[op] = distances[j];
+                    _g_U[op++] = Ipopt.PositiveInfinity;
+                }
+            }
+
             Weight = new double[data.ballCount];
             for (int i = 0; i < data.ballCount; i++)
             {
                 Weight[i] = data.ball[i].Weight;
             }
             C = data.C ?? null;
-            _nele_hess = 0;
+        }
 
-        } // End_Конструктор 
+        private double[] GetDistansces(Data data, int numberOfCombinedObject)
+        {
+            int t = data.amountOfCombinedObjectsInEachObject[0];
+            int p = 1;
+            while (p != numberOfCombinedObject)
+            {
+                if (numberOfCombinedObject == 1)
+                {
+                    // t = data.ballCount;
+                    break;
+                }
+                else
+                {
+                    t += data.amountOfCombinedObjectsInEachObject[p];
+                }
+                ++p;
+            }
+
+            p = 0;
+            for (int i = (data.amountOfCombinedObjectsInEachObject[numberOfCombinedObject] - 1); i >= 1; i--)
+            {
+                p += i;
+            }
+
+            double[] distances = new double[p];
+            p = 0;
+            for (int i = t; i < t + data.amountOfCombinedObjectsInEachObject[numberOfCombinedObject] - 1; i++)
+            {
+                for (int j = i + 1; j < t + data.amountOfCombinedObjectsInEachObject[numberOfCombinedObject]; j++)
+                {
+                    distances[p++] = Math.Sqrt(Math.Pow(data.ball[i].X - data.ball[j].X, 2.0)
+                                + Math.Pow(data.ball[i].Y - data.ball[j].Y, 2.0)
+                                + Math.Pow(data.ball[i].Z - data.ball[j].Z, 2.0));
+                }
+            }
+
+            return distances;
+        }
 
         private void AddNewIteration(object element)
         {
@@ -252,12 +341,12 @@ namespace hs071_cs
 
             // для комбинир. объектов
             Parallel.For(countCircles, countCircles + countOfCombinedObjects, i =>
-             {
-                 g[kk++] = Math.Pow((x[_n - 1] - radius[i]), 2) -
-                     x[3 * i] * x[3 * i] -          // x
-                     x[3 * i + 1] * x[3 * i + 1] -  // y
-                     x[3 * i + 2] * x[3 * i + 2];   // z
-             });
+            {
+                g[kk++] = Math.Pow((x[_n - 1] - radius[i]), 2) -
+                    x[3 * i] * x[3 * i] -          // x
+                    x[3 * i + 1] * x[3 * i + 1] -  // y
+                    x[3 * i + 2] * x[3 * i + 2];   // z
+            });
 
             // kk = count
             // (x[i]-x[j])^2 + (y[i]-y[j])^2 + (z[i]-z[j])^2 - (r[i]-r[j])^2 >=0
@@ -273,11 +362,29 @@ namespace hs071_cs
                                   - Math.Pow((radius[i] - radius[j]), 2.0);
                 }
             }
-            ////Weight[i] * X[i] + Weight[i] * Y[i] + Weight[i] * Z[i]
-            //Parallel.For(0, countCircles, i =>
-            //{
-            //    g[kk++] = Math.Pow(Weight[i] * x[3 * i], 2) + Math.Pow(Weight[i] * x[3 * i + 1], 2) + Math.Pow(Weight[i] * x[3 * i + 2], 2);
-            //});
+
+            // комбинир. объекты
+            for (int i = 0; i < countCircles; i++)
+            {
+                for (int j = countCircles; j < countCircles + countOfCombinedObjects; j++)
+                {
+                    g[kk++] = Math.Pow((x[3 * i] - x[3 * j]), 2.0)
+                                  + Math.Pow((x[3 * i + 1] - x[3 * j + 1]), 2.0)
+                                  + Math.Pow((x[3 * i + 2] - x[3 * j + 2]), 2.0)
+                                  - Math.Pow((radius[i] - radius[j]), 2.0);
+                }
+            }
+
+            // фиксированные расстояния!!!
+
+            foreach (var item in listWithDistances)
+            {
+                foreach (var item1 in item)
+                {
+                    g[kk++] = item1;
+                }
+            }
+
             return true;
         }
 
@@ -356,22 +463,63 @@ namespace hs071_cs
                     }
                 }
 
-                //// Weight[i] * X[i] + Weight[i] * Y[i] + Weight[i] * Z[i]
-                //Parallel.For(0, countCircles, i =>
-                //{
-                //    // Weight[i] * X[i]
-                //    iRow[kk] = g;
-                //    jCol[kk++] = 0;
+                // комбинир. объекты
+                for (int i = 0; i < countCircles; i++)
+                {
+                    for (int j = countCircles; j < countCircles + countOfCombinedObjects; j++)
+                    {
+                        // -------  X[i], X[j] ------- 
+                        iRow[kk] = g;
+                        jCol[kk++] = 3 * i;
+                        iRow[kk] = g;
+                        jCol[kk++] = 3 * j;
 
-                //    // Weight[i] * Y[i] 
-                //    iRow[kk] = g;
-                //    jCol[kk++] = 1;
+                        // -------  Y[i], Y[j] ------- 
+                        iRow[kk] = g; ;
+                        jCol[kk++] = 3 * i + 1;
+                        iRow[kk] = g;
+                        jCol[kk++] = 3 * j + 1;
 
-                //    // Weight[i] * Z[i]
-                //    iRow[kk] = g;
-                //    jCol[kk++] = 2;
-                //    ++g;
-                //});
+                        // -------  Z[i], Z[j] ------- 
+                        iRow[kk] = g;
+                        jCol[kk++] = 3 * i + 2;
+                        iRow[kk] = g;
+                        jCol[kk++] = 3 * j + 2;
+
+                        ++g;
+                    }
+                }
+
+                // фиксированные расстояния
+                int t = countCircles;
+                for (int i = 0; i < amountOfCombinedObjectsInEachObject.Length; i++)
+                {
+                    t += amountOfCombinedObjectsInEachObject[i];
+                    for (int j = t; j < amountOfCombinedObjectsInEachObject[i] + t; j++)
+                    {
+                        {
+                            // -------  X[i], X[j] ------- 
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * i;
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * j;
+
+                            // -------  Y[i], Y[j] ------- 
+                            iRow[kk] = g; ;
+                            jCol[kk++] = 3 * i + 1;
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * j + 1;
+
+                            // -------  Z[i], Z[j] ------- 
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * i + 2;
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * j + 2;
+
+                            ++g;
+                        }
+                    }
+                }
             }
             else
             {
@@ -420,16 +568,41 @@ namespace hs071_cs
                     }
                 }
 
-                //////mx;my;mz
-                //Parallel.For(0, countCircles, i =>
-                //{
-                //    values[kk] = 2 * Math.Pow(Weight[i], 2) * x[3 * i];
-                //    kk++;
-                //    values[kk] = 2 * Math.Pow(Weight[i], 2) * x[3 * i + 1];
-                //    kk++;
-                //    values[kk] = 2 * Math.Pow(Weight[i], 2) * x[3 * i + 2];
-                //    kk++;
-                //});
+                // комбинир. объекты
+                for (int i = 0; i < countCircles; i++)
+                {
+                    for (int j = countCircles; j < countCircles + countOfCombinedObjects; j++)
+                    {
+                        values[kk++] = 2.0 * (x[3 * i] - x[3 * j]); //X[i]'
+                        values[kk++] = -2.0 * (x[3 * i] - x[3 * j]); //X[j]'
+
+                        values[kk++] = 2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[i]'
+                        values[kk++] = -2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[j]'
+
+                        values[kk++] = 2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[i]'
+                        values[kk++] = -2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[j]'
+                    }
+                }
+
+                // фиксированные расстояния
+                int t = countCircles;
+                for (int i = 0; i < amountOfCombinedObjectsInEachObject.Length; i++)
+                {
+                    t += amountOfCombinedObjectsInEachObject[i];
+                    for (int j = t; j < amountOfCombinedObjectsInEachObject[i] + t; j++)
+                    {
+                        {
+                            values[kk++] = 2.0 * (x[3 * i] - x[3 * j]); //X[i]'
+                            values[kk++] = -2.0 * (x[3 * i] - x[3 * j]); //X[j]'
+
+                            values[kk++] = 2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[i]'
+                            values[kk++] = -2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[j]'
+
+                            values[kk++] = 2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[i]'
+                            values[kk++] = -2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[j]'
+                        }
+                    }
+                }
             }
             return true;
         }
