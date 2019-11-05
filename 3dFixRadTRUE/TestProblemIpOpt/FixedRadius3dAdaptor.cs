@@ -115,7 +115,7 @@ namespace hs071_cs
             _m += v1;
 
 
-            // для комбинир. объектов
+            // комбинир. объекты и обычных
             int y = 0;
             for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
             {
@@ -135,18 +135,28 @@ namespace hs071_cs
             y = 0;
             for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
             {
-                for (int j = data.amountOfCombinedObjectsInEachObject[i]; j > 1; j--)
+                if (data.amountOfCombinedObjectsInEachObject[i] == 1)
                 {
-                    if (data.amountOfCombinedObjectsInEachObject[i] > 2)
-                    {
-                        y += 3 * (j - 1);
-                    }
-                    else
-                    {
-                        y += 2*3;
-                    }
+                    y += 2 * 3;
+                    break;
                 }
+
+                if (data.amountOfCombinedObjectsInEachObject[i] == 2)
+                {
+                    y += 2 * 3 * data.amountOfCombinedObjectsInEachObject[i];
+                    break;
+                }
+
+                var value = data.amountOfCombinedObjectsInEachObject[i] - 1;
+
+                while (value != 0)
+                {
+                    y += value;
+                    value--;
+                }
+                y *= 2 * 3;
             }
+
             _nele_jac += y;
 
             v2 = 0;
@@ -186,7 +196,7 @@ namespace hs071_cs
                 }
             }
 
-            // комбинир. объекты
+            // комбинир. объекты и обычные
             for (int i = 0; i < countCircles; i++)
             {
                 for (int j = countCircles; j < countCircles + countOfCombinedObjects; j++)
@@ -199,7 +209,6 @@ namespace hs071_cs
             double eps = Ipopt.PositiveInfinity;
 
             // фиксация расстояния!!!!!!!!!
-
             for (int i = 1; i < data.amountOfCombinedObjectsInEachObject.Length; i++)
             {
                 var distances = GetDistansces(data, i);
@@ -207,9 +216,11 @@ namespace hs071_cs
                 for (int j = 0; j < distances.Length; j++)
                 {
                     _g_L[op] = distances[j];
-                    _g_U[op++] = Ipopt.PositiveInfinity;
+                    _g_U[op++] = distances[j];// Ipopt.PositiveInfinity;
                 }
             }
+
+            //попарное непересечение комбинированных
 
             Weight = new double[data.ballCount];
             for (int i = 0; i < data.ballCount; i++)
@@ -363,7 +374,7 @@ namespace hs071_cs
                 }
             }
 
-            // комбинир. объекты
+            // комбинир. объекты и обычные
             for (int i = 0; i < countCircles; i++)
             {
                 for (int j = countCircles; j < countCircles + countOfCombinedObjects; j++)
@@ -463,7 +474,7 @@ namespace hs071_cs
                     }
                 }
 
-                // комбинир. объекты
+                // комбинир. объекты и обычные
                 for (int i = 0; i < countCircles; i++)
                 {
                     for (int j = countCircles; j < countCircles + countOfCombinedObjects; j++)
@@ -492,11 +503,11 @@ namespace hs071_cs
 
                 // фиксированные расстояния
                 int t = countCircles;
-                for (int i = 0; i < amountOfCombinedObjectsInEachObject.Length; i++)
+                for (int u = 0; u < amountOfCombinedObjectsInEachObject.Length; u++)
                 {
-                    t += amountOfCombinedObjectsInEachObject[i];
-                    for (int j = t; j < amountOfCombinedObjectsInEachObject[i] + t; j++)
+                    for (int i = t; i < amountOfCombinedObjectsInEachObject[u] + t - 1; i++)
                     {
+                        for (int j = i + 1; j < amountOfCombinedObjectsInEachObject[u] + t; j++)
                         {
                             // -------  X[i], X[j] ------- 
                             iRow[kk] = g;
@@ -519,6 +530,7 @@ namespace hs071_cs
                             ++g;
                         }
                     }
+                    t += amountOfCombinedObjectsInEachObject[u];
                 }
             }
             else
@@ -568,7 +580,7 @@ namespace hs071_cs
                     }
                 }
 
-                // комбинир. объекты
+                // комбинир. объекты и обычные
                 for (int i = 0; i < countCircles; i++)
                 {
                     for (int j = countCircles; j < countCircles + countOfCombinedObjects; j++)
@@ -586,11 +598,11 @@ namespace hs071_cs
 
                 // фиксированные расстояния
                 int t = countCircles;
-                for (int i = 0; i < amountOfCombinedObjectsInEachObject.Length; i++)
+                for (int u = 0; u < amountOfCombinedObjectsInEachObject.Length; u++)
                 {
-                    t += amountOfCombinedObjectsInEachObject[i];
-                    for (int j = t; j < amountOfCombinedObjectsInEachObject[i] + t; j++)
+                    for (int i = t; i < amountOfCombinedObjectsInEachObject[u] + t - 1; i++)
                     {
+                        for (int j = i + 1; j < amountOfCombinedObjectsInEachObject[u] + t; j++)
                         {
                             values[kk++] = 2.0 * (x[3 * i] - x[3 * j]); //X[i]'
                             values[kk++] = -2.0 * (x[3 * i] - x[3 * j]); //X[j]'
@@ -602,8 +614,10 @@ namespace hs071_cs
                             values[kk++] = -2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[j]'
                         }
                     }
+                    t += amountOfCombinedObjectsInEachObject[u];
                 }
             }
+
             return true;
         }
 
