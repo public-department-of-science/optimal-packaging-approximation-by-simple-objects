@@ -92,13 +92,16 @@ namespace hs071_cs
             fixRTaskTime.Start();// Start time
 
             //Fixed radius
-            using (var adaptor = new FixedRadius3dAdaptor(startPointData))
-            {
-                RunTask(adaptor, xyzFixR, out xIter, out yIter, out zIter, TotalBallCount);
-                RIter = xyzFixR[3 * TotalBallCount];
-                IpoptIterationData = adaptor.AllIteration;
-                rNach = adaptor.radius;
-            }
+          //  while (Density(rNach, RIter) < 0.25)
+         //   {
+                using (var adaptor = new FixedRadius3dAdaptor(startPointData))
+                {
+                    RunTask(adaptor, xyzFixR, out xIter, out yIter, out zIter, TotalBallCount);
+                    RIter = xyzFixR[3 * TotalBallCount];
+                    IpoptIterationData = adaptor.AllIteration;
+                    rNach = adaptor.radius;
+                }
+        //    }
 
             fixRTaskTime.Stop(); // Stop time
             Print("\nВыполенение задачи RunTime: " + OutPut.getElapsedTime(fixRTaskTime));
@@ -111,7 +114,7 @@ namespace hs071_cs
             Show(optionalPoint);
             Print("\nQuality of solution = " + Density(rNach, RIter));
 
-            OutPut.SaveToFileAllIteration(optionalPoint, IpoptIterationData, "IterationFixedRadius", true);
+            OutPut.SaveToFileAllIteration(optionalPoint, IpoptIterationData, "IterationFixedRadiusAndCombinedObjects", true);
             SaveToFile(optionalPoint, "CoordinateWithHolesAndCombinedObjects"); // запись результата в файл
 
             //

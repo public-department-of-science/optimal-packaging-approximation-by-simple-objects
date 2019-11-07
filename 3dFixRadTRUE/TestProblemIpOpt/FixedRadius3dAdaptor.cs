@@ -18,10 +18,9 @@ namespace hs071_cs
         public readonly int[] amountOfCombinedObjectsInEachObject;
         private double K1 = 1;
         private double K2 = 1;
-        private List<double[]> _allIteration;
         private List<double[]> listWithDistances = new List<double[]>();
 
-        public List<double[]> AllIteration { get => _allIteration; set => _allIteration = value; }
+        public List<double[]> AllIteration;
         private double[] Weight { get; set; }
         private double[,] C { get; set; }
 
@@ -170,6 +169,26 @@ namespace hs071_cs
 
             _m += v2;
 
+
+            #region попарное непересечение комбинированных
+
+            if (amountOfCombinedObjectsInEachObject.Length > 1)
+            {
+                int restrictions = 0;
+                for (int i = 0; i < amountOfCombinedObjectsInEachObject.Length - 1; i++)
+                {
+                    for (int j = i + 1; j < amountOfCombinedObjectsInEachObject.Length; j++)
+                    {
+                        restrictions += amountOfCombinedObjectsInEachObject[i] * amountOfCombinedObjectsInEachObject[j];
+                    }
+                }
+
+                _nele_jac += 6 * restrictions;
+                _m += restrictions;
+            }
+
+            #endregion
+
             _g_L = new double[_m];
             _g_U = new double[_m];
             int op = 0;
@@ -221,6 +240,28 @@ namespace hs071_cs
             }
 
             //попарное непересечение комбинированных
+            if (amountOfCombinedObjectsInEachObject.Length > 1)
+            {
+                int sumOfAllBalls = countCircles + amountOfCombinedObjectsInEachObject.Sum();
+
+                int q = 0;
+                int t = countCircles;
+                int count = 0;
+                for (int i = countCircles; i < t + amountOfCombinedObjectsInEachObject[q]; i++)
+                {
+                    for (int j = t + amountOfCombinedObjectsInEachObject[q]; j < sumOfAllBalls; j++)
+                    {
+                        _g_L[op] = Math.Pow(radius[i] + radius[j], 2);
+                        _g_U[op++] = Ipopt.PositiveInfinity;
+                    }
+                    if (++count == amountOfCombinedObjectsInEachObject[q])
+                    {
+                        t += amountOfCombinedObjectsInEachObject[q];
+                        q++;
+                    }
+                }
+            }
+
 
             Weight = new double[data.ballCount];
             for (int i = 0; i < data.ballCount; i++)
@@ -269,20 +310,12 @@ namespace hs071_cs
             return distances;
         }
 
-        private void AddNewIteration(object element)
-        {
-            AllIteration.Add((double[])element);
-        }
-
         public override bool Eval_f(int n, double[] x, bool new_x, out double obj_value)
         {
             // R -> min
-            int minWorker, minIOC;
-
             obj_value = K2 * x[_n - 1] + K2 * C_Multiply_by_Length(x);
-            ThreadPool.GetMinThreads(out minWorker, out minIOC);
-            ThreadPool.SetMaxThreads(minWorker, minIOC);
-            ThreadPool.QueueUserWorkItem(new WaitCallback(AddNewIteration), x);
+            AllIteration.Add(x);
+
             return true;
         }
 
@@ -396,6 +429,30 @@ namespace hs071_cs
                 }
             }
 
+            if (amountOfCombinedObjectsInEachObject.Length > 1)
+            {
+                int sumOfAllBalls = countCircles + amountOfCombinedObjectsInEachObject.Sum();
+
+                int q = 0;
+                int t = countCircles;
+                int count = 0;
+                for (int i = countCircles; i < t + amountOfCombinedObjectsInEachObject[q]; i++)
+                {
+                    for (int j = t + amountOfCombinedObjectsInEachObject[q]; j < sumOfAllBalls; j++)
+                    {
+                        g[kk++] = Math.Pow((x[3 * i] - x[3 * j]), 2.0)
+                                  + Math.Pow((x[3 * i + 1] - x[3 * j + 1]), 2.0)
+                                  + Math.Pow((x[3 * i + 2] - x[3 * j + 2]), 2.0)
+                                  - Math.Pow((radius[i] - radius[j]), 2.0);
+                    }
+                    if (++count == amountOfCombinedObjectsInEachObject[q])
+                    {
+                        t += amountOfCombinedObjectsInEachObject[q];
+                        q++;
+                    }
+                }
+            }
+
             return true;
         }
 
@@ -503,6 +560,7 @@ namespace hs071_cs
 
                 // фиксированные расстояния
                 int t = countCircles;
+                int someCount = 0;
                 for (int u = 0; u < amountOfCombinedObjectsInEachObject.Length; u++)
                 {
                     for (int i = t; i < amountOfCombinedObjectsInEachObject[u] + t - 1; i++)
@@ -528,9 +586,50 @@ namespace hs071_cs
                             jCol[kk++] = 3 * j + 2;
 
                             ++g;
+                            ++someCount;
                         }
                     }
                     t += amountOfCombinedObjectsInEachObject[u];
+                }
+
+                if (amountOfCombinedObjectsInEachObject.Length > 1)
+                {
+                    int sumOfAllBalls = countCircles + amountOfCombinedObjectsInEachObject.Sum();
+
+                    int q = 0;
+                    int t1 = countCircles;
+                    int count = 0;
+                    for (int i = countCircles; i < t1 + amountOfCombinedObjectsInEachObject[q]; i++)
+                    {
+                        for (int j = t1 + amountOfCombinedObjectsInEachObject[q]; j < sumOfAllBalls; j++)
+                        {
+                            // -------  X[i], X[j] ------- 
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * i;
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * j;
+
+                            // -------  Y[i], Y[j] ------- 
+                            iRow[kk] = g; ;
+                            jCol[kk++] = 3 * i + 1;
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * j + 1;
+
+                            // -------  Z[i], Z[j] ------- 
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * i + 2;
+                            iRow[kk] = g;
+                            jCol[kk++] = 3 * j + 2;
+
+                            ++g;
+                        }
+
+                        if (++count == amountOfCombinedObjectsInEachObject[q])
+                        {
+                            t1 += amountOfCombinedObjectsInEachObject[q];
+                            q++;
+                        }
+                    }
                 }
             }
             else
@@ -615,6 +714,35 @@ namespace hs071_cs
                         }
                     }
                     t += amountOfCombinedObjectsInEachObject[u];
+                }
+
+                if (amountOfCombinedObjectsInEachObject.Length > 1)
+                {
+                    int sumOfAllBalls = countCircles + amountOfCombinedObjectsInEachObject.Sum();
+
+                    int q = 0;
+                    int t1 = countCircles;
+                    int count = 0;
+                    for (int i = countCircles; i < t1 + amountOfCombinedObjectsInEachObject[q]; i++)
+                    {
+                        for (int j = t1 + amountOfCombinedObjectsInEachObject[q]; j < sumOfAllBalls; j++)
+                        {
+                            values[kk++] = 2.0 * (x[3 * i] - x[3 * j]); //X[i]'
+                            values[kk++] = -2.0 * (x[3 * i] - x[3 * j]); //X[j]'
+
+                            values[kk++] = 2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[i]'
+                            values[kk++] = -2.0 * (x[3 * i + 1] - x[3 * j + 1]); //Y[j]'
+
+                            values[kk++] = 2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[i]'
+                            values[kk++] = -2.0 * (x[3 * i + 2] - x[3 * j + 2]); //Z[j]'
+                        }
+
+                        if (++count == amountOfCombinedObjectsInEachObject[q])
+                        {
+                            t1 += amountOfCombinedObjectsInEachObject[q];
+                            q++;
+                        }
+                    }
                 }
             }
 
