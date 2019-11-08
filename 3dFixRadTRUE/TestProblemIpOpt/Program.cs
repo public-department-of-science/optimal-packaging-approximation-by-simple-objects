@@ -197,7 +197,7 @@ namespace hs071_cs
                 problem.AddOption("tol", 1e-2);
                 problem.AddOption("mu_strategy", "adaptive");
                 problem.AddOption("hessian_approximation", "limited-memory");
-                problem.AddOption("max_iter", 3000);
+                problem.AddOption("max_iter", 10000);
                 problem.AddOption("print_level", 3); // 0 <= value <= 12, default is 5
 
                 /* solve the problem */
