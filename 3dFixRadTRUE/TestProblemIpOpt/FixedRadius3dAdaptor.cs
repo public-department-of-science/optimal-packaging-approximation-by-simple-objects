@@ -46,7 +46,8 @@ namespace hs071_cs
             /*    Ограничения переменных
             * *************************************************************************************/
 
-            if (countCircles <= 10)
+            var ll = countCircles + amountOfCombinedObjectsInEachObject.Sum();
+            if (ll <= 10)
             {
                 K1 = 1;
             }
@@ -235,8 +236,8 @@ namespace hs071_cs
                 listWithDistances.Add(distances);
                 for (int j = 0; j < distances.Length; j++)
                 {
-                    _g_L[op] = distances[j];
-                    _g_U[op++] = distances[j];// Ipopt.PositiveInfinity;
+                    _g_L[op] = distances[j] - 1.0;
+                    _g_U[op++] = distances[j] + 1.0;// Ipopt.PositiveInfinity;
                 }
             }
 

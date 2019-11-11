@@ -91,17 +91,27 @@ namespace hs071_cs
             Stopwatch fixRTaskTime = new Stopwatch();
             fixRTaskTime.Start();// Start time
 
-            //Fixed radius
-          //  while (Density(rNach, RIter) < 0.25)
-         //   {
-                using (var adaptor = new FixedRadius3dAdaptor(startPointData))
+            IpoptReturnCode t = IpoptReturnCode.User_Requested_Stop;
+           // while (t != IpoptReturnCode.Solve_Succeeded)
+            {
+                try
                 {
-                    RunTask(adaptor, xyzFixR, out xIter, out yIter, out zIter, TotalBallCount);
-                    RIter = xyzFixR[3 * TotalBallCount];
-                    IpoptIterationData = adaptor.AllIteration;
-                    rNach = adaptor.radius;
+                    using (var adaptor = new FixedRadius3dAdaptor(startPointData))
+                    {
+                        t = RunTask(adaptor, xyzFixR, out xIter, out yIter, out zIter, TotalBallCount);
+                        RIter = xyzFixR[3 * TotalBallCount];
+                        IpoptIterationData = adaptor.AllIteration;
+                        rNach = adaptor.radius;
+                    }
                 }
-        //    }
+                catch (Exception)
+                {
+                }
+                catch
+                {
+
+                }
+            }
 
             fixRTaskTime.Stop(); // Stop time
             Print("\nВыполенение задачи RunTime: " + OutPut.getElapsedTime(fixRTaskTime));
@@ -121,7 +131,7 @@ namespace hs071_cs
             fullTaskTime.Stop();
             Print("\nВыполенение всей задачи RunTime: " + OutPut.getElapsedTime(fullTaskTime));
             Print("\nQuality of solution = " + Density(rNach, RIter));
-            Print("\n========= Press <RETURN> to exit... ========= \n");
+            Print("\n========= Press <RETURN> to exit... ========= \n\a");
             Console.ReadLine();
             #endregion
         }
@@ -186,26 +196,34 @@ namespace hs071_cs
             xyzFixR[3 * ballCount] = RNach;
         }
 
-        static void RunTask(FixedRadius3dAdaptor op, double[] xyz, out double[] NewX, out double[] NewY, out double[] NewZ, int ballN)
+        static IpoptReturnCode RunTask(FixedRadius3dAdaptor op, double[] xyz, out double[] NewX, out double[] NewY, out double[] NewZ, int ballN)
         {
             Stopwatch taskWatch = new Stopwatch();
-            IpoptReturnCode status;
+            IpoptReturnCode status = IpoptReturnCode.User_Requested_Stop;
             taskWatch.Start();
-            using (Ipopt problem = new Ipopt(op._n, op._x_L, op._x_U, op._m, op._g_L, op._g_U, op._nele_jac, op._nele_hess, op.Eval_f, op.Eval_g, op.Eval_grad_f, op.Eval_jac_g, op.Eval_h))
+            try
             {
-                // https://www.coin-or.org/Ipopt/documentation/node41.html#opt:print_options_documentation
-                problem.AddOption("tol", 1e-2);
-                problem.AddOption("mu_strategy", "adaptive");
-                problem.AddOption("hessian_approximation", "limited-memory");
-                problem.AddOption("max_iter", 10000);
-                problem.AddOption("print_level", 3); // 0 <= value <= 12, default is 5
 
-                /* solve the problem */
-                double obj;
-                status = problem.SolveProblem(xyz, out obj, null, null, null, null);
+                using (Ipopt problem = new Ipopt(op._n, op._x_L, op._x_U, op._m, op._g_L, op._g_U, op._nele_jac, op._nele_hess, op.Eval_f, op.Eval_g, op.Eval_grad_f, op.Eval_jac_g, op.Eval_h))
+                {
+                    // https://www.coin-or.org/Ipopt/documentation/node41.html#opt:print_options_documentation
+                    problem.AddOption("tol", 1e-1);
+                    problem.AddOption("mu_strategy", "adaptive");
+                    problem.AddOption("hessian_approximation", "limited-memory");
+                    problem.AddOption("max_iter", 20000);
+                    problem.AddOption("print_level", 3); // 0 <= value <= 12, default is 5
+
+                    /* solve the problem */
+                    double obj;
+                    status = problem.SolveProblem(xyz, out obj, null, null, null, null);
+                }
+                taskWatch.Stop();
+                new PrintResultCodeDel(OutPut.ReturnCodeMessage)("\nOptimization return status: " + status);
+
             }
-            taskWatch.Stop();
-            new PrintResultCodeDel(OutPut.ReturnCodeMessage)("\nOptimization return status: " + status);
+            catch (System.AccessViolationException)
+            {
+            }
 
             NewX = new double[ballN];
             NewY = new double[ballN];
@@ -218,6 +236,7 @@ namespace hs071_cs
                 NewZ[i] = xyz[3 * i + 2];
             }
             new PrintTextDel(OutPut.WriteLine)("RunTime: " + OutPut.getElapsedTime(taskWatch));
+            return status;
         }
 
         //объемное заполнение внешнего шара
