@@ -43,13 +43,7 @@ namespace hs071_cs
 
             _ra = new double[trueRadiuses.Length];
             trueRadiuses.CopyTo(_ra, 0);
-            Balls = new Balls[balls.Length];
-            for (int index = 0; index < balls.Length; ++index)
-            {
-                Balls[index] = new Balls();
-            }
-
-            balls.CopyTo(Balls, 0);
+            Balls = balls;
             count = balls.Length;
             _groupCount = 0;
             for (int index = 0; index < count; ++index)
@@ -86,7 +80,7 @@ namespace hs071_cs
                 X[3 * count + index] = Balls[index].Radius;
             }
 
-            X[_n - 1] = 70.0;
+            X[_n - 1] = 250.0;
             _x_L = new double[_n];
             _x_U = new double[_n];
             for (int index = 0; index < count; ++index)

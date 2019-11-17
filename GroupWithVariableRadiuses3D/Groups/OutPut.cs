@@ -70,10 +70,10 @@ namespace hs071_cs
                 }
                 using (StreamWriter sw = new StreamWriter(writePath, appandFlag, System.Text.Encoding.Default))
                 {
-                    sw.Write(data.ballCount.ToString().Replace(',', '.')); // ballCount
-                    sw.Write(" ");
-                    sw.Write(data.holeCount.ToString().Replace(',', '.')); // holeCount
-                    sw.Write(" ");
+                    //sw.Write(data.ballCount.ToString().Replace(',', '.')); // ballCount
+                    //sw.Write(" ");
+                    //sw.Write(data.holeCount.ToString().Replace(',', '.')); // holeCount
+                    //sw.Write(" ");
                     sw.Write(allIteration.Count.ToString().Replace(',', '.')); // iteration Count
                     sw.WriteLine();
                     int counterXYZ = 0, // счетчик x,y,z

@@ -122,7 +122,7 @@ namespace Groups
         {
             for (int i = 0; i < balls.Length; i++)
             {
-                balls[i].Radius = Random.Next(0, 20);
+                balls[i].Radius = Random.Next(1, 20);
             }
         }
 
@@ -142,7 +142,7 @@ namespace Groups
             }
         }
 
-        internal void SetGroups(Balls[] balls, ref int varRadiuses)
+        internal (int groupCount, int elementsInGroup) SetGroups(Balls[] balls, ref int varRadiuses)
         {
             Console.WriteLine("Укажите кол. элементов в группе 3-15");
             int inGroupElements = 0;
@@ -183,6 +183,8 @@ namespace Groups
                 ++elementsCounter;
                 ++varRadiuses;
             }
+
+            return (groupNumber, inGroupElements);
         }
 
         #endregion

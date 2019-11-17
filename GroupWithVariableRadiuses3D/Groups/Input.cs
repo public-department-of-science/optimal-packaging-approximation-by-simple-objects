@@ -20,7 +20,7 @@ namespace hs071_cs
         {
             try
             {
-                string readPath = @"D:\p134.txt";
+                string readPath = @"D:\test1.txt";
                 FileInfo fileInfo = new FileInfo(readPath);
                 if (fileInfo.Exists)
                 {
@@ -42,7 +42,7 @@ namespace hs071_cs
                     string[] arrayOfLines = allReadedSymbols.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     TotalBallCount = Convert.ToInt32(arrayOfLines[0].Split(' ')[0].Trim()); // amount balls
 
-                    R = double.Parse(arrayOfLines[1].Split(' ')[0].Replace('.', ',').Trim()); // external radius
+                    R = double.Parse(arrayOfLines[1].Split(';')[0].Replace('.', ',').Trim()); // external radius
 
                     // check demention
                     if ((i - 1) != (TotalBallCount + 1)) /// (i-2)
@@ -63,10 +63,10 @@ namespace hs071_cs
                             {
                                 xyzrString[k] = xyzrString[k].Replace('.', ',').Trim();
                             }
-                            r[i - 2] = double.Parse(xyzrString[0]);
-                            x[i - 2] = double.Parse(xyzrString[1]);
-                            y[i - 2] = double.Parse(xyzrString[2]);
-                            z[i - 2] = double.Parse(xyzrString[3]);
+                            x[i - 2] = double.Parse(xyzrString[0]);
+                            y[i - 2] = double.Parse(xyzrString[1]);
+                            z[i - 2] = double.Parse(xyzrString[2]);
+                            r[i - 2] = double.Parse(xyzrString[03]);
                         }
                         OutPut.WriteLine("Data has been read!");
                     }
