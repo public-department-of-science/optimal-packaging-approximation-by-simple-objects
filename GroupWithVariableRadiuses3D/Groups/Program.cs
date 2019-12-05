@@ -11,7 +11,7 @@ namespace hs071_cs
     {
         private static Random _rnd = new Random();
         private static int ballN;
-        private static int _countVarR = 10; // количество кругов с переменным радиусом
+        private static int _countVarR = 0; // количество кругов с переменным радиусом
 
         public static void Main()
         {
@@ -23,6 +23,12 @@ namespace hs071_cs
             double[] rSortSum = null; // отсортированный массив радиусов, для ограничений
             int[] groups = new int[ballsCount];
             DataHelper dataHelper = new DataHelper();
+
+            double[] xNachFile = new double[ballsCount];
+            double[] yNachFile = new double[ballsCount];
+            double[] zNachFile = new double[ballsCount];
+            double[] rNachFile = new double[ballsCount];
+            double RNachFile = 0.0;
 
             double[] xNach = new double[ballsCount];
             double[] yNach = new double[ballsCount];
@@ -44,7 +50,7 @@ namespace hs071_cs
             #endregion
 
             fullTaskTime.Start();
-            ballN = ballsCount; // для использования вне Main (количество кругов)
+            ballN = ballsCount; // для использования вне Main (количеств1о кругов)
 
             Console.WriteLine("\nSelect input method \n 1 --> Read from File \n 2 --> Random generate");
 
@@ -58,33 +64,40 @@ namespace hs071_cs
                 default: return;
             }
 
+            Input.ReadFromFile(ref xNachFile, ref yNachFile, ref zNachFile, ref rNachFile, ref RNachFile, ref ballsCount, "");
+
             if (type == "1")
             {
-                Input.ReadFromFile(ref xNach, ref yNach, ref zNach, ref rNach, ref RNach, ref ballsCount, "");
                 //xyRRandomGenerateAvg1(ballsCount, rNach, ref xNach, ref yNach, ref zNach, ref RNach);
             }
 
-            if (type == "2")
-            {
-                /* Генерирования случайными числами начальных радиусов
-                 * *********************************************************************************/
-                Console.WriteLine("~~~ Генерирования случайными числами начальных радиусов ~~~");
-                Stopwatch stopWatch = new Stopwatch();
-                rNach = rRandomGenerate(maxRandRadius, ballsCount);
-                //rNach.OrderBy(a => a).ToArray();
-                rSortSum = raSumGenerate(rNach); // отсортированные радиусы r[0]; r[0] + r[1]; ...
-                                                 // генерируем начальные точки x,y,r,R
-                xyRRandomGenerateAvg(ballsCount, ref rNach, ref xNach, ref yNach, ref zNach, ref RNach);
-                Console.WriteLine("\n\t~~~ Генерируем точки с которых будем считать ~~~");
-                for (int i = 0; i < ballsCount; ++i)
-                {
-                    xIter[i] = xNach[i];
-                    yIter[i] = yNach[i];
-                    zIter[i] = zNach[i];
-                    rIter[i] = rNach[i];
-                }
-                RIter = RNach;
-            }
+            //if (type == "2")
+            //{
+            //    /* Генерирования случайными числами начальных радиусов
+            //     * *********************************************************************************/
+            //    Console.WriteLine("~~~ Генерирования случайными числами начальных радиусов ~~~");
+            //    Stopwatch stopWatch = new Stopwatch();
+            //    rNach = rRandomGenerate(maxRandRadius, ballsCount);
+            //    //rNach.OrderBy(a => a).ToArray();
+            //    rSortSum = raSumGenerate(rNach); // отсортированные радиусы r[0]; r[0] + r[1]; ...
+            //                                     // генерируем начальные точки x,y,r,R
+            //    xyRRandomGenerateAvg(ballsCount, ref rNach, ref xNach, ref yNach, ref zNach, ref RNach);
+            //    Console.WriteLine("\n\t~~~ Генерируем точки с которых будем считать ~~~");
+            //    for (int i = 0; i < ballsCount; ++i)
+            //    {
+            //        xIter[i] = xNach[i];
+            //        yIter[i] = yNach[i];
+            //        zIter[i] = zNach[i];
+            //        rIter[i] = rNach[i];
+            //    }
+            //    RIter = RNach;
+            //}
+
+            xNach = xNachFile;
+            yNach = yNachFile;
+            zNach = zNachFile;
+            rNach = rNachFile;
+            RIter = RNach = RNachFile;
 
             Console.WriteLine("=== Начальные значения ===");
             ShowData(xNach, yNach, zNach, rNach, RNach);
@@ -110,7 +123,7 @@ namespace hs071_cs
             xyzFixR[3 * ballsCount] = RNach;
 
             Stopwatch fixRTaskTime = new Stopwatch();
-            Data startPointData = new Data(xNach, yNach, zNach, rNach, RNach, ballsCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+            Data startPointData = new Data(xNach, yNach, zNach, rNachFile, RNach, ballsCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
             OutPut.SaveToFile(startPointData, $"FixRad-StartPoint-{RNach.ToString("0.00")}");
 
             using (FixedRadius3dAdaptor adaptor = new FixedRadius3dAdaptor(startPointData))
@@ -127,7 +140,7 @@ namespace hs071_cs
             var maxY = yNach.Max().ToString("0.00");
             var minZ = zNach.Min().ToString("0.00");
             var maxZ = zNach.Max().ToString("0.00");
-            startPointData = new Data(xIter, yIter, zIter, rNach.OrderBy(x => x).ToArray(), RIter, ballsCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
+            startPointData = new Data(xIter, yIter, zIter, rNachFile.OrderBy(x => x).ToArray(), RIter, ballsCount, 0, TaskClassification.FixedRadiusTask, type: null, Weight: null, C: null);
 
             var t = (fixRTaskTime.ElapsedMilliseconds / 1000).ToString();
             OutPut.SaveToFile(startPointData, $"FixedRad-{ballsCount}-{RNach.ToString("0.00")}-Time={t}sec-[{minX}$x${maxX}][{minY}$y${maxY}][{minZ}$z${maxZ}]");
@@ -164,8 +177,8 @@ namespace hs071_cs
                 balls[i].Odz.zL = zIter[i] - maxRandRadius;
                 balls[i].Odz.zU = zIter[i] + maxRandRadius;
                 balls[i].Odz.rL = 0;
-                balls[i].Odz.rU = rIter.Sum();
-                balls[i].Radius = rIter[i] * new Random().NextDouble();
+                balls[i].Odz.rU = rNachFile.Sum();
+                balls[i].Radius = rNachFile[i];// * new Random().NextDouble();
             }
 
             foreach (var item in balls)
@@ -174,7 +187,7 @@ namespace hs071_cs
             }
 
             dataHelper.RandomizeCoordinate(ref balls, xIter, yIter, zIter, ballsCount);
-            dataHelper.RandomizeRadiuses(ref balls, rIter, ballsCount);
+            dataHelper.RandomizeRadiuses(ref balls, rNachFile, ballsCount);
             var tuple = dataHelper.SetGroups(balls, ref _countVarR);
 
             IpoptReturnCode status;
