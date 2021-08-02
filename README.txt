@@ -1,3 +1,4 @@
+Wiki-page (https://en.wikipedia.org/wiki/Bin_packing_problem)
 For working with project you must have do next steps:
   -- 0) clone / download repository
   -- 1) Copy to system disk "C" folder LibIPOPT which you can find in the root of this repository (contain IpOprt library x64 and x86) ==> you must add / expend environment variable "Path" (with local path to Ipopt.dll-s)
